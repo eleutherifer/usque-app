@@ -11,6 +11,10 @@
 На адресах 162.159.198.\* и 162.159.199.\* возможны разные колокации, например:<br />
 162.159.198.\* - colo=HEL (аэропорт Хельсинки) <br />
 162.159.199.\* - colo=LED (аэропорт Пулково, Санкт-Петербург)
+
+Некоторые SNI на замену speed.cloudflare.com, которые на протоколе MASQUE h3 (TCP) работают не только с портами 443 и 8443, но и с портами 500, 1701, 4500, 4443 и 8095:<br />
+2gis.ru, apteka.ru, autonews.ru, beeline.ru, deepseek.com, mail.ru, max.ru, pochta.ru, profi.ru, psbank.ru, pypi.org, rt.ru, rutube.ru, sberbank.ru, vk.ru
+
 <p align="center">
   <img src="assets/branding/usque-readme-banner.png" alt="Usque — unofficial client compatible with Cloudflare WARP" width="100%">
 </p>
