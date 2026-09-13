@@ -12,7 +12,7 @@
 162.159.198.\* - colo=HEL (аэропорт Хельсинки) <br />
 162.159.199.\* - colo=LED (аэропорт Пулково, Санкт-Петербург)
 
-Некоторые SNI на замену speed.cloudflare.com, которые на протоколе MASQUE h3 (TCP) работают не только с портами 443 и 8443, но и с портами 500, 1701, 4500, 4443 и 8095:<br />
+Некоторые SNI на замену speed.cloudflare.com, которые на протоколе MASQUE h3 (TCP) работают, если для HTTP/3 (QUIC) включится проверка по белым спискам:<br />
 2gis.ru, apteka.ru, autonews.ru, beeline.ru, deepseek.com, mail.ru, profi.ru, psbank.ru, pypi.org, rt.ru, rutube.ru, vk.ru
 
 <p align="center">
