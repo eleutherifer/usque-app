@@ -1,19 +1,20 @@
 # В данном форке:
 - заменена используемая для регистрации ссылка на API на незабаненную ссылку на API для Zero Trust.
 # Возможные адреса эндпоинтов:
-162.159.198.\*, 162.159.199.\* - для обычных пользователей<br />
-162.159.197.\* - доступен только с Zero Trust<br />
-\* заменяем на:<br />
-- число 0 или число от 3 до 255 - только MASQUE h2 (TCP)<br />
-- число 1 - только MASQUE h3 (UDP)<br />
-- число 2 - MASQUE h3 (UDP) или MASQUE h2 (TCP)<br />
+162.159.198.\*, 162.159.199.\* - для обычных пользователей  
+162.159.197.\* - доступен только с Zero Trust  
+\* заменяем на:  
+- число 0 или число от 3 до 255 - только MASQUE h2 (TCP)  
+- число 1 - только MASQUE h3 (UDP)  
+- число 2 - MASQUE h3 (UDP) или MASQUE h2 (TCP)  
 
-На адресах 162.159.198.\* и 162.159.199.\* возможны разные колокации, например:<br />
-162.159.198.\* - colo=HEL (аэропорт Хельсинки) <br />
+На адресах 162.159.198.\* и 162.159.199.\* возможны разные колокации, например:  
+162.159.198.\* - colo=HEL (аэропорт Хельсинки)  
 162.159.199.\* - colo=LED (аэропорт Пулково, Санкт-Петербург)
 
-Некоторые SNI на замену speed.cloudflare.com, которые на протоколе MASQUE h3 (TCP) работают, если для HTTP/3 (QUIC) включится проверка по белым спискам:<br />
-2gis.ru, apteka.ru, autonews.ru, beeline.ru, deepseek.com, mail.ru, profi.ru, psbank.ru, pypi.org, rt.ru, rutube.ru, vk.ru
+Некоторые SNI на замену speed.cloudflare.com, которые на протоколе MASQUE h3 (TCP) работают, если для HTTP/3 (QUIC) включится проверка по белым спискам:  
+360tv.ru, nplus1.ru (эти два находятся в сети Cloudflare),  
+а также 2gis.ru, apteka.ru, autonews.ru, beeline.ru, deepseek.com, joomag.com, mail.ru, profi.ru, psbank.ru, pypi.org, rt.ru, rutube.ru, vk.ru
 
 <p align="center">
   <img src="assets/branding/usque-readme-banner.png" alt="Usque — unofficial client compatible with Cloudflare WARP" width="100%">
