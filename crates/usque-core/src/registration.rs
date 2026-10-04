@@ -16,14 +16,14 @@ use crate::identity::{
     ConsumerEntitlement, EndpointPin, IdentityError, IdentityProvider, MasqueKeyPair, WarpIdentity,
 };
 
-const API_ROOT: &str = "https://api.cloudflareclient.com/";
+const API_ROOT: &str = "https://api.devices.cloudflare.com/";
 const API_VERSION: &str = "v0a4471";
 const CF_CLIENT_VERSION: &str = "a-6.35-4471";
 const MAX_API_RESPONSE_BYTES: usize = 1024 * 1024;
 const MAX_ZERO_TRUST_CALLBACK_BYTES: usize = 64 * 1024;
 pub const ZERO_TRUST_SNI: &str = "zt-masque.cloudflareclient.com";
 pub const ZERO_TRUST_PORT: u16 = 443;
-pub const REGISTRATION_API_HOST: &str = "api.cloudflareclient.com";
+pub const REGISTRATION_API_HOST: &str = "api.devices.cloudflare.com";
 pub const REGISTRATION_API_PORT: u16 = 443;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
