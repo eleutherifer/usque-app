@@ -6,6 +6,7 @@ const Map<String, String> kUiWorkflowZhTw = <String, String>{
   'preview_restart_onboarding': '重新開始首次引導',
   'home_local_proxies': '本機代理',
   'home_manage_proxies': '管理代理',
+  'home_exit_ip': '出口 IP：',
   'home_enabled_interfaces': '已啟用：{interfaces}',
   'home_system_proxy': '系統代理',
   'home_tun_hint': '接管本機應用程式的流量',
@@ -60,6 +61,7 @@ const Map<String, String> kUiWorkflowZhTw = <String, String>{
   'application_group': '應用程式',
   'tools_group': '工具',
   'reset_draft_hint': '預設值會填入此表單，按「套用變更」後才會生效。',
+  'error_generic': '發生錯誤',
 };
 
 const Map<String, String> kNetworkQualityZhTw = <String, String>{

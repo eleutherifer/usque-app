@@ -21,6 +21,7 @@ For setup and practical tutorials, start with the Wiki: [English](https://github
 | [Installation and removal](INSTALLATION.md) | Package verification, upgrades, uninstall, recovery, and version applicability / 校验、升级、卸载、恢复与适用版本 |
 | [Network Doctor](network-doctor.md) | Run checks, read results, and export a local report / 运行检查、理解结果与导出诊断 |
 | [Direct DNS](encrypted-direct-dns.md) | Choose System, DoH or DoT and fill in resolver settings / 选择直连 DNS 模式与填写服务器配置 |
+| [WARP® exit DNS](WARP_DNS.md) | Configure Plain DNS, DoH or DoT inside the WARP tunnel / 配置 WARP 隧道内普通 DNS、DoH、DoT |
 | [WARP via WireGuard](WARP_WIREGUARD.md) | Generate/import WARP configurations and edit endpoints / 生成、导入 WARP 配置与编辑端点 |
 | [Chain proxy](CHAIN_PROXY.md) | OpenVPN, WireGuard, WARP via WireGuard, VPN Gate, HTTP, SOCKS5: configure, select and apply / 导入、选用与应用 |
 | Proton VPN over MASQUE: [English](https://github.com/GeorgeXie2333/usque-app/wiki/Proton-VPN-over-MASQUE) / [简体中文](https://github.com/GeorgeXie2333/usque-app/wiki/Proton-VPN-over-MASQUE-zh-CN) | Download a WireGuard configuration, import, apply, verify the exit and troubleshoot / 下载 WireGuard 配置、导入、应用、验证出口与排障 |
@@ -40,6 +41,7 @@ For setup and practical tutorials, start with the Wiki: [English](https://github
 | [Linux and WSL development](LINUX_DEVELOPMENT.md) | Native tools, debug UI preview, hot reload and checks / Linux 工具、模拟界面预览、热重载与检查 |
 | [Country flags](COUNTRY_FLAGS.md) | Bundled assets, attribution and update checks / 内置旗帜资源、来源与更新检查 |
 | [Release process](RELEASE.md) | Candidate preparation, approval, signing, and publication / 候选包、审批、签名与发布 |
+| [v0.3.0 readiness review](RELEASE_V0.3.0_READINESS.md) | Reviewed source, documentation checks, version synchronization and remaining release requirements / 审查源码、文档检查、版本同步与发布待办 |
 | [Flutter release symbols](FLUTTER_SYMBOLS.md) | Separate and archive matching Dart symbols; restore stack traces / 分离、归档 Dart 符号与还原堆栈 |
 | [Code signing policy](CODE_SIGNING.md) | Official identities, key handling, and rotation / 官方签名身份、密钥管理与轮换 |
 | [GitHub governance](GITHUB_GOVERNANCE.md) | Repository checks, permissions, and maintainer rules / 仓库检查、权限与维护规则 |
@@ -102,11 +104,14 @@ Common terms in these references:
 | [Chain proxy validation](CHAIN_PROXY_VALIDATION.md) | Native builds, protocol/UI tests and size comparisons / 原生编译、协议与界面测试、体积对照 |
 | [Chain proxy fixes](CHAIN_PROXY_FIX_VALIDATION.md) | Import, DNS, queues, authentication, multiple endpoints and candidate-specific regressions / 导入、DNS、队列、认证、多端点修复与回归 |
 | [Custom bypass validation](BYPASS_SETTINGS_VALIDATION.md) | Custom target routing, configuration compatibility, editor checks and unavailable isolated validation / 自定义目标分流、兼容性、编辑器检查及未执行的隔离验证 |
+| [Windows setup validation](WINDOWS_SETUP_VALIDATION.md) | Native setup/uninstall implementation, local checks and unavailable isolated validation / 原生安装与卸载、已执行检查与未运行的隔离验证 |
 | [Chain DNS follow-up](CHAIN_DNS_VALIDATION.md) | DNS receive cancellation, TCP alternatives, and explicitly authorized SOCKS-only measurements / DNS 接收竞态、TCP 备用及无 TUN 代理实测 |
 | [WARP WireGuard validation](WARP_WIREGUARD_VALIDATION.md) | Discovery, storage, platform checks and artifact sizes / 扫描、存储、平台检查与产物体积 |
 | [WARP WireGuard registration fix](WARP_WIREGUARD_REGISTRATION_FIX.md) | wgcf registration compatibility, endpoint parsing, disconnected tasks and regression results / 注册兼容、端点解析、未连接任务与回归验证 |
 | [WARP single-port scan](WARP_WIREGUARD_SCAN_VALIDATION.md) | One port per IP, saved-job compatibility, overlapping HTTPS and validation limits / 每 IP 单端口、任务兼容、并行 HTTPS 与验证边界 |
+| [Brand migration validation](LOGO_MIGRATION_VALIDATION.md) | Shared master, themed logos, platform icons, visual review and unavailable checks / 统一母版、主题 Logo、平台图标、视觉审阅与未运行检查 |
 | [Automatic endpoint validation](AUTOMATIC_ENDPOINTS_VALIDATION.md) | Pool selection, concurrent startup, native authorization, UI checks and unavailable live validation / 端点池、并发连接、原生授权、界面检查与未运行的实网验证 |
+| [Zero Trust endpoint editing validation](ZERO_TRUST_ENDPOINTS_VALIDATION.md) | Risk confirmation, account overrides, registration reset, platform checks and unavailable live validation / 风险确认、账号地址覆盖、注册地址恢复、平台检查与未运行的实网验证 |
 
 Historical results apply only to the recorded candidate and environment. Some
 records identify a baseline plus uncommitted work rather than a reproducible
@@ -129,3 +134,7 @@ changes are recorded separately for
 [smoltcp integration](../third_party/ts_netstack_smoltcp_core/PATCHES.md), and
 [Wintun provenance](../third_party/wintun-0.14.1/SOURCE.md).
 Do not rewrite frozen upstream documents as product instructions.
+
+---
+
+WARP is a trademark and/or registered trademark of Cloudflare, Inc. in the United States and other jurisdictions.

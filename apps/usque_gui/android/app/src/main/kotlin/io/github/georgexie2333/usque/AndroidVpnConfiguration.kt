@@ -24,26 +24,19 @@ internal data class AndroidVpnProfile(
     val vpnGateEnabled: Boolean = false,
     val customChain: Boolean = false,
     val proxyChainEnabled: Boolean = false,
+    val warpDnsMode: String = "plain",
 ) {
     // ipPolicy controls only the physical MASQUE endpoint. CONNECT-IP remains
     // dual-stack regardless of which outer address family carries it.
-    val includeIpv4: Boolean
-        get() = true
-
-    val includeIpv6: Boolean
-        get() = true
-
     val dnsServers: List<InetAddress>
-        get() =
-            buildList {
-                if (includeIpv4) add(dnsIpv4)
-                if (includeIpv6) add(dnsIpv6)
-            }
+        get() = listOf(dnsIpv4, dnsIpv6)
 
     val splitDnsEnabled: Boolean
         get() =
             (geoDirectCountries.isNotEmpty() || bypassDomains.isNotEmpty()) ||
-                (vpnGateEnabled && (dnsMode == "tunnel" || customChain)) || (dataPlane == "l4_proxy" && !vpnGateEnabled)
+                (vpnGateEnabled && (dnsMode == "tunnel" || customChain)) ||
+                (dataPlane == "l4_proxy" && !vpnGateEnabled) ||
+                (warpDnsMode != "plain" && !vpnGateEnabled)
 
     val requiresPhysicalDns: Boolean
         get() = (geoDirectCountries.isNotEmpty() || bypassDomains.isNotEmpty()) && directDnsMode == "physicalSystem"
@@ -103,13 +96,17 @@ internal data class AndroidVpnProfile(
                 parseNumericAddress(source.requiredString("dns_v4", 64), false) as Inet4Address
             val dnsIpv6 =
                 parseNumericAddress(source.requiredString("dns_v6", 128), true) as Inet6Address
+            val warpDnsMode = source.optJSONObject("warp_dns")?.optString("mode", "plain") ?: "plain"
+            require(warpDnsMode in setOf("plain", "doh", "dot")) { "Invalid WARP DNS mode" }
+            val ordinaryEncryptedDns = warpDnsMode != "plain" && !ChainProfileFields.enabled(source)
             val endpointIpv4 =
                 parseNumericAddress(source.requiredString("endpoint_v4", 64), false) as Inet4Address
             val endpointIpv6 =
                 parseNumericAddress(source.requiredString("endpoint_v6", 128), true) as Inet6Address
             val endpointSelection = source.optString("endpoint_selection", "custom")
             require(endpointSelection in setOf("automatic", "custom")) { "Invalid endpoint selection" }
-            val activeDnsServers = listOf(dnsIpv4, dnsIpv6)
+            val configuredDnsServers = listOf(dnsIpv4, dnsIpv6)
+            val activeDnsServers = if (ordinaryEncryptedDns) emptyList() else configuredDnsServers
             if (endpointSelection == "custom") {
                 require(
                     activeDnsServers.none { server -> server == endpointIpv4 || server == endpointIpv6 },
@@ -119,7 +116,7 @@ internal data class AndroidVpnProfile(
             // Automatic selection filters DNS clashes against real candidates
             // in Rust; the dormant custom pair does not describe that pool.
             require(
-                activeDnsServers.none { server ->
+                configuredDnsServers.none { server ->
                     server.isAnyLocalAddress ||
                         server.isLoopbackAddress ||
                         server.isLinkLocalAddress ||
@@ -154,6 +151,7 @@ internal data class AndroidVpnProfile(
                 geoDirectCountries = geoDirectCountries,
                 bypassDomains = source.optJSONArray("bypass_domains")?.domainStrings() ?: emptyList(),
                 directDnsMode = directDnsMode,
+                warpDnsMode = warpDnsMode,
             )
         }
     }

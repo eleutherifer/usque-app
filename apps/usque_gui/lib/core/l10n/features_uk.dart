@@ -6,6 +6,7 @@ const Map<String, String> kUiWorkflowUk = <String, String>{
   'preview_restart_onboarding': 'Почати налаштування заново',
   'home_local_proxies': 'Локальні проксі',
   'home_manage_proxies': 'Керування проксі',
+  'home_exit_ip': 'Вихідна IP:',
   'home_enabled_interfaces': 'Увімкнено: {interfaces}',
   'home_system_proxy': 'Системний проксі',
   'home_tun_hint': 'Перехоплює трафік застосунків на цьому пристрої',
@@ -68,6 +69,7 @@ const Map<String, String> kUiWorkflowUk = <String, String>{
   'reset_draft_hint':
       'У форму буде завантажено типові значення. Застосуйте зміни, '
       'щоб вони набрали чинності.',
+  'error_generic': 'Сталася помилка',
 };
 
 const kNetworkQualityUk = <String, String>{

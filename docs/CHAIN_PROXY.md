@@ -5,7 +5,7 @@ selector: six choices that always use this order:
 
 1. **OpenVPN**
 2. **WireGuard**
-3. **WARP via WireGuard**
+3. **WARP® via WireGuard**
 4. **VPN Gate**
 5. **HTTP**
 6. **SOCKS5**
@@ -228,7 +228,7 @@ network-interface address candidates that WebRTC or other browser APIs can expos
 it is not a guarantee that every browser-reported address is the proxy address.
 
 HTTP/SOCKS5 defaults to encrypted DNS through the final proxy. In **Add proxy →
-DNS**, **Automatic (DoH by default)** uses Cloudflare DoH at
+DNS**, **Automatic (DoH by default)** uses Cloudflare® DoH at
 `cloudflare-dns.com/dns-query` over verified TLS and HTTP/2. Fixed numeric
 bootstrap addresses also use the final exit. Custom chain DNS, non-default
 inherited DNS and an explicit local DNS choice retain TCP DNS. **Encrypted DNS ·
@@ -483,7 +483,7 @@ at most one second, shortened when necessary to reserve time for later candidate
 Truncated UDP responses retry TCP immediately. TCP connections are reused within
 the same final session; cancelled or invalid exchanges are never returned to the
 pool. Valid NXDOMAIN/NODATA answers are terminal. Direct-rule DNS retains its
-separate policy. Endpoint resolution through WARP is also separate.
+separate policy. Endpoint resolution through the WARP tunnel is also separate.
 
 WireGuard defaults to inner MTU 1280, with explicit MTU in the project's 1280–9000
 range. Its imported MTU controls the final interface; it is not capped by the WARP
@@ -602,7 +602,7 @@ The explicit clear-all-data workflow removes these objects after disconnecting.
 | [BoringTun](https://docs.rs/crate/boringtun/0.7.1) | `=0.7.1`, Rust protocol API, default features disabled | BSD-3-Clause |
 | OpenVPN 3 Core + Mbed TLS | Existing embedded native bridge; TCP and UDP | OpenVPN 3 Core used under MPL-2.0 (offered as AGPL-3.0-only or MPL-2.0); Mbed TLS used under Apache-2.0; see [native source notices](VPN_GATE.md#sources-licenses-and-validation) |
 | [flutter_svg](https://pub.dev/packages/flutter_svg/versions/2.3.0) | `2.3.0`, local SVG assets | MIT |
-| smoltcp | `=0.13.1`, existing stack with 16 KiB fragmentation buffer | 0BSD |
+| smoltcp | `=0.14.0`, existing stack with 16 KiB fragmentation buffer | 0BSD |
 
 Cargo and Flutter lockfiles contain transitive versions and checksums. BoringTun's
 CLI, OS tunnel/device layer, JNI and C FFI features are not enabled. The
@@ -626,7 +626,8 @@ for the workstation and isolated-runner boundaries.
 
 ## Imported record compatibility / 导入记录兼容
 
-Shared settings are schema 21 and store only configuration references, plus the
+The [shared configuration](../crates/usque-core/src/config/mod.rs) stores chain
+configuration references, plus the
 optional **WARP via WireGuard** endpoint override (`ChainExitSettings` IPC fields
 5/6). HTTP/SOCKS5 records use version 5, appending `dns_transport` (`auto`, `doh`, `tcp`);
 version 4 reads reconstruct only the appended metadata without rewriting credentials,
@@ -643,7 +644,7 @@ authentication mode before connecting. No automatic rewrite or batch deletion
 occurs. Windows selection commits and deletion hold the configuration transaction
 before the library lock, so concurrent operations cannot leave a dangling reference.
 
-共享设置为 schema 21，仅保存配置引用，以及 **WARP via WireGuard** 可选的端点
+共享配置保存链式配置引用，以及 **WARP via WireGuard** 可选的端点
 覆盖（IPC `ChainExitSettings` 字段 5/6）。HTTP/SOCKS5 加密对象写入版本 5，新增 `dns_transport`（`auto`、`doh`、`tcp`）；
 读取版本 4 只补齐新元数据，不重写凭据、ID 或版本引用。旧客户端拒绝 v5。
 修改链 DNS 模式需添加替代配置，共享 DNS 策略变更会重建会话。VPN 对象仍写入
@@ -653,3 +654,7 @@ before the library lock, so concurrent operations cannot leave a dangling refere
 历史较大记录可读取、删除，再次修改超限时保留原对象。旧版缺少认证方式的记录
 可管理，但必须重新导入有效配置后才能连接。Windows 删除与选用共用配置事务，
 避免并发操作留下失效引用。
+
+---
+
+Cloudflare and WARP are trademarks and/or registered trademarks of Cloudflare, Inc. in the United States and other jurisdictions.

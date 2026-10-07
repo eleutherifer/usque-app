@@ -1,5 +1,14 @@
 /// Dutch UI catalog.
 const Map<String, String> kNlCatalog = <String, String>{
+  'warp_dns_type': 'WARP-DNS',
+  'warp_dns_bootstrap_optional': 'Optioneel',
+  'warp_dns_plain': 'Gewone DNS',
+  'warp_dns_unsupported': 'Versleutelde DNS niet beschikbaar',
+  'warp_dns_invalid_mode': 'Niet-ondersteund DNS-type',
+  'warp_dns_invalid_name': 'Voer een servernaam in',
+  'warp_dns_invalid_path': 'Voer een geldig pad in',
+  'warp_dns_invalid_bootstrap': 'Voer 1–8 IP-adressen in',
+
   'disable_quic': "QUIC uitschakelen",
   'disable_quic_managed': 'Automatisch beheerd door deze verbinding',
   'disable_quic_help':
@@ -28,6 +37,13 @@ const Map<String, String> kNlCatalog = <String, String>{
   'tray_connect_profile': 'Actief account verbinden',
   'tray_disconnect_profile': 'Actief account verbreken',
   'tray_disconnect_exit': 'Verbreken en afsluiten',
+  'notice_connection_interrupted':
+      'De verbinding is onderbroken. Usque probeert deze te herstellen.',
+  'notice_connection_failed':
+      'Usque kon de verbinding niet behouden. Open Usque voor details.',
+  'notice_connection_restored': 'De verbinding is hersteld.',
+  'notice_kill_switch_blocking':
+      'Kill Switch blokkeert netwerkverkeer totdat de verbinding is hersteld of je de verbinding verbreekt.',
   'connection_status': 'Verbindingsstatus',
   'outputs': '{tunnel} en lokale proxy’s',
   'home': 'Start',
@@ -107,8 +123,24 @@ const Map<String, String> kNlCatalog = <String, String>{
       'Meld je opnieuw aan bij dezelfde organisatie om dit account weer te verbinden.',
   'zero_trust_metadata_missing':
       'De opgeslagen organisatiegegevens zijn onvolledig. Voeg een nieuw Zero Trust-account toe en meld je opnieuw aan.',
-  'zero_trust_endpoint_managed':
-      'Het organisatieaccount bepaalt dit serveradres. Je kunt het hier niet wijzigen.',
+  "zero_trust_endpoint_home_risk_title":
+      "Risico van aangepaste Zero Trust-eindpunten",
+  "zero_trust_endpoint_home_risk_body":
+      "Aangepaste Zero Trust-eindpunten kunnen je privacy en gegevensbeveiliging in gevaar brengen. Gebruik alleen vertrouwde eindpunten waarvoor je toestemming hebt.",
+  "zero_trust_endpoint_edit": "Zero Trust-eindpunten bewerken",
+  "zero_trust_endpoint_risk_title":
+      "Risico's van het wijzigen van Zero Trust-eindpunten",
+  "zero_trust_endpoint_risk_body":
+      "Eindpunten van onbekende herkomst kunnen je privacy en gegevensbeveiliging in gevaar brengen.\n\nOnjuiste adressen kunnen verbindingen verhinderen.\n\nGebruik alleen vertrouwde eindpunten waarvoor je toestemming hebt en volg de eisen van je organisatie.",
+  "zero_trust_endpoint_risk_ack":
+      "Ik begrijp de risico's en bevestig dat ik dit eindpunt mag gebruiken.",
+  "zero_trust_endpoint_risk_continue": "Risico's accepteren en doorgaan",
+  "zero_trust_endpoint_risk_locked":
+      "Bevestig de risico's voordat je deze adressen bewerkt.",
+  "zero_trust_endpoint_unsupported":
+      "Werk Usque bij om Zero Trust-eindpunten te bewerken.",
+  "zero_trust_reauth_endpoints":
+      "Opnieuw aanmelden herstelt de geregistreerde eindpuntadressen en verwijdert je aangepaste adressen.",
   'experimental': 'Experimenteel',
   'show_license': 'License Key tonen',
   'hide_license': 'License Key verbergen',
@@ -324,7 +356,7 @@ const Map<String, String> kNlCatalog = <String, String>{
       'Controleer verbindingsproblemen, exporteer logboeken en beheer lokale gegevens.',
   'engine_status': 'Verbindingsinformatie',
   'version': 'Versie',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Lokale logboeken',
   'export_diagnostics': 'Diagnostisch pakket exporteren',
   'diagnostics_saved': 'Diagnostisch pakket opgeslagen in',
@@ -337,7 +369,9 @@ const Map<String, String> kNlCatalog = <String, String>{
       'Dit kan niet ongedaan worden gemaakt. Usque verbreekt de verbinding, verwijdert alle accounts en aanmeldgegevens en keert terug naar de eerste installatie.',
   'clear_all_data_complete': 'Alle lokale Usque-gegevens zijn gewist.',
   'unofficial':
-      'Onofficiële client die compatibel is met Cloudflare WARP. Niet gelieerd aan of goedgekeurd door Cloudflare.',
+      'Onofficiële client die compatibel is met de diensten van Cloudflare® WARP®. Niet gelieerd aan, gesponsord door of goedgekeurd door Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare en WARP zijn handelsmerken en/of geregistreerde handelsmerken van Cloudflare, Inc. in de Verenigde Staten en andere rechtsgebieden.',
   'welcome_title': 'Welkom bij Usque',
   'setup_progress': 'Instelstap {current} van {total}',
   'get_started': 'Aan de slag',

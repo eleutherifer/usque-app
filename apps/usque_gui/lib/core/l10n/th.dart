@@ -1,5 +1,14 @@
 /// Thai UI catalog.
 const Map<String, String> kThCatalog = <String, String>{
+  'warp_dns_type': 'DNS ของ WARP',
+  'warp_dns_bootstrap_optional': 'ไม่บังคับ',
+  'warp_dns_plain': 'DNS ปกติ',
+  'warp_dns_unsupported': 'DNS แบบเข้ารหัสไม่พร้อมใช้งาน',
+  'warp_dns_invalid_mode': 'ไม่รองรับประเภท DNS นี้',
+  'warp_dns_invalid_name': 'ป้อนชื่อเซิร์ฟเวอร์',
+  'warp_dns_invalid_path': 'ป้อนเส้นทางที่ถูกต้อง',
+  'warp_dns_invalid_bootstrap': 'ป้อนที่อยู่ IP 1–8 รายการ',
+
   'disable_quic': "ปิดใช้งาน QUIC",
   'disable_quic_managed': 'จัดการโดยอัตโนมัติตามการเชื่อมต่อปัจจุบัน',
   'disable_quic_help':
@@ -27,6 +36,13 @@ const Map<String, String> kThCatalog = <String, String>{
   'tray_connect_profile': 'เชื่อมต่อบัญชีที่ใช้งาน',
   'tray_disconnect_profile': 'ตัดการเชื่อมต่อบัญชีที่ใช้งาน',
   'tray_disconnect_exit': 'ตัดการเชื่อมต่อแล้วออก',
+  'notice_connection_interrupted':
+      'การเชื่อมต่อถูกขัดจังหวะ Usque กำลังพยายามกู้คืน',
+  'notice_connection_failed':
+      'Usque ไม่สามารถรักษาการเชื่อมต่อไว้ได้ เปิด Usque เพื่อดูรายละเอียด',
+  'notice_connection_restored': 'กู้คืนการเชื่อมต่อแล้ว',
+  'notice_kill_switch_blocking':
+      'Kill Switch กำลังบล็อกการรับส่งข้อมูลเครือข่ายจนกว่าการเชื่อมต่อจะกลับมาหรือคุณตัดการเชื่อมต่อ',
   'connection_status': 'สถานะการเชื่อมต่อ',
   'outputs': '{tunnel} และพร็อกซีภายในเครื่อง',
   'home': 'หน้าหลัก',
@@ -104,8 +120,22 @@ const Map<String, String> kThCatalog = <String, String>{
       'เข้าสู่ระบบองค์กรเดิมอีกครั้งเพื่อกู้คืนการเชื่อมต่อของบัญชีนี้',
   'zero_trust_metadata_missing':
       'ข้อมูลองค์กรที่บันทึกไว้ไม่ครบ เพิ่มบัญชี Zero Trust ใหม่แล้วเข้าสู่ระบบ',
-  'zero_trust_endpoint_managed':
-      'บัญชีองค์กรเป็นผู้กำหนดที่อยู่เซิร์ฟเวอร์ จึงแก้ไขที่นี่ไม่ได้',
+  "zero_trust_endpoint_home_risk_title":
+      "ความเสี่ยงของปลายทาง Zero Trust ที่กำหนดเอง",
+  "zero_trust_endpoint_home_risk_body":
+      "ปลายทาง Zero Trust ที่กำหนดเองอาจทำให้ความเป็นส่วนตัวและความปลอดภัยของข้อมูลมีความเสี่ยง ใช้เฉพาะปลายทางที่เชื่อถือได้และคุณได้รับอนุญาตให้เข้าถึง",
+  "zero_trust_endpoint_edit": "แก้ไขปลายทาง Zero Trust",
+  "zero_trust_endpoint_risk_title": "ความเสี่ยงในการเปลี่ยนปลายทาง Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "ปลายทางจากแหล่งที่ไม่รู้จักอาจทำให้ความเป็นส่วนตัวและความปลอดภัยของข้อมูลมีความเสี่ยง\n\nที่อยู่ไม่ถูกต้องอาจทำให้เชื่อมต่อไม่ได้\n\nใช้เฉพาะปลายทางที่เชื่อถือได้และคุณได้รับอนุญาตให้เข้าถึง และปฏิบัติตามข้อกำหนดขององค์กร",
+  "zero_trust_endpoint_risk_ack":
+      "ฉันเข้าใจความเสี่ยงและยืนยันว่ามีสิทธิ์ใช้ปลายทางนี้",
+  "zero_trust_endpoint_risk_continue": "ยอมรับความเสี่ยงและแก้ไขต่อ",
+  "zero_trust_endpoint_risk_locked": "ยืนยันความเสี่ยงก่อนแก้ไขที่อยู่เหล่านี้",
+  "zero_trust_endpoint_unsupported":
+      "อัปเดต Usque เพื่อแก้ไขปลายทาง Zero Trust",
+  "zero_trust_reauth_endpoints":
+      "การเข้าสู่ระบบอีกครั้งจะคืนค่าที่อยู่ปลายทางที่ลงทะเบียนไว้และลบที่อยู่ที่กำหนดเอง",
   'experimental': 'ทดลองใช้',
   'show_license': 'แสดง License Key',
   'hide_license': 'ซ่อน License Key',
@@ -318,7 +348,7 @@ const Map<String, String> kThCatalog = <String, String>{
       'ตรวจสอบปัญหาการเชื่อมต่อ ส่งออกบันทึก และจัดการข้อมูลในเครื่อง',
   'engine_status': 'ข้อมูลการเชื่อมต่อ',
   'version': 'เวอร์ชัน',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'บันทึกในเครื่อง',
   'export_diagnostics': 'ส่งออกชุดการวินิจฉัย',
   'diagnostics_saved': 'บันทึกชุดการวินิจฉัยไปที่',
@@ -331,7 +361,9 @@ const Map<String, String> kThCatalog = <String, String>{
       'ย้อนกลับการดำเนินการนี้ไม่ได้ การเชื่อมต่อจะถูกตัด ทุกบัญชีและข้อมูลเข้าสู่ระบบจะถูกลบ และแอปจะกลับไปที่การตั้งค่าเริ่มต้น',
   'clear_all_data_complete': 'ล้างข้อมูล Usque ในเครื่องทั้งหมดแล้ว',
   'unofficial':
-      'ไคลเอนต์ที่ไม่เป็นทางการ ที่ใช้กับ Cloudflare WARP ได้ ไม่มีส่วนเกี่ยวข้องหรือการรับรองจาก Cloudflare',
+      'ไคลเอนต์ที่ไม่เป็นทางการและเข้ากันได้กับบริการ Cloudflare® WARP® ไม่มีส่วนเกี่ยวข้อง ไม่ได้รับการสนับสนุนหรือการรับรองจาก Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare และ WARP เป็นเครื่องหมายการค้าและ/หรือเครื่องหมายการค้าจดทะเบียนของ Cloudflare, Inc. ในสหรัฐอเมริกาและเขตอำนาจศาลอื่น ๆ',
   'welcome_title': 'ยินดีต้อนรับสู่ Usque',
   'setup_progress': 'ขั้นตอนการตั้งค่า {current} จาก {total}',
   'get_started': 'เริ่มต้นใช้งาน',

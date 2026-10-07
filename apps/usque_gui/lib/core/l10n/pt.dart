@@ -1,5 +1,14 @@
 /// Portuguese (Brazil) UI catalog.
 const Map<String, String> kPtCatalog = <String, String>{
+  'warp_dns_type': 'DNS do WARP',
+  'warp_dns_bootstrap_optional': 'Opcional',
+  'warp_dns_plain': 'DNS comum',
+  'warp_dns_unsupported': 'DNS criptografado indisponível',
+  'warp_dns_invalid_mode': 'Tipo de DNS não compatível',
+  'warp_dns_invalid_name': 'Digite o nome do servidor',
+  'warp_dns_invalid_path': 'Digite um caminho válido',
+  'warp_dns_invalid_bootstrap': 'Digite de 1 a 8 endereços IP',
+
   'disable_quic': "Desativar QUIC",
   'disable_quic_managed': 'Gerenciado automaticamente por esta conexão',
   'disable_quic_help':
@@ -28,6 +37,13 @@ const Map<String, String> kPtCatalog = <String, String>{
   'tray_connect_profile': 'Conectar a conta ativa',
   'tray_disconnect_profile': 'Desconectar a conta ativa',
   'tray_disconnect_exit': 'Desconectar e sair',
+  'notice_connection_interrupted':
+      'A conexão foi interrompida. O Usque está tentando restaurá-la.',
+  'notice_connection_failed':
+      'O Usque não conseguiu manter a conexão. Abra o Usque para ver os detalhes.',
+  'notice_connection_restored': 'A conexão foi restaurada.',
+  'notice_kill_switch_blocking':
+      'O Kill Switch está bloqueando o tráfego de rede até que a conexão seja restaurada ou você se desconecte.',
   'connection_status': 'Status da conexão',
   'outputs': '{tunnel} e proxies locais',
   'home': 'Início',
@@ -108,8 +124,23 @@ const Map<String, String> kPtCatalog = <String, String>{
       'Entre novamente na mesma organização para recuperar a conexão desta conta.',
   'zero_trust_metadata_missing':
       'Os dados salvos da organização estão incompletos. Adicione outra conta Zero Trust e entre novamente.',
-  'zero_trust_endpoint_managed':
-      'A conta da organização define este endereço de servidor. Ele não pode ser alterado aqui.',
+  "zero_trust_endpoint_home_risk_title":
+      "Risco dos endpoints Zero Trust personalizados",
+  "zero_trust_endpoint_home_risk_body":
+      "Endpoints Zero Trust personalizados podem colocar sua privacidade e a segurança dos dados em risco. Use apenas endpoints confiáveis aos quais você tem autorização de acesso.",
+  "zero_trust_endpoint_edit": "Editar endpoints Zero Trust",
+  "zero_trust_endpoint_risk_title": "Riscos de alterar endpoints Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Endpoints de origem desconhecida podem colocar sua privacidade e a segurança dos dados em risco.\n\nEndereços incorretos podem impedir a conexão.\n\nUse apenas endpoints confiáveis aos quais você tem autorização de acesso e respeite os requisitos da organização.",
+  "zero_trust_endpoint_risk_ack":
+      "Entendo os riscos e confirmo que tenho autorização para usar este endpoint.",
+  "zero_trust_endpoint_risk_continue": "Aceitar riscos e continuar",
+  "zero_trust_endpoint_risk_locked":
+      "Confirme os riscos antes de editar estes endereços.",
+  "zero_trust_endpoint_unsupported":
+      "Atualize o Usque para editar endpoints Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Entrar novamente restaura os endereços registrados e remove seus endereços personalizados.",
   'experimental': 'Experimental',
   'show_license': 'Mostrar License Key',
   'hide_license': 'Ocultar License Key',
@@ -326,7 +357,7 @@ const Map<String, String> kPtCatalog = <String, String>{
       'Verifique problemas de conexão, exporte registros e gerencie os dados locais.',
   'engine_status': 'Informações da conexão',
   'version': 'Versão',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Logs locais',
   'export_diagnostics': 'Exportar pacote de diagnóstico',
   'diagnostics_saved': 'Pacote de diagnóstico salvo em',
@@ -339,7 +370,9 @@ const Map<String, String> kPtCatalog = <String, String>{
       'Não é possível desfazer. O Usque desconectará, apagará todas as contas e dados de login e voltará à configuração inicial.',
   'clear_all_data_complete': 'Todos os dados locais do Usque foram limpos.',
   'unofficial':
-      'Cliente não oficial compatível com Cloudflare WARP. Não é afiliado nem endossado pela Cloudflare.',
+      'Cliente não oficial compatível com os serviços Cloudflare® WARP®. Não é afiliado, patrocinado nem endossado pela Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare e WARP são marcas comerciais e/ou marcas registradas da Cloudflare, Inc. nos Estados Unidos e em outras jurisdições.',
   'welcome_title': 'Bem-vindo ao Usque',
   'setup_progress': 'Etapa {current} de {total} da configuração',
   'get_started': 'Começar',

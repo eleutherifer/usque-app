@@ -148,6 +148,14 @@ jobs:
         shell: pwsh
         run: ./tool/build_windows_rust_release.ps1 -Variant "${{ matrix.variant }}"
 
+      - name: Compile native setup interface and run inert tests
+        shell: pwsh
+        run: |
+          & ./tool/build_windows_bootstrapper.ps1 `
+            -Variant "${{ matrix.variant }}" `
+            -OutputDirectory (Join-Path $env:RUNNER_TEMP "windows-bootstrapper-${{ matrix.variant }}") `
+            -Test
+
       - name: Build Flutter Windows Release
         working-directory: apps/usque_gui
         shell: pwsh
@@ -166,6 +174,17 @@ jobs:
             --version $version --source-commit $sourceCommit `
             --platform windows --kind windows --architecture "windows-${{ matrix.flutter_arch }}"
           if ($LASTEXITCODE -ne 0) { throw "Flutter symbol validation failed." }
+
+      # These tests use fake engines and inert shell fixtures, not a live VPN.
+      - name: Run Windows runner and shell integration tests
+        shell: pwsh
+        run: |
+          $testExecutable = "apps/usque_gui/build/windows/${{ matrix.flutter_arch }}/tests/Release/usque_zero_trust_test.exe"
+          if (-not (Test-Path -LiteralPath $testExecutable -PathType Leaf)) {
+            throw "Windows runner test executable was not built: $testExecutable"
+          }
+          & $testExecutable
+          if ($LASTEXITCODE -ne 0) { throw "Windows runner tests failed: $LASTEXITCODE" }
 
       - name: Assemble and verify compile-only application directory
         shell: pwsh

@@ -1,6 +1,5 @@
 pub mod chain_exit;
 pub mod config;
-pub mod connector;
 pub mod diagnostics;
 pub mod diagnostics_contract_generated;
 pub mod endpoints;
@@ -25,11 +24,9 @@ pub use config::{
     EndpointSelection, EndpointSettings, FrontendSettings, InitialIdentityOperation,
     InitialIdentityPhase, IpPolicy, LogLevel, MAX_GEO_DIRECT_COUNTRIES, ManagedEndpointIps,
     OperatingMode, PendingIdentityReplacement, Profile, ProxyAuthCredentials, ProxyDnsMode,
-    ProxySettings, SHARED_NETWORK_SECRET_ID, SharedNetworkSettings, TransportPolicy,
-    ZERO_TRUST_L4_SNI, l4_server_name, validate_proxy_password, validate_proxy_username,
-};
-pub use connector::{
-    ConnectedPath, ConnectionAttempt, ConnectionOrchestrator, ConnectorError, TransportConnector,
+    ProxySettings, SHARED_NETWORK_SECRET_ID, SharedNetworkSettings, TransportPolicy, WarpDnsMode,
+    WarpDnsSettings, ZERO_TRUST_L4_SNI, l4_server_name, validate_proxy_password,
+    validate_proxy_username,
 };
 pub use diagnostics::{
     DiagnosticCategory, DiagnosticCheckStatus, DiagnosticEvidence, DiagnosticFinding,

@@ -1,5 +1,14 @@
 /// Vietnamese UI catalog.
 const Map<String, String> kViCatalog = <String, String>{
+  'warp_dns_type': 'DNS WARP',
+  'warp_dns_bootstrap_optional': 'Không bắt buộc',
+  'warp_dns_plain': 'DNS thường',
+  'warp_dns_unsupported': 'DNS mã hóa không khả dụng',
+  'warp_dns_invalid_mode': 'Loại DNS không được hỗ trợ',
+  'warp_dns_invalid_name': 'Nhập tên máy chủ',
+  'warp_dns_invalid_path': 'Nhập đường dẫn hợp lệ',
+  'warp_dns_invalid_bootstrap': 'Nhập 1–8 địa chỉ IP',
+
   'disable_quic': "Tắt QUIC",
   'disable_quic_managed': 'Được kết nối hiện tại quản lý tự động',
   'disable_quic_help':
@@ -27,6 +36,13 @@ const Map<String, String> kViCatalog = <String, String>{
   'tray_connect_profile': 'Kết nối tài khoản đang dùng',
   'tray_disconnect_profile': 'Ngắt tài khoản đang dùng',
   'tray_disconnect_exit': 'Ngắt kết nối và thoát',
+  'notice_connection_interrupted':
+      'Kết nối bị gián đoạn. Usque đang cố khôi phục kết nối.',
+  'notice_connection_failed':
+      'Usque không thể duy trì kết nối. Mở Usque để xem chi tiết.',
+  'notice_connection_restored': 'Đã khôi phục kết nối.',
+  'notice_kill_switch_blocking':
+      'Kill Switch đang chặn lưu lượng mạng cho đến khi kết nối được khôi phục hoặc bạn ngắt kết nối.',
   'connection_status': 'Trạng thái kết nối',
   'outputs': '{tunnel} và proxy cục bộ',
   'home': 'Trang chủ',
@@ -105,8 +121,23 @@ const Map<String, String> kViCatalog = <String, String>{
       'Đăng nhập lại vào cùng tổ chức để khôi phục kết nối cho tài khoản này.',
   'zero_trust_metadata_missing':
       'Thông tin tổ chức đã lưu chưa đầy đủ. Thêm tài khoản Zero Trust mới rồi đăng nhập.',
-  'zero_trust_endpoint_managed':
-      'Tài khoản tổ chức quyết định địa chỉ máy chủ. Không thể sửa địa chỉ này tại đây.',
+  "zero_trust_endpoint_home_risk_title":
+      "Rủi ro của điểm cuối Zero Trust tùy chỉnh",
+  "zero_trust_endpoint_home_risk_body":
+      "Điểm cuối Zero Trust tùy chỉnh có thể gây rủi ro cho quyền riêng tư và bảo mật dữ liệu. Chỉ dùng điểm cuối đáng tin cậy mà bạn được phép truy cập.",
+  "zero_trust_endpoint_edit": "Sửa điểm cuối Zero Trust",
+  "zero_trust_endpoint_risk_title": "Rủi ro khi thay đổi điểm cuối Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Điểm cuối không rõ nguồn gốc có thể gây rủi ro cho quyền riêng tư và bảo mật dữ liệu.\n\nĐịa chỉ sai có thể khiến kết nối thất bại.\n\nChỉ dùng điểm cuối đáng tin cậy mà bạn được phép truy cập và tuân thủ yêu cầu của tổ chức.",
+  "zero_trust_endpoint_risk_ack":
+      "Tôi hiểu rủi ro và xác nhận rằng tôi có quyền sử dụng điểm cuối này.",
+  "zero_trust_endpoint_risk_continue": "Chấp nhận rủi ro và tiếp tục sửa",
+  "zero_trust_endpoint_risk_locked":
+      "Xác nhận rủi ro trước khi sửa các địa chỉ này.",
+  "zero_trust_endpoint_unsupported":
+      "Cập nhật Usque để sửa điểm cuối Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Đăng nhập lại khôi phục địa chỉ đã đăng ký và xóa địa chỉ tùy chỉnh.",
   'experimental': 'Thử nghiệm',
   'show_license': 'Hiện License Key',
   'hide_license': 'Ẩn License Key',
@@ -319,7 +350,7 @@ const Map<String, String> kViCatalog = <String, String>{
       'Kiểm tra sự cố kết nối, xuất nhật ký và quản lý dữ liệu cục bộ.',
   'engine_status': 'Thông tin kết nối',
   'version': 'Phiên bản',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Nhật ký cục bộ',
   'export_diagnostics': 'Xuất gói chẩn đoán',
   'diagnostics_saved': 'Đã lưu gói chẩn đoán vào',
@@ -332,7 +363,9 @@ const Map<String, String> kViCatalog = <String, String>{
       'Không thể hoàn tác thao tác này. Kết nối sẽ bị ngắt, mọi tài khoản và thông tin đăng nhập sẽ bị xóa, ứng dụng sẽ quay về bước thiết lập ban đầu.',
   'clear_all_data_complete': 'Đã xóa toàn bộ dữ liệu Usque cục bộ.',
   'unofficial':
-      'Ứng dụng không chính thức tương thích với Cloudflare WARP. Không liên kết với hoặc được Cloudflare xác nhận.',
+      'Ứng dụng không chính thức tương thích với dịch vụ Cloudflare® WARP®. Không liên kết, được tài trợ hay được xác nhận bởi Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare và WARP là nhãn hiệu và/hoặc nhãn hiệu đã đăng ký của Cloudflare, Inc. tại Hoa Kỳ và các khu vực tài phán khác.',
   'welcome_title': 'Chào mừng đến với Usque',
   'setup_progress': 'Bước thiết lập {current} trên {total}',
   'get_started': 'Bắt đầu',

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -163,6 +164,18 @@ class AppController extends ChangeNotifier {
   bool get networkSettingsCanReconnect =>
       networkSettings.state?.persisted == true &&
       networkSettings.state?.status == NetworkSettingsApplyStatus.failed;
+
+  /// True while the Home and tray output shortcuts must not start a save.
+  bool get networkShortcutsLocked =>
+      !initialized ||
+      busy ||
+      snapshot.isTransitional ||
+      snapshot.errorCode == 'WINDOWS_RECOVERY_BLOCKED' ||
+      !networkSettings.supported ||
+      networkSettings.unconfirmed ||
+      networkSettings.state?.status == NetworkSettingsApplyStatus.applying ||
+      networkSettings.state?.operationId != null &&
+          networkSettings.state?.status == NetworkSettingsApplyStatus.unknown;
   SharedPreferences? _preferences;
   Timer? _snapshotTimer;
   Future<void>? _snapshotRefresh;
@@ -316,6 +329,9 @@ class AppController extends ChangeNotifier {
     return sharedNetwork.copyWith(
       id: account.id,
       name: account.name,
+      endpointSelection: zeroTrust
+          ? EndpointSelection.custom
+          : sharedNetwork.endpointSelection,
       endpointIpv4: zeroTrust
           ? account.endpointIpv4
           : sharedNetwork.endpointIpv4,
@@ -323,6 +339,37 @@ class AppController extends ChangeNotifier {
           ? account.endpointIpv6
           : sharedNetwork.endpointIpv6,
     );
+  }
+
+  /// Warn for a saved override or a still-running custom session. A draft
+  /// or a saved reset cannot describe what the active session is using.
+  bool get hasCustomZeroTrustEndpointRisk {
+    bool custom(UsqueProfile profile) {
+      final identity = identityStatus(profile.id);
+      if (identity.provider != IdentityProvider.zeroTrust) return false;
+      final registeredV4 = InternetAddress.tryParse(
+        identity.registeredEndpointIpv4,
+      );
+      final registeredV6 = InternetAddress.tryParse(
+        identity.registeredEndpointIpv6,
+      );
+      if (registeredV4?.type != InternetAddressType.IPv4 ||
+          registeredV6?.type != InternetAddressType.IPv6) {
+        return false;
+      }
+      final v4 = InternetAddress.tryParse(profile.endpointIpv4);
+      final v6 = InternetAddress.tryParse(profile.endpointIpv6);
+      return v4 != null &&
+          v6 != null &&
+          (!listEquals(v4.rawAddress, registeredV4!.rawAddress) ||
+              !listEquals(v6.rawAddress, registeredV6!.rawAddress));
+    }
+
+    if (custom(activeProfile)) return true;
+    final applied = networkSettings.state?.appliedProfile;
+    return (snapshot.isConnected || snapshot.isTransitional) &&
+        applied != null &&
+        custom(applied);
   }
 
   void _captureSharedNetwork() {
@@ -352,6 +399,22 @@ class AppController extends ChangeNotifier {
       return;
     }
     _acceptedSettings = state;
+    final accountProfile = state?.storedProfile;
+    if (accountProfile != null &&
+        state?.persisted == true &&
+        identityStatus(accountProfile.id).provider ==
+            IdentityProvider.zeroTrust) {
+      profiles = [
+        for (final account in profiles)
+          if (account.id == accountProfile.id)
+            account.copyWith(
+              endpointIpv4: accountProfile.endpointIpv4,
+              endpointIpv6: accountProfile.endpointIpv6,
+            )
+          else
+            account,
+      ];
+    }
     final stored = state?.sharedNetwork ?? state?.storedProfile;
     if (stored != null) {
       final managed =
@@ -2231,6 +2294,16 @@ class AppController extends ChangeNotifier {
     List<String>? changedFields,
   }) async {
     if (updated.id != activeProfileId) return Future.value(false);
+    if (identityStatus(updated.id).provider == IdentityProvider.zeroTrust &&
+        (changedFields ?? networkSettingsChangedFields(activeProfile, updated))
+            .any(
+              (field) => field == 'endpoint.ipv4' || field == 'endpoint.ipv6',
+            ) &&
+        !(engineCapabilities?.zeroTrustEndpointEditing ?? false)) {
+      lastError = strings.get('zero_trust_endpoint_unsupported');
+      _notifyListeners();
+      return false;
+    }
     if (updated.endpointSelection == EndpointSelection.automatic &&
         identityStatus(updated.id).provider != IdentityProvider.zeroTrust) {
       if (engineCapabilities == null) await _refreshCapabilities();

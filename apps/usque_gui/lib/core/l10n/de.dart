@@ -1,5 +1,14 @@
 /// German UI catalog.
 const Map<String, String> kDeCatalog = <String, String>{
+  'warp_dns_type': 'WARP-DNS',
+  'warp_dns_bootstrap_optional': 'Optional',
+  'warp_dns_plain': 'Normales DNS',
+  'warp_dns_unsupported': 'Verschlüsseltes DNS nicht verfügbar',
+  'warp_dns_invalid_mode': 'DNS-Typ nicht unterstützt',
+  'warp_dns_invalid_name': 'Servernamen eingeben',
+  'warp_dns_invalid_path': 'Gültigen Pfad eingeben',
+  'warp_dns_invalid_bootstrap': '1–8 IP-Adressen eingeben',
+
   'disable_quic': "QUIC deaktivieren",
   'disable_quic_managed': 'Automatisch von dieser Verbindung verwaltet',
   'disable_quic_help':
@@ -29,6 +38,13 @@ const Map<String, String> kDeCatalog = <String, String>{
   'tray_connect_profile': 'Aktives Konto verbinden',
   'tray_disconnect_profile': 'Aktives Konto trennen',
   'tray_disconnect_exit': 'Trennen und beenden',
+  'notice_connection_interrupted':
+      'Die Verbindung wurde unterbrochen. Usque versucht, sie wiederherzustellen.',
+  'notice_connection_failed':
+      'Usque konnte die Verbindung nicht aufrechterhalten. Öffne Usque für Details.',
+  'notice_connection_restored': 'Die Verbindung wurde wiederhergestellt.',
+  'notice_kill_switch_blocking':
+      'Kill Switch blockiert den Netzwerkverkehr, bis die Verbindung wiederhergestellt ist oder du sie trennst.',
   'connection_status': 'Verbindungsstatus',
   'outputs': '{tunnel} und lokale Proxys',
   'home': 'Start',
@@ -109,8 +125,24 @@ const Map<String, String> kDeCatalog = <String, String>{
       'Melde dich erneut bei derselben Organisation an, um die Kontoverbindung wiederherzustellen.',
   'zero_trust_metadata_missing':
       'Die gespeicherten Organisationsdaten sind unvollständig. Füge ein neues Zero-Trust-Konto hinzu und melde dich an.',
-  'zero_trust_endpoint_managed':
-      'Diese Serveradresse wird vom Organisationskonto festgelegt und kann hier nicht geändert werden.',
+  "zero_trust_endpoint_home_risk_title": "Risiko eigener Zero Trust-Endpunkte",
+  "zero_trust_endpoint_home_risk_body":
+      "Eigene Zero Trust-Endpunkte können deine Privatsphäre und Datensicherheit gefährden. Nutze nur vertrauenswürdige Endpunkte, für die du eine Zugriffsberechtigung hast.",
+  "zero_trust_endpoint_edit": "Zero Trust-Endpunkte bearbeiten",
+  "zero_trust_endpoint_risk_title":
+      "Risiken beim Ändern von Zero Trust-Endpunkten",
+  "zero_trust_endpoint_risk_body":
+      "Endpunkte unbekannter Herkunft können deine Privatsphäre und Datensicherheit gefährden.\n\nFalsche Adressen können die Verbindung verhindern.\n\nNutze nur vertrauenswürdige Endpunkte, für die du eine Zugriffsberechtigung hast, und beachte die Vorgaben deiner Organisation.",
+  "zero_trust_endpoint_risk_ack":
+      "Ich verstehe die Risiken und bestätige, dass ich diesen Endpunkt nutzen darf.",
+  "zero_trust_endpoint_risk_continue":
+      "Risiken akzeptieren und weiter bearbeiten",
+  "zero_trust_endpoint_risk_locked":
+      "Bestätige die Risiken, bevor du diese Adressen bearbeitest.",
+  "zero_trust_endpoint_unsupported":
+      "Aktualisiere Usque, um Zero Trust-Endpunkte zu bearbeiten.",
+  "zero_trust_reauth_endpoints":
+      "Eine erneute Anmeldung stellt die registrierten Endpunktadressen wieder her und entfernt deine eigenen Adressen.",
   'experimental': 'Experimentell',
   'show_license': 'License Key anzeigen',
   'hide_license': 'License Key ausblenden',
@@ -328,7 +360,7 @@ const Map<String, String> kDeCatalog = <String, String>{
       'Verbindungsprobleme prüfen, Protokolle exportieren und lokale Daten verwalten.',
   'engine_status': 'Verbindungsinformationen',
   'version': 'Version',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Lokale Protokolle',
   'export_diagnostics': 'Diagnosepaket exportieren',
   'diagnostics_saved': 'Diagnosepaket gespeichert unter',
@@ -341,7 +373,9 @@ const Map<String, String> kDeCatalog = <String, String>{
       'Das lässt sich nicht rückgängig machen. Usque trennt die Verbindung, löscht alle Konten samt Anmeldedaten und kehrt zur Ersteinrichtung zurück.',
   'clear_all_data_complete': 'Alle lokalen Usque-Daten wurden gelöscht.',
   'unofficial':
-      'Inoffizieller Client, kompatibel mit Cloudflare WARP. Nicht mit Cloudflare verbunden und nicht von Cloudflare empfohlen.',
+      'Inoffizieller Client, kompatibel mit den Diensten von Cloudflare® WARP®. Nicht mit Cloudflare, Inc. verbunden und nicht von diesem Unternehmen gesponsert oder empfohlen.',
+  'trademark_attribution':
+      'Cloudflare und WARP sind Marken und/oder eingetragene Marken von Cloudflare, Inc. in den Vereinigten Staaten und anderen Rechtsordnungen.',
   'welcome_title': 'Willkommen bei Usque',
   'setup_progress': 'Einrichtungsschritt {current} von {total}',
   'get_started': 'Loslegen',

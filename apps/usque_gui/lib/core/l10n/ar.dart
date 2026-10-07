@@ -1,5 +1,14 @@
 /// Arabic UI catalog.
 const Map<String, String> kArCatalog = <String, String>{
+  'warp_dns_type': 'DNS ‏WARP',
+  'warp_dns_bootstrap_optional': 'اختياري',
+  'warp_dns_plain': 'DNS عادي',
+  'warp_dns_unsupported': 'DNS المشفر غير متاح',
+  'warp_dns_invalid_mode': 'نوع DNS غير مدعوم',
+  'warp_dns_invalid_name': 'أدخل اسم الخادم',
+  'warp_dns_invalid_path': 'أدخل مسارًا صالحًا',
+  'warp_dns_invalid_bootstrap': 'أدخل من 1 إلى 8 عناوين IP',
+
   'disable_quic': "تعطيل QUIC",
   'disable_quic_managed': 'يديره الاتصال الحالي تلقائيًا',
   'disable_quic_help':
@@ -27,6 +36,12 @@ const Map<String, String> kArCatalog = <String, String>{
   'tray_connect_profile': 'توصيل الحساب النشط',
   'tray_disconnect_profile': 'قطع الحساب النشط',
   'tray_disconnect_exit': 'قطع الاتصال والخروج',
+  'notice_connection_interrupted': 'انقطع الاتصال. يحاول Usque استعادته.',
+  'notice_connection_failed':
+      'تعذّر على Usque الحفاظ على الاتصال. افتح Usque لمعرفة التفاصيل.',
+  'notice_connection_restored': 'تمت استعادة الاتصال.',
+  'notice_kill_switch_blocking':
+      'يحظر Kill Switch حركة مرور الشبكة حتى تتم استعادة الاتصال أو تقطع الاتصال.',
   'connection_status': 'حالة الاتصال',
   'outputs': '{tunnel} والوكلاء المحليون',
   'home': 'الرئيسية',
@@ -106,8 +121,20 @@ const Map<String, String> kArCatalog = <String, String>{
       'سجّل الدخول مجددًا إلى المؤسسة نفسها لاستعادة اتصال هذا الحساب.',
   'zero_trust_metadata_missing':
       'معلومات المؤسسة المحفوظة غير مكتملة. أضف حساب Zero Trust جديدًا وسجّل الدخول.',
-  'zero_trust_endpoint_managed':
-      'يحدد حساب المؤسسة عنوان الخادم. لا يمكن تغييره هنا.',
+  "zero_trust_endpoint_home_risk_title": "مخاطر نقطة نهاية Zero Trust المخصصة",
+  "zero_trust_endpoint_home_risk_body":
+      "قد تعرّض نقاط نهاية Zero Trust المخصصة خصوصيتك وأمان بياناتك للخطر. استخدم فقط نقاط النهاية الموثوقة التي لديك إذن باستخدامها.",
+  "zero_trust_endpoint_edit": "تعديل نقاط نهاية Zero Trust",
+  "zero_trust_endpoint_risk_title": "مخاطر تغيير نقاط نهاية Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "قد تعرّض نقاط النهاية مجهولة المصدر خصوصيتك وأمان بياناتك للخطر.\n\nقد تتسبب العناوين غير الصحيحة في فشل الاتصال.\n\nاستخدم فقط نقاط النهاية الموثوقة التي لديك إذن باستخدامها، والتزم بمتطلبات مؤسستك.",
+  "zero_trust_endpoint_risk_ack":
+      "أفهم المخاطر وأؤكد أن لدي إذنًا باستخدام نقطة النهاية هذه.",
+  "zero_trust_endpoint_risk_continue": "قبول المخاطر ومتابعة التعديل",
+  "zero_trust_endpoint_risk_locked": "أكّد فهم المخاطر قبل تعديل هذه العناوين.",
+  "zero_trust_endpoint_unsupported": "حدّث Usque لتعديل نقاط نهاية Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "تؤدي إعادة تسجيل الدخول إلى استعادة عناوين نقاط النهاية المسجلة وإزالة العناوين المخصصة.",
   'experimental': 'تجريبي',
   'show_license': 'إظهار License Key',
   'hide_license': 'إخفاء License Key',
@@ -320,7 +347,7 @@ const Map<String, String> kArCatalog = <String, String>{
       'تحقق من مشكلات الاتصال وصدّر السجلات وأدِر البيانات المحلية.',
   'engine_status': 'معلومات الاتصال',
   'version': 'الإصدار',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'السجلات المحلية',
   'export_diagnostics': 'تصدير حزمة التشخيص',
   'diagnostics_saved': 'تم حفظ حزمة التشخيص في',
@@ -333,7 +360,9 @@ const Map<String, String> kArCatalog = <String, String>{
       'لا يمكن التراجع عن هذا الإجراء. سيُقطع الاتصال وتُحذف جميع الحسابات ومعلومات الدخول، وسيعود التطبيق إلى الإعداد الأولي.',
   'clear_all_data_complete': 'تم مسح جميع بيانات Usque المحلية.',
   'unofficial':
-      'عميل غير رسمي متوافق مع Cloudflare WARP. غير مرتبط بـ Cloudflare ولا يحظى بتأييده.',
+      'عميل غير رسمي متوافق مع خدمات Cloudflare® WARP®. غير تابع لشركة Cloudflare, Inc. ولا يحظى برعايتها أو تأييدها.',
+  'trademark_attribution':
+      'Cloudflare وWARP علامتان تجاريتان و/أو علامتان تجاريتان مسجلتان لشركة Cloudflare, Inc. في الولايات المتحدة وغيرها من الولايات القضائية.',
   'welcome_title': 'مرحبًا بك في Usque',
   'setup_progress': 'خطوة الإعداد {current} من {total}',
   'get_started': 'البدء',

@@ -48,7 +48,6 @@ pub(crate) fn validate_query_bytes(bytes: &[u8]) -> Result<(), String> {
 
 pub(crate) fn validate_response_bytes(query: &[u8], response: &[u8]) -> Result<(), String> {
     let query = parse_query(query).map_err(|_| "invalid DNS query".to_owned())?;
-    validate_response(&query, response)?;
     response_hints(response, &query).map(|_| ())
 }
 
@@ -694,12 +693,20 @@ pub(crate) struct SplitDnsConfig {
     assigned_addresses: (Ipv4Addr, Ipv6Addr),
     tunnel_dns_servers: Vec<IpAddr>,
     final_exit: bool,
+    final_doh: Option<Arc<crate::encrypted_dns::FinalDohResolver>>,
     policy: Arc<GeoDirectPolicy>,
     protector: Arc<dyn SocketProtector>,
     quality: NetworkQualityTelemetry,
 }
 
 impl SplitDnsConfig {
+    pub(crate) fn with_doh(
+        mut self,
+        resolver: Option<Arc<crate::encrypted_dns::FinalDohResolver>>,
+    ) -> Self {
+        self.final_doh = resolver;
+        self
+    }
     pub(crate) fn with_final_exit(mut self, enabled: bool) -> Self {
         self.final_exit = enabled;
         self
@@ -717,6 +724,7 @@ impl SplitDnsConfig {
             assigned_addresses,
             tunnel_dns_servers: tunnel_dns_servers.to_vec(),
             final_exit: false,
+            final_doh: None,
             policy,
             protector,
             quality,
@@ -786,7 +794,7 @@ impl SplitDnsRuntime {
                 ))
             }),
             final_exit: config.final_exit,
-            final_doh: None,
+            final_doh: config.final_doh,
             tunnel_servers: config
                 .tunnel_dns_servers
                 .into_iter()
@@ -1150,7 +1158,7 @@ fn parse_questions(packet: &[u8], count: usize) -> Result<(Vec<Question>, usize)
     Ok((questions, offset))
 }
 
-fn validate_response(query: &ParsedQuery, response: &[u8]) -> Result<(), String> {
+fn validate_response(query: &ParsedQuery, response: &[u8]) -> Result<usize, String> {
     if response.len() < 12 || response.len() > MAX_TCP_MESSAGE {
         return Err("invalid DNS response length".to_owned());
     }
@@ -1165,11 +1173,11 @@ fn validate_response(query: &ParsedQuery, response: &[u8]) -> Result<(), String>
     if question_count != query.questions.len() {
         return Err("DNS response question count mismatch".to_owned());
     }
-    let (questions, _) = parse_questions(response, question_count)?;
+    let (questions, question_end) = parse_questions(response, question_count)?;
     if questions != query.questions {
         return Err("DNS response question mismatch".to_owned());
     }
-    Ok(())
+    Ok(question_end)
 }
 
 pub(crate) fn validate_dns_query(query: &[u8]) -> Result<(), String> {
@@ -1266,7 +1274,7 @@ fn response_is_truncated(response: &[u8]) -> bool {
 }
 
 fn response_hints(response: &[u8], query: &ParsedQuery) -> Result<Vec<(IpAddr, u32)>, String> {
-    validate_response(query, response)?;
+    let mut offset = validate_response(query, response)?;
     let answer_count = usize::from(read_u16(response, 6)?);
     let authority_count = usize::from(read_u16(response, 8)?);
     let additional_count = usize::from(read_u16(response, 10)?);
@@ -1277,7 +1285,6 @@ fn response_hints(response: &[u8], query: &ParsedQuery) -> Result<Vec<(IpAddr, u
     {
         return Err("DNS response record count exceeds the supported bound".to_owned());
     }
-    let (_, mut offset) = parse_questions(response, query.questions.len())?;
     let mut cnames: HashMap<String, (String, u32)> = HashMap::new();
     let mut addresses: HashMap<String, Vec<(IpAddr, u32)>> = HashMap::new();
     for _ in 0..answer_count {
@@ -2075,6 +2082,34 @@ pub(crate) mod tests {
         let parsed = parse_query(&request).unwrap();
         let response = a_response(&request, 60, [198, 51, 100, 7]);
         validate_response(&parsed, &response).unwrap();
+        assert_eq!(
+            response_hints(&response, &parsed).unwrap(),
+            vec![(IpAddr::V4(Ipv4Addr::new(198, 51, 100, 7)), 60)]
+        );
+    }
+
+    #[test]
+    fn compressed_response_questions_supply_the_answer_offset() {
+        let mut request = query(9, "www.example.cn");
+        let first_question_end = request.len();
+        request[4..6].copy_from_slice(&2_u16.to_be_bytes());
+        append_name(&mut request, "www.example.cn");
+        request.extend_from_slice(&[0, 1, 0, 1]);
+        let parsed = parse_query(&request).unwrap();
+
+        let mut response = request[..first_question_end].to_vec();
+        response[2..4].copy_from_slice(&0x8180_u16.to_be_bytes());
+        response[6..8].copy_from_slice(&1_u16.to_be_bytes());
+        response.extend_from_slice(&[0xc0, 0x0c, 0, 1, 0, 1]);
+        let response_question_end = response.len();
+        response.extend_from_slice(&[0xc0, 0x0c, 0, 1, 0, 1, 0, 0, 0, 60, 0, 4, 198, 51, 100, 7]);
+
+        assert!(response_question_end < parsed.question_end);
+        assert_eq!(
+            validate_response(&parsed, &response).unwrap(),
+            response_question_end
+        );
+        validate_response_bytes(&request, &response).unwrap();
         assert_eq!(
             response_hints(&response, &parsed).unwrap(),
             vec![(IpAddr::V4(Ipv4Addr::new(198, 51, 100, 7)), 60)]

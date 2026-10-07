@@ -1,5 +1,14 @@
 /// Korean UI catalog.
 const Map<String, String> kKoCatalog = <String, String>{
+  'warp_dns_type': 'WARP DNS',
+  'warp_dns_bootstrap_optional': '선택 사항',
+  'warp_dns_plain': '일반 DNS',
+  'warp_dns_unsupported': '암호화 DNS 사용 불가',
+  'warp_dns_invalid_mode': '지원하지 않는 DNS 유형',
+  'warp_dns_invalid_name': '서버 이름을 입력하세요',
+  'warp_dns_invalid_path': '올바른 경로를 입력하세요',
+  'warp_dns_invalid_bootstrap': 'IP 주소를 1–8개 입력하세요',
+
   'disable_quic': "QUIC 비활성화",
   'disable_quic_managed': '현재 연결에서 자동으로 관리합니다',
   'disable_quic_help':
@@ -27,6 +36,11 @@ const Map<String, String> kKoCatalog = <String, String>{
   'tray_connect_profile': '현재 계정 연결',
   'tray_disconnect_profile': '현재 계정 연결 해제',
   'tray_disconnect_exit': '연결 해제 후 종료',
+  'notice_connection_interrupted': '연결이 끊겼습니다. Usque가 복구를 시도하고 있습니다.',
+  'notice_connection_failed': 'Usque가 연결을 유지하지 못했습니다. 자세한 내용은 Usque를 여세요.',
+  'notice_connection_restored': '연결이 복구되었습니다.',
+  'notice_kill_switch_blocking':
+      '연결이 복구되거나 연결을 해제할 때까지 Kill Switch가 네트워크 트래픽을 차단합니다.',
   'connection_status': '연결 상태',
   'outputs': '{tunnel} 및 로컬 프록시',
   'home': '홈',
@@ -100,7 +114,19 @@ const Map<String, String> kKoCatalog = <String, String>{
   'zero_trust_repair_same_team': '같은 조직에 다시 로그인해 이 계정의 연결을 복구하세요.',
   'zero_trust_metadata_missing':
       '저장된 조직 정보가 불완전합니다. 새 Zero Trust 계정을 추가하고 다시 로그인하세요.',
-  'zero_trust_endpoint_managed': '이 서버 주소는 조직 계정에서 설정하므로 여기에서 변경할 수 없습니다.',
+  "zero_trust_endpoint_home_risk_title": "사용자 지정 Zero Trust 엔드포인트 위험",
+  "zero_trust_endpoint_home_risk_body":
+      "사용자 지정 Zero Trust 엔드포인트는 개인정보와 데이터 보안을 위협할 수 있습니다. 사용 권한이 있는 신뢰할 수 있는 엔드포인트만 사용하세요.",
+  "zero_trust_endpoint_edit": "Zero Trust 엔드포인트 편집",
+  "zero_trust_endpoint_risk_title": "Zero Trust 엔드포인트 변경 위험",
+  "zero_trust_endpoint_risk_body":
+      "출처를 알 수 없는 엔드포인트는 개인정보와 데이터 보안을 위협할 수 있습니다.\n\n잘못된 주소로 인해 연결이 실패할 수 있습니다.\n\n사용 권한이 있는 신뢰할 수 있는 엔드포인트만 사용하고 조직의 요구 사항을 준수하세요.",
+  "zero_trust_endpoint_risk_ack": "위험을 이해했으며 이 엔드포인트를 사용할 권한이 있음을 확인합니다.",
+  "zero_trust_endpoint_risk_continue": "위험을 감수하고 편집 계속",
+  "zero_trust_endpoint_risk_locked": "주소를 편집하기 전에 위험을 확인하세요.",
+  "zero_trust_endpoint_unsupported": "Zero Trust 엔드포인트를 편집하려면 Usque를 업데이트하세요.",
+  "zero_trust_reauth_endpoints":
+      "다시 로그인하면 등록된 엔드포인트 주소가 복원되고 사용자 지정 주소가 제거됩니다.",
   'experimental': '실험적',
   'show_license': 'License Key 표시',
   'hide_license': 'License Key 숨기기',
@@ -306,7 +332,7 @@ const Map<String, String> kKoCatalog = <String, String>{
   'diagnostics_subtitle': '연결 문제를 확인하고 로그를 내보내거나 기기의 데이터를 관리합니다.',
   'engine_status': '연결 정보',
   'version': '버전',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': '로컬 로그',
   'export_diagnostics': '진단 번들 내보내기',
   'diagnostics_saved': '진단 번들을 저장한 위치',
@@ -319,7 +345,9 @@ const Map<String, String> kKoCatalog = <String, String>{
       '되돌릴 수 없습니다. Usque는 연결을 끊고 저장된 모든 계정과 로그인 정보를 삭제한 뒤 초기 설정으로 돌아갑니다.',
   'clear_all_data_complete': '로컬 Usque 데이터를 모두 지웠습니다.',
   'unofficial':
-      'Cloudflare WARP와 호환되는 비공식 클라이언트입니다. Cloudflare와 제휴하지 않으며 Cloudflare의 보증을 받지 않습니다.',
+      'Cloudflare® WARP® 서비스와 호환되는 비공식 클라이언트입니다. Usque는 Cloudflare, Inc.와 제휴하지 않으며 해당 회사의 후원이나 보증을 받지 않습니다.',
+  'trademark_attribution':
+      'Cloudflare 및 WARP는 미국 및 기타 관할 지역에서 Cloudflare, Inc.의 상표 또는 등록 상표입니다.',
   'welcome_title': 'Usque에 오신 것을 환영합니다',
   'setup_progress': '설정 단계 {current}/{total}',
   'get_started': '시작하기',

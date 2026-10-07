@@ -6,6 +6,7 @@ const Map<String, String> kUiWorkflowEs = <String, String>{
   'preview_restart_onboarding': 'Reiniciar configuración inicial',
   'home_local_proxies': 'Proxies locales',
   'home_manage_proxies': 'Administrar proxies',
+  'home_exit_ip': 'IP de salida:',
   'home_enabled_interfaces': 'Habilitado: {interfaces}',
   'home_system_proxy': 'Proxy del sistema',
   'home_tun_hint': 'Captura el tráfico de las aplicaciones de este dispositivo',
@@ -68,6 +69,7 @@ const Map<String, String> kUiWorkflowEs = <String, String>{
   'reset_draft_hint':
       'Los valores predeterminados se cargarán en este formulario. Aplique '
       'los cambios para que surtan efecto.',
+  'error_generic': 'Se produjo un error',
 };
 
 const Map<String, String> kNetworkQualityEs = <String, String>{

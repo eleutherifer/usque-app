@@ -64,9 +64,10 @@ numeric IP address.
 - Apps using their own encrypted DNS hide names from Usque, so country routing
   uses IP rules. The direct-DNS selector does not control those apps' resolvers.
 
-Other remote VPN queries use the final exit's DNS: WARP without a chain, or the
+Other remote VPN queries use the final exit's DNS: WARP® without a chain, or the
 active chain exit (custom OpenVPN or WireGuard, WARP via WireGuard, or VPN
-Gate). Explicit local DNS and proxy DNS settings keep their own scope.
+Gate). Ordinary WARP supports configurable Plain DNS, DoH and DoT; see
+[WARP exit DNS](WARP_DNS.md). Explicit local DNS and proxy DNS settings keep their own scope.
 See the [direct DNS threat model](direct-dns-threat-model.md) for platform
 protection and diagnostic limits.
 
@@ -182,9 +183,9 @@ physical-system DNS. Users may explicitly change the Profile themselves.
 
 #### Profile/config schema 13 (introduction)
 
-Direct DNS was introduced in configuration schema 13; the current schema is 21,
-and later migrations keep these fields.
-`AppConfig.shared_network.direct_dns` is hydrated into each account's runtime
+Direct DNS was introduced in configuration schema 13; later
+[configuration migrations](../crates/usque-core/src/storage.rs) keep these fields.
+`AppConfig.network.direct_dns` is hydrated into each account's runtime
 Profile. Old schema-12 configurations and missing protobuf Profile field 17
 canonicalize to System. Shared settings, not per-account endpoint overlays,
 select DNS. `DirectDnsSettings` wire fields 1–5 are mode, server name, DoH path,
@@ -257,3 +258,7 @@ and pending-settings workflow. An older Engine shows targets read-only.
 错误行会阻止整份草稿保存。自定义规则无需下载国家规则即可工作，设置跨账号共享，
 适用于 Windows、Android 的 VPN 和 HTTP/SOCKS5 入口。直连域名使用当前的直连 DNS
 设置；应用自行使用加密 DNS 时只能按地址分流。请查看应用结果，必要时重新连接。
+
+---
+
+WARP is a trademark and/or registered trademark of Cloudflare, Inc. in the United States and other jurisdictions.

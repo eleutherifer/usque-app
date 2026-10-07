@@ -1,5 +1,14 @@
 /// English UI catalog.
 const Map<String, String> kEnCatalog = <String, String>{
+  'warp_dns_type': 'WARP DNS',
+  'warp_dns_bootstrap_optional': 'Optional',
+  'warp_dns_plain': 'Plain DNS',
+  'warp_dns_unsupported': 'Encrypted DNS unavailable',
+  'warp_dns_invalid_mode': 'Unsupported DNS type',
+  'warp_dns_invalid_name': 'Enter a server name',
+  'warp_dns_invalid_path': 'Enter a valid path',
+  'warp_dns_invalid_bootstrap': 'Enter 1–8 IP addresses',
+
   'disable_quic': "Disable QUIC",
   'disable_quic_managed': 'Automatically managed by this connection',
   'disable_quic_help':
@@ -27,6 +36,13 @@ const Map<String, String> kEnCatalog = <String, String>{
   'tray_connect_profile': 'Connect Active Profile',
   'tray_disconnect_profile': 'Disconnect Active Profile',
   'tray_disconnect_exit': 'Disconnect and Exit',
+  'notice_connection_interrupted':
+      'The connection was interrupted. Usque is trying to restore it.',
+  'notice_connection_failed':
+      'Usque could not keep the connection. Open Usque for details.',
+  'notice_connection_restored': 'The connection has been restored.',
+  'notice_kill_switch_blocking':
+      'Kill Switch is blocking network traffic until the connection is restored or you disconnect.',
   'connection_status': 'Connection status',
   'outputs': '{tunnel} and local proxies',
   'home': 'Home',
@@ -57,7 +73,7 @@ const Map<String, String> kEnCatalog = <String, String>{
   'error': 'Connection error',
   'active_profile': 'Current account',
   'protocol': 'Protocol',
-  'address_family': 'Address family',
+  'address_family': 'IP version',
   'duration': 'Duration',
   'download': 'Download',
   'upload': 'Upload',
@@ -104,8 +120,22 @@ const Map<String, String> kEnCatalog = <String, String>{
       'Sign in to the same organization again to reconnect this account.',
   'zero_trust_metadata_missing':
       'The saved organization details are incomplete. Add a new Zero Trust account and sign in again.',
-  'zero_trust_endpoint_managed':
-      'This server address is set by your organization account and cannot be changed here.',
+  "zero_trust_endpoint_home_risk_title": "Custom Zero Trust endpoint risk",
+  "zero_trust_endpoint_home_risk_body":
+      "Custom Zero Trust endpoints may put your privacy and data security at risk. Use only trusted endpoints you are authorized to access.",
+  "zero_trust_endpoint_edit": "Edit Zero Trust endpoints",
+  "zero_trust_endpoint_risk_title": "Risks of changing Zero Trust endpoints",
+  "zero_trust_endpoint_risk_body":
+      "Endpoints from unknown sources may put your privacy and data security at risk.\n\nIncorrect addresses may prevent your connection from working.\n\nUse only trusted endpoints you are authorized to access, and follow your organization's requirements.",
+  "zero_trust_endpoint_risk_ack":
+      "I understand the risks and confirm that I am authorized to use this endpoint.",
+  "zero_trust_endpoint_risk_continue": "Accept risks and continue editing",
+  "zero_trust_endpoint_risk_locked":
+      "Confirm the risks before editing these addresses.",
+  "zero_trust_endpoint_unsupported":
+      "Update Usque to edit Zero Trust endpoints.",
+  "zero_trust_reauth_endpoints":
+      "Signing in again restores the registered endpoint addresses and removes your custom addresses.",
   'experimental': 'Experimental',
   'show_license': 'Show License Key',
   'hide_license': 'Hide License Key',
@@ -319,7 +349,7 @@ const Map<String, String> kEnCatalog = <String, String>{
       'Check connection problems, export logs and manage local data.',
   'engine_status': 'Connection information',
   'version': 'Version',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Local logs',
   'export_diagnostics': 'Export diagnostic bundle',
   'diagnostics_saved': 'Diagnostic bundle saved to',
@@ -332,7 +362,9 @@ const Map<String, String> kEnCatalog = <String, String>{
       'This cannot be undone. Usque will disconnect, delete all saved accounts and login information, then return to setup.',
   'clear_all_data_complete': 'All local Usque data was cleared.',
   'unofficial':
-      'Unofficial client compatible with Cloudflare WARP. Not affiliated with or endorsed by Cloudflare.',
+      'Unofficial client compatible with Cloudflare® WARP® services. Not affiliated with, sponsored by, or endorsed by Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare and WARP are trademarks and/or registered trademarks of Cloudflare, Inc. in the United States and other jurisdictions.',
   'welcome_title': 'Welcome to Usque',
   'setup_progress': 'Setup step {current} of {total}',
   'get_started': 'Get started',

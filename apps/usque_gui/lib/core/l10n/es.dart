@@ -1,5 +1,14 @@
 /// Spanish UI catalog.
 const Map<String, String> kEsCatalog = <String, String>{
+  'warp_dns_type': 'DNS de WARP',
+  'warp_dns_bootstrap_optional': 'Opcional',
+  'warp_dns_plain': 'DNS normal',
+  'warp_dns_unsupported': 'DNS cifrado no disponible',
+  'warp_dns_invalid_mode': 'Tipo DNS no compatible',
+  'warp_dns_invalid_name': 'Introduce el nombre del servidor',
+  'warp_dns_invalid_path': 'Introduce una ruta válida',
+  'warp_dns_invalid_bootstrap': 'Introduce de 1 a 8 direcciones IP',
+
   'disable_quic': "Desactivar QUIC",
   'disable_quic_managed': 'Esta conexión lo gestiona automáticamente',
   'disable_quic_help':
@@ -29,6 +38,13 @@ const Map<String, String> kEsCatalog = <String, String>{
   'tray_connect_profile': 'Conectar la cuenta activa',
   'tray_disconnect_profile': 'Desconectar la cuenta activa',
   'tray_disconnect_exit': 'Desconectar y salir',
+  'notice_connection_interrupted':
+      'La conexión se interrumpió. Usque está intentando restablecerla.',
+  'notice_connection_failed':
+      'Usque no pudo mantener la conexión. Abre Usque para ver los detalles.',
+  'notice_connection_restored': 'La conexión se ha restablecido.',
+  'notice_kill_switch_blocking':
+      'Kill Switch bloquea el tráfico de red hasta que se restablezca la conexión o te desconectes.',
   'connection_status': 'Estado de la conexión',
   'outputs': '{tunnel} y proxies locales',
   'home': 'Inicio',
@@ -109,8 +125,24 @@ const Map<String, String> kEsCatalog = <String, String>{
       'Inicia sesión de nuevo en la misma organización para recuperar la conexión de esta cuenta.',
   'zero_trust_metadata_missing':
       'La información guardada de la organización está incompleta. Añade otra cuenta Zero Trust e inicia sesión.',
-  'zero_trust_endpoint_managed':
-      'La cuenta de la organización establece esta dirección del servidor. No puedes modificarla aquí.',
+  "zero_trust_endpoint_home_risk_title":
+      "Riesgo de los extremos personalizados de Zero Trust",
+  "zero_trust_endpoint_home_risk_body":
+      "Los extremos personalizados de Zero Trust pueden poner en riesgo tu privacidad y la seguridad de tus datos. Usa solo extremos de confianza para los que tengas autorización.",
+  "zero_trust_endpoint_edit": "Editar extremos de Zero Trust",
+  "zero_trust_endpoint_risk_title":
+      "Riesgos de cambiar los extremos de Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Los extremos de origen desconocido pueden poner en riesgo tu privacidad y la seguridad de tus datos.\n\nLas direcciones incorrectas pueden impedir la conexión.\n\nUsa solo extremos de confianza para los que tengas autorización y respeta los requisitos de tu organización.",
+  "zero_trust_endpoint_risk_ack":
+      "Entiendo los riesgos y confirmo que tengo autorización para usar este extremo.",
+  "zero_trust_endpoint_risk_continue": "Aceptar riesgos y seguir editando",
+  "zero_trust_endpoint_risk_locked":
+      "Confirma los riesgos antes de editar estas direcciones.",
+  "zero_trust_endpoint_unsupported":
+      "Actualiza Usque para editar los extremos de Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Al iniciar sesión de nuevo se restauran las direcciones registradas y se eliminan tus direcciones personalizadas.",
   'experimental': 'Experimental',
   'show_license': 'Mostrar License Key',
   'hide_license': 'Ocultar License Key',
@@ -328,7 +360,7 @@ const Map<String, String> kEsCatalog = <String, String>{
       'Revisa problemas de conexión, exporta registros y administra los datos locales.',
   'engine_status': 'Información de conexión',
   'version': 'Versión',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Registros locales',
   'export_diagnostics': 'Exportar paquete de diagnóstico',
   'diagnostics_saved': 'Paquete de diagnóstico guardado en',
@@ -341,7 +373,9 @@ const Map<String, String> kEsCatalog = <String, String>{
       'No se puede deshacer. Usque desconectará, borrará todas las cuentas y sus datos de acceso y volverá a la configuración inicial.',
   'clear_all_data_complete': 'Se borraron todos los datos locales de Usque.',
   'unofficial':
-      'Cliente no oficial compatible con Cloudflare WARP. No está afiliado ni respaldado por Cloudflare.',
+      'Cliente no oficial compatible con los servicios Cloudflare® WARP®. No está afiliado, patrocinado ni respaldado por Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare y WARP son marcas comerciales y/o marcas registradas de Cloudflare, Inc. en Estados Unidos y otras jurisdicciones.',
   'welcome_title': 'Bienvenido a Usque',
   'setup_progress': 'Paso de configuración {current} de {total}',
   'get_started': 'Empezar',

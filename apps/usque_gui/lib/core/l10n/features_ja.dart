@@ -6,6 +6,7 @@ const Map<String, String> kUiWorkflowJa = <String, String>{
   'preview_restart_onboarding': '初回設定をやり直す',
   'home_local_proxies': 'ローカルプロキシ',
   'home_manage_proxies': 'プロキシ管理',
+  'home_exit_ip': '出口 IP：',
   'home_enabled_interfaces': '有効：{interfaces}',
   'home_system_proxy': 'システムプロキシ',
   'home_tun_hint': 'このデバイスのアプリの通信を引き受けます',
@@ -60,6 +61,7 @@ const Map<String, String> kUiWorkflowJa = <String, String>{
   'application_group': 'アプリ',
   'tools_group': 'ツール',
   'reset_draft_hint': '既定値がこのフォームに読み込まれます。適用すると反映されます。',
+  'error_generic': 'エラーが発生しました',
 };
 
 const Map<String, String> kNetworkQualityJa = <String, String>{

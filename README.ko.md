@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/branding/usque-readme-banner.png" alt="Usque — Cloudflare WARP와 호환되는 비공식 클라이언트" width="100%">
+  <img src="assets/branding/usque-readme-banner.png" alt="Usque — Cloudflare® WARP® 서비스와 호환되는 비공식 클라이언트" width="100%">
 </p>
 
 <p align="center">
@@ -20,17 +20,17 @@
   <a href="https://github.com/GeorgeXie2333/usque-app/actions/workflows/pr-check.yml"><img alt="PR Check" src="https://github.com/GeorgeXie2333/usque-app/actions/workflows/pr-check.yml/badge.svg"></a>
   <a href="https://github.com/GeorgeXie2333/usque-app/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/GeorgeXie2333/usque-app/actions/workflows/ci.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/GeorgeXie2333/usque-app/actions/workflows/build.yml"><img alt="Build" src="https://github.com/GeorgeXie2333/usque-app/actions/workflows/build.yml/badge.svg"></a>
-  <a href="LICENSE.md"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-F48120.svg"></a>
+  <a href="LICENSE.md"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-C2500C.svg"></a>
 </p>
 
 # Usque
 
-Usque는 Windows와 Android / Android TV용 비공식 Cloudflare WARP 클라이언트입니다. 시스템 VPN, SOCKS5, HTTP 프록시를 네이티브 Flutter 인터페이스에 모으고, Rust로 구현한 MASQUE 엔진으로 통신을 처리합니다.
+Usque는 Windows와 Android / Android TV용 Cloudflare® WARP® 서비스와 호환되는 비공식 클라이언트입니다. 시스템 VPN, SOCKS5, HTTP 프록시를 네이티브 Flutter 인터페이스에 모으고, Rust로 구현한 MASQUE 엔진으로 통신을 처리합니다.
 
 > [!IMPORTANT]
 > 공식 패키지는 [GitHub Releases](https://github.com/GeorgeXie2333/usque-app/releases)에서만 다운로드하세요. Pull Request 산출물, 로컬 빌드, 태그가 없는 바이너리는 공식 릴리스가 아닙니다. 개발 브랜치 문서에는 아직 배포되지 않은 변경 사항이 포함될 수 있습니다. 사용 중인 패키지의 태그에 해당하는 릴리스 노트와 문서를 확인하세요.
 
-Usque는 독립 프로젝트입니다. Cloudflare와 제휴 관계가 없으며, 해당 회사의 후원이나 추천을 받지 않습니다. Cloudflare와 WARP는 Cloudflare, Inc.의 상표입니다. 개인용 WARP 사용에는 여전히 Cloudflare의 이용 약관과 개인정보 처리방침이 적용됩니다.
+Usque는 독립 프로젝트입니다. Cloudflare, Inc.와 제휴 관계가 없으며, 해당 회사의 후원이나 추천을 받지 않습니다. Cloudflare 및 WARP는 미국 및 기타 관할 지역에서 Cloudflare, Inc.의 상표 또는 등록 상표입니다. 개인용 WARP 서비스 사용에는 여전히 Cloudflare의 이용 약관과 개인정보 처리방침이 적용됩니다.
 
 ## 스크린샷
 
@@ -51,7 +51,7 @@ Usque는 독립 프로젝트입니다. Cloudflare와 제휴 관계가 없으며,
 
 ## 다운로드 및 설치
 
-이 소스는 **v0.2.9**를 대상으로 합니다. 배포된 버전은 [GitHub Releases](https://github.com/GeorgeXie2333/usque-app/releases)에서 확인하세요. 설치 패키지는 6종이며, Windows MSI 파일 2개를 앱 내 업데이트 전용으로 별도 제공합니다.
+이 문서는 **v0.3.0**의 기능을 설명하며, 소스에 명시된 앱 버전은 **0.3.0**입니다. 버전 표기만으로 배포 완료를 뜻하지는 않습니다. 승인된 공식 패키지는 [GitHub Releases](https://github.com/GeorgeXie2333/usque-app/releases)에서 받으세요. [릴리스 준비 검토](docs/RELEASE_V0.3.0_READINESS.md)는 당시의 소스와 검증 범위를 기록합니다. 설치 패키지는 6종이며, Windows MSI 파일 2개를 앱 내 업데이트 전용으로 별도 제공합니다.
 
 | 플랫폼 | 최소 OS | 패키지 |
 | --- | --- | --- |
@@ -59,16 +59,18 @@ Usque는 독립 프로젝트입니다. Cloudflare와 제휴 관계가 없으며,
 | Android / Android TV | Android 8.0, API 26 | arm64-v8a, x86_64 또는 armeabi-v7a APK |
 | Android / Android TV | Android 8.0, API 26 | 위의 ABI 3종을 모두 포함하는 범용 APK |
 
-기기 아키텍처에 맞는 패키지를 선택하세요. Android ABI를 모르면 용량이 더 큰 범용 APK를 사용할 수 있습니다. 설치 전에 패키지의 SHA-256을 `SHA256SUMS` 및 GitHub에 표시된 파일 다이제스트와 대조하고, 릴리스 노트에 명시된 서명자 지문도 확인하세요. 하나라도 일치하지 않으면 설치를 중단하세요.
+기기 아키텍처에 맞는 패키지를 선택하세요. Windows x64에는 **x86-64-v2**를 지원하는 CPU가 필요하며, ARM64 Windows에는 네이티브 ARM64 패키지를 사용합니다. Android ABI를 모르면 용량이 더 큰 범용 APK를 사용할 수 있습니다. 설치 전에 패키지의 SHA-256을 `SHA256SUMS` 및 GitHub에 표시된 파일 다이제스트와 대조하고, 릴리스 노트에 명시된 서명자 지문도 확인하세요. 하나라도 일치하지 않으면 설치를 중단하세요.
 
 1.0 이전 패키지는 프로젝트에서 관리하는 고정된 자체 서명 인증서를 사용합니다. Windows에는 알 수 없는 게시자 경고가 나타날 수 있으며, Android 패키지는 Google Play 밖에서 설치합니다. 경고를 우회하려고 백신이나 방화벽을 끄거나 비공식 패키지에 포함된 인증서를 가져오지 마세요.
 
 업그레이드, 제거, 복구, Android 개발자 인증에 관한 설명은 [설치 및 제거](docs/INSTALLATION.md)를, 공식 서명에 사용하는 인증서 정보는 [코드 서명](docs/CODE_SIGNING.md)을 참고하세요. 업데이트는 다운로드 전에 확인이 필요하며, 플랫폼 설치 프로그램으로 설치합니다. 사용자 확인 없이 자동으로 설치하지 않습니다.
 
+업그레이드하면 로컬 구성이 v0.2.9에서 읽을 수 없는 형식으로 마이그레이션됩니다. 업그레이드 전에 [구성 호환성](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)과 필요한 백업을 확인하세요. 이전 패키지를 다시 설치해도 마이그레이션은 되돌려지지 않습니다.
+
 ## 첫 연결
 
 1. [검증된 공식 패키지](docs/INSTALLATION.md#verify-before-installing)를 설치하고 Usque를 엽니다.
-2. 첫 실행의 권한 및 약관 단계를 완료합니다. Android에서는 설정을 마치려면 VPN 권한이 필요합니다. 권한을 허용하면 다른 VPN의 연결이 끊길 수 있지만, 그 자체로 Usque 연결을 시작하지는 않습니다. 알림 권한은 선택 사항입니다. 개인용 WARP 계정을 등록하고, 필요하면 WARP License Key를 입력합니다. 설정이 중단되었다면 다시 등록하기 전에 저장된 결과를 확인하세요. 새 WARP Secret 가져오기는 지원하지 않습니다.
+2. 첫 실행의 권한 및 약관 단계를 완료합니다. Android에서는 설정을 마치려면 VPN 권한이 필요합니다. 권한을 허용하면 다른 VPN의 연결이 끊길 수 있지만, 그 자체로 Usque 연결을 시작하지는 않습니다. 알림 권한은 선택 사항입니다. 개인용 WARP® 계정을 등록하고, 필요하면 WARP License Key를 입력합니다. 설정이 중단되었다면 다시 등록하기 전에 저장된 결과를 확인하세요. 새 WARP Secret 가져오기는 지원하지 않습니다.
 3. Windows에서는 **프록시 → 가상 네트워크 어댑터 및 로컬 프록시**, Android에서는 **프록시 → VPN 및 로컬 프록시**를 열어 사용할 연결 방식을 선택한 다음 홈에서 연결합니다. 스위치는 즉시 적용됩니다. 수신 대기 주소나 DNS 양식을 수정했다면 **변경 적용**이 필요합니다. 프록시만 사용하는 모드에서는 이미 받은 VPN 권한으로 VPN을 시작하지 않습니다.
 
 | 연결 방식 | 용도 |
@@ -96,11 +98,13 @@ VPN, SOCKS5, HTTP는 기본적으로 켜져 있고, Windows 시스템 프록시�
 - HTTP/3 자동 연결과 실패 시 HTTP/2 폴백. IPv4와 IPv6 연결 시도로 접근 가능한 엔드포인트를 찾습니다.
   지원되는 네트워크 변경에서는 H3 연결을 이동할 수 있습니다. [경로 동작](docs/h3-path-infrastructure.md)을 참고하세요.
 - 전체 터널 VPN, 터널 내 DNS, Kill Switch, LAN 접근, [사용자 지정 CIDR·IP·도메인 우회 규칙](docs/encrypted-direct-dns.md#custom-bypass-targets--自定义绕过目标). 도메인 규칙은 하위 도메인도 포함하며, 사용자 지정 규칙은 국가 규칙을 다운로드하지 않아도 사용할 수 있습니다.
+- 사용자 지정 [WARP 출구 DNS](docs/WARP_DNS.md): **설정 → 고급 네트워크 설정 → IP 및 DNS**를 열어 일반 DNS, DoH 또는 DoT를 선택하고 **변경 적용**을 누릅니다. DNS를 변경하면 연결 중인 세션이 다시 연결되며, 최종 체인 출구는 자체 DNS 정책을 유지합니다.
 - 선택적인 국가별 직접 연결 라우팅. 선택한 국가의 GeoIP 데이터와 전체 GeoSite 목록을 별도로 다운로드합니다.
   도메인 이름이 보이면 도메인 규칙을, 그렇지 않으면 IP 규칙을 사용합니다. 분류하지 못한 대상은 계속 터널을 사용합니다.
 - 로컬 [네트워크 진단](docs/network-doctor.md)과 네트워크 품질 페이지. 지연 시간, 패킷 손실과 측정 가능 여부, 대기열, 최근 60초 추이를 표시합니다.
   표준 검사는 로컬 상태만 읽으며, 심층 검사는 확인을 받은 뒤 테스트 요청을 보냅니다.
-- Windows의 트레이, 단일 인스턴스 활성화, 시작 시 실행, 창을 닫으면 트레이로 최소화하는 기능.
+- Windows의 트레이(상태 배지, 가상 네트워크 어댑터와 시스템 프록시 스위치, 백그라운드에서 5초간 지속되는 재연결·연결 오류·알림으로 보고된 중단 후 복구 알림), 단일 인스턴스 활성화, 시작 시 실행, 창을 닫으면 트레이로 최소화하는 기능, 창 위치 기억, 키보드 단축키.
+  **Ctrl+1~4**로 페이지 전환, **Ctrl+S**로 변경 적용, **F5**로 VPN Gate 또는 진단을 새로 고칩니다. [트레이 및 키보드 조작](docs/INSTALLATION.md#tray-and-keyboard-controls)을 참고하세요.
   Android의 빠른 설정 타일, 런처 바로가기, 재부팅 후 복구, TV 리모컨 탐색.
   21개 언어와 밝은 테마 및 어두운 테마를 지원합니다.
 - 확인 후 개인용 WARP Secret을 선택한 파일로 내보낼 수 있습니다.
@@ -133,8 +137,8 @@ Android의 **VPN을 사용하지 않는 연결 차단**도 켜져 있으면, 선
 이 리졸버가 질의를 받으며, 연결에 실패해도 평문 DNS로 바뀌지 않습니다.
 [설정 단계와 예시](docs/encrypted-direct-dns.md)를 참고하세요.
 
-그 밖의 원격 VPN 질의는 WARP 또는 선택한 최종 체인 출구를 사용합니다.
-HTTP/SOCKS5 체인 DNS는 기본적으로 해당 프록시를 통해 TLS를 검증하는 Cloudflare DoH를 사용합니다.
+그 밖의 원격 VPN 질의는 WARP 터널 또는 선택한 최종 체인 출구를 사용합니다.
+HTTP/SOCKS5 체인 DNS는 기본적으로 해당 프록시를 통해 TLS를 검증하는 Cloudflare® DoH를 사용합니다.
 사용자 지정 DNS나 기본값과 다른 상속 DNS는 TCP DNS를 유지합니다. 이 두 출구에서는 앱이 선택한 리졸버로 보내는 UDP/53 질의를 같은 리졸버로 보내는 TCP 질의로 변환하며, 물리 네트워크 DNS로 폴백하지 않습니다.
 [체인 DNS 선택지](docs/CHAIN_PROXY.md#http-and-socks5-exits--http-与-socks5-出口)를 참고하세요.
 명시적인 로컬 DNS 및 프록시 DNS 설정도 계속 적용됩니다.
@@ -143,7 +147,7 @@ HTTP/SOCKS5 체인 DNS는 기본적으로 해당 프록시를 통해 TLS를 검�
 
 ### 실험적 기능과 지원하지 않는 범위
 
-[Zero Trust 등록](docs/ZERO_TRUST_EXPERIMENTAL.md)은 실험적 기능입니다. 조직의 ID로 MASQUE 인터넷 터널을 구성하지만, Cloudflare One Client의 모든 기능과 호환되지는 않습니다.
+[Zero Trust 등록](docs/ZERO_TRUST_EXPERIMENTAL.md)은 실험적 기능입니다. 조직의 ID로 MASQUE 인터넷 터널을 구성하지만, Cloudflare One™ Client의 모든 기능과 호환되지는 않습니다.
 macOS 소스는 보존하고 있으나 빌드하거나 배포하지 않습니다.
 iOS, 앱 스토어 배포, 공개 CLI는 이번 릴리스 범위에 포함되지 않습니다.
 
@@ -163,7 +167,7 @@ iOS, 앱 스토어 배포, 공개 CLI는 이번 릴리스 범위에 포함되지
 | SOCKS5 | `127.0.0.1:1080`, `[::1]:1080` |
 | HTTP 프록시 | `127.0.0.1:8080`, `[::1]:8080` |
 
-프록시 주소, 포트, DNS 수정은 변경을 적용하기 전까지 초안입니다. 고급 설정의 초기화는 기본값을 초안에 불러올 뿐 즉시 적용하지 않습니다. Zero Trust 엔드포인트 주소는 등록 과정에서 받으며 수정할 수 없습니다.
+프록시 주소, 포트, DNS 수정은 변경을 적용하기 전까지 초안입니다. 고급 설정의 초기화는 기본값을 초안에 불러올 뿐 즉시 적용하지 않습니다. Zero Trust는 처음에 등록된 주소를 사용합니다. 고급 네트워크 설정에서 **Zero Trust 엔드포인트 편집**을 선택하고 빨간색 전체 화면 경고를 읽은 뒤 위험과 사용 권한을 확인하여 IPv4/IPv6를 편집하고 변경을 적용하세요. 초기화는 등록된 주소를 초안에 불러오며, 다시 로그인하면 등록된 주소가 복원되고 사용자 지정 주소가 제거됩니다. 선택한 계정에 사용자 지정 Zero Trust 주소가 설정되어 있거나 현재 ZT 연결이 해당 주소를 사용하는 동안 홈에 닫을 수 없는 위험 안내가 표시됩니다.
 
 고급 네트워크 설정의 자동 선택은 계정에서 사용 가능한 엔드포인트에 병렬로 연결을 시도하며, 사용자 지정은 수동 주소를 유지합니다. 포트와 SNI는 두 모드 모두 수정할 수 있습니다. [자동 엔드포인트 선택](docs/NETWORK_SETTINGS.md#automatic-endpoints--自动选择端点)을 참고하세요.
 
@@ -194,3 +198,7 @@ HTTP/2는 시스템 TCP를 사용합니다. [HTTP/3 혼잡 제어](docs/congesti
 선택적인 [체인 프록시](docs/CHAIN_PROXY.md)는 MPL-2.0의 OpenVPN 3 Core와 Apache-2.0의 Mbed TLS를 포함합니다.
 해당 소스, 검토한 패치, 라이선스 전문은 `third_party`에 있으며, 앱의 VPN Gate 페이지에서 라이선스 고지를 확인할 수 있습니다.
 WireGuard는 BoringTun 0.7.1(BSD-3-Clause)을, 로컬 SVG 아이콘은 flutter_svg 2.3.0(MIT)을 사용합니다. 해당 고지는 앱의 라이선스 목록에도 포함되어 있습니다.
+
+---
+
+Cloudflare, WARP 및 Cloudflare One은 미국 및 기타 관할 지역에서 Cloudflare, Inc.의 상표 또는 등록 상표입니다.

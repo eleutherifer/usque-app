@@ -1,5 +1,14 @@
 /// Russian UI catalog.
 const Map<String, String> kRuCatalog = <String, String>{
+  'warp_dns_type': 'DNS WARP',
+  'warp_dns_bootstrap_optional': 'Необязательно',
+  'warp_dns_plain': 'Обычный DNS',
+  'warp_dns_unsupported': 'Шифрованный DNS недоступен',
+  'warp_dns_invalid_mode': 'Тип DNS не поддерживается',
+  'warp_dns_invalid_name': 'Введите имя сервера',
+  'warp_dns_invalid_path': 'Введите допустимый путь',
+  'warp_dns_invalid_bootstrap': 'Введите 1–8 IP-адресов',
+
   'disable_quic': "Отключить QUIC",
   'disable_quic_managed': 'Автоматически управляется текущим подключением',
   'disable_quic_help':
@@ -27,6 +36,13 @@ const Map<String, String> kRuCatalog = <String, String>{
   'tray_connect_profile': 'Подключить текущий аккаунт',
   'tray_disconnect_profile': 'Отключить текущий аккаунт',
   'tray_disconnect_exit': 'Отключить и выйти',
+  'notice_connection_interrupted':
+      'Подключение прервано. Usque пытается его восстановить.',
+  'notice_connection_failed':
+      'Usque не удалось сохранить подключение. Откройте Usque, чтобы узнать подробности.',
+  'notice_connection_restored': 'Подключение восстановлено.',
+  'notice_kill_switch_blocking':
+      'Kill Switch блокирует сетевой трафик, пока подключение не восстановится или вы не отключитесь.',
   'connection_status': 'Состояние подключения',
   'outputs': '{tunnel} и локальные прокси',
   'home': 'Главная',
@@ -106,8 +122,22 @@ const Map<String, String> kRuCatalog = <String, String>{
       'Войдите снова в ту же организацию, чтобы восстановить подключение аккаунта.',
   'zero_trust_metadata_missing':
       'Сохранённые сведения об организации неполны. Добавьте новый аккаунт Zero Trust и войдите снова.',
-  'zero_trust_endpoint_managed':
-      'Этот адрес сервера задаётся аккаунтом организации. Здесь его изменить нельзя.',
+  "zero_trust_endpoint_home_risk_title": "Риски собственных адресов Zero Trust",
+  "zero_trust_endpoint_home_risk_body":
+      "Собственные узлы Zero Trust могут угрожать вашей конфиденциальности и безопасности данных. Используйте только доверенные узлы, доступ к которым вам разрешён.",
+  "zero_trust_endpoint_edit": "Изменить адреса Zero Trust",
+  "zero_trust_endpoint_risk_title": "Риски изменения адресов Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Узлы неизвестного происхождения могут угрожать вашей конфиденциальности и безопасности данных.\n\nНеверные адреса могут привести к сбою подключения.\n\nИспользуйте только доверенные узлы, доступ к которым вам разрешён, и соблюдайте требования организации.",
+  "zero_trust_endpoint_risk_ack":
+      "Я понимаю риски и подтверждаю, что имею право использовать этот узел.",
+  "zero_trust_endpoint_risk_continue": "Принять риски и продолжить",
+  "zero_trust_endpoint_risk_locked":
+      "Подтвердите риски перед изменением этих адресов.",
+  "zero_trust_endpoint_unsupported":
+      "Обновите Usque для изменения адресов Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Повторный вход восстанавливает зарегистрированные адреса и удаляет ваши собственные адреса.",
   'experimental': 'Экспериментально',
   'show_license': 'Показать License Key',
   'hide_license': 'Скрыть License Key',
@@ -323,7 +353,7 @@ const Map<String, String> kRuCatalog = <String, String>{
       'Проверяйте проблемы подключения, экспортируйте журналы и управляйте локальными данными.',
   'engine_status': 'Сведения о подключении',
   'version': 'Версия',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Локальные журналы',
   'export_diagnostics': 'Экспортировать диагностический пакет',
   'diagnostics_saved': 'Диагностический пакет сохранён в',
@@ -336,7 +366,9 @@ const Map<String, String> kRuCatalog = <String, String>{
       'Отменить это нельзя. Usque отключится, удалит все аккаунты и данные входа, затем вернётся к первоначальной настройке.',
   'clear_all_data_complete': 'Все локальные данные Usque очищены.',
   'unofficial':
-      'Неофициальный клиент, совместимый с Cloudflare WARP. Не связан с Cloudflare и не одобрен этой компанией.',
+      'Неофициальный клиент, совместимый с сервисами Cloudflare® WARP®. Не связан с Cloudflare, Inc., не спонсируется и не одобрен этой компанией.',
+  'trademark_attribution':
+      'Cloudflare и WARP — товарные знаки и/или зарегистрированные товарные знаки Cloudflare, Inc. в США и других юрисдикциях.',
   'welcome_title': 'Добро пожаловать в Usque',
   'setup_progress': 'Шаг настройки {current} из {total}',
   'get_started': 'Начать работу',

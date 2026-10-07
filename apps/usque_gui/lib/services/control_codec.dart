@@ -77,6 +77,14 @@ class ControlCodec {
       directDns.string(4, bootstrapIp);
     }
     directDns.unsigned(5, profile.directDns.port);
+    final warpDns = ControlPayloadWriter()
+      ..enumeration(1, _warpDnsModeWireValue(profile.warpDns.mode))
+      ..string(2, profile.warpDns.serverName)
+      ..string(3, profile.warpDns.dohPath);
+    for (final bootstrapIp in profile.warpDns.bootstrapIps) {
+      warpDns.string(4, bootstrapIp);
+    }
+    warpDns.unsigned(5, profile.warpDns.port);
     final writer = ControlPayloadWriter()
       ..string(1, profile.id)
       ..string(2, profile.name)
@@ -104,6 +112,9 @@ class ControlCodec {
       writer.string(23, domain);
     }
     writer.message(17, directDns.takeBytes());
+    if (profile.warpDns != const WarpDnsSettings()) {
+      writer.message(24, warpDns.takeBytes());
+    }
     writer.enumeration(
       18,
       _congestionControlWireValue(profile.congestionControl),
@@ -715,6 +726,8 @@ ProfileCatalog _decodeProfileCatalog(_ProtoReader reader) {
         var cleanupPending = false;
         var provider = IdentityProvider.consumer;
         var organization = '';
+        var registeredEndpointIpv4 = '';
+        var registeredEndpointIpv6 = '';
         while (!status.isDone) {
           final statusField = status.field();
           switch (statusField.number) {
@@ -741,6 +754,10 @@ ProfileCatalog _decodeProfileCatalog(_ProtoReader reader) {
               }
             case 7:
               organization = status.string(statusField);
+            case 8:
+              registeredEndpointIpv4 = status.string(statusField);
+            case 9:
+              registeredEndpointIpv6 = status.string(statusField);
             default:
               status.skip(statusField);
           }
@@ -754,6 +771,8 @@ ProfileCatalog _decodeProfileCatalog(_ProtoReader reader) {
             cleanupPending: cleanupPending,
             provider: provider,
             organization: organization,
+            registeredEndpointIpv4: registeredEndpointIpv4,
+            registeredEndpointIpv6: registeredEndpointIpv6,
           );
         }
       default:
@@ -811,6 +830,7 @@ UsqueProfile _decodeProfile(_ProtoReader reader) {
   final geoDirectCountries = <String>[];
   final bypassDomains = <String>[];
   var directDns = defaults.directDns;
+  var warpDns = defaults.warpDns;
 
   while (!reader.isDone) {
     final field = reader.field();
@@ -910,6 +930,8 @@ UsqueProfile _decodeProfile(_ProtoReader reader) {
         bypassDomains.add(reader.string(field));
       case 17:
         directDns = _decodeDirectDnsSettings(reader.message(field));
+      case 24:
+        warpDns = _decodeWarpDnsSettings(reader.message(field));
       case 18:
         final value = reader.varint(field);
         congestionControl = value == 0
@@ -974,8 +996,55 @@ UsqueProfile _decodeProfile(_ProtoReader reader) {
     proxy: proxy,
     frontends: frontends,
     directDns: directDns,
+    warpDns: warpDns,
   );
 }
+
+WarpDnsSettings _decodeWarpDnsSettings(_ProtoReader reader) {
+  var mode = WarpDnsMode.plain;
+  var serverName = '';
+  var dohPath = '';
+  final bootstrapIps = <String>[];
+  var port = 0;
+  while (!reader.isDone) {
+    final field = reader.field();
+    switch (field.number) {
+      case 1:
+        mode = _decodeWarpDnsMode(reader.varint(field));
+      case 2:
+        serverName = reader.string(field);
+      case 3:
+        dohPath = reader.string(field);
+      case 4:
+        bootstrapIps.add(reader.string(field));
+      case 5:
+        port = reader.varint(field);
+      default:
+        reader.skip(field);
+    }
+  }
+  return WarpDnsSettings(
+    mode: mode,
+    serverName: serverName,
+    dohPath: dohPath,
+    bootstrapIps: List<String>.unmodifiable(bootstrapIps),
+    port: port,
+  );
+}
+
+int _warpDnsModeWireValue(WarpDnsMode mode) => switch (mode) {
+  WarpDnsMode.unknown => 0,
+  WarpDnsMode.plain => 1,
+  WarpDnsMode.doh => 2,
+  WarpDnsMode.dot => 3,
+};
+
+WarpDnsMode _decodeWarpDnsMode(int value) => switch (value) {
+  1 => WarpDnsMode.plain,
+  2 => WarpDnsMode.doh,
+  3 => WarpDnsMode.dot,
+  _ => WarpDnsMode.unknown,
+};
 
 DirectDnsSettings _decodeDirectDnsSettings(_ProtoReader reader) {
   var mode = DirectDnsMode.physicalSystem;
@@ -1676,6 +1745,8 @@ EngineCapabilities _decodeCapabilities(_ProtoReader reader) {
   final congestionAlgorithms = <CongestionControlAlgorithm>[];
   var networkQuality = false;
   var encryptedDirectDns = false;
+  var encryptedWarpDns = false;
+  var zeroTrustEndpointEditing = false;
   var quicMigration = false;
   var automaticPmtu = false;
   while (!reader.isDone) {
@@ -1709,6 +1780,10 @@ EngineCapabilities _decodeCapabilities(_ProtoReader reader) {
         automaticEndpoints = reader.varint(field) != 0;
       case 43:
         chainProxyEncryptedDns = reader.varint(field) != 0;
+      case 44:
+        encryptedWarpDns = reader.varint(field) != 0;
+      case 45:
+        zeroTrustEndpointEditing = reader.varint(field) != 0;
       case 40:
         chainSocks5Proxy = reader.varint(field) != 0;
       case 38:
@@ -1768,6 +1843,8 @@ EngineCapabilities _decodeCapabilities(_ProtoReader reader) {
     h3CongestionControlAlgorithms: List.unmodifiable(congestionAlgorithms),
     networkQuality: networkQuality,
     encryptedDirectDns: encryptedDirectDns,
+    encryptedWarpDns: encryptedWarpDns,
+    zeroTrustEndpointEditing: zeroTrustEndpointEditing,
     quicMigration: quicMigration,
     automaticPmtu: automaticPmtu,
   );

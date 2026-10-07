@@ -8,7 +8,7 @@ Only packages attached to a GitHub Release for this repository, with matching ch
 
 Pre-1.0 official packages use two fixed, project-controlled self-signed identities:
 
-- Windows Authenticode for the installer bundle, its detached Burn engine, the update MSI, and every EXE/DLL in the Windows application payload inside that MSI except the official Wintun DLL
+- Windows Authenticode for the installer bundle, its detached Burn engine, its native setup EXE, the update MSI, and every EXE/DLL in the Windows application payload inside that MSI except the official Wintun DLL
 - an Android release certificate for every official APK
 
 Those identities are not a public CA and are not in the Windows Root or Trusted Publisher stores. Windows will show an unknown-publisher warning. That is expected. The installer does not install the certificate into the machine trust stores.
@@ -17,10 +17,12 @@ A v1.0.0 change of signing identity is a separate release. Until then, the pre-1
 
 ## Android developer verification
 
-The Android package name `io.github.georgexie2333.usque` and current official
-release certificate are registered to a verified developer identity through
-Android developer verification. Registration records package-name and signing-key
-ownership; it is not an app-content review or Google Play distribution.
+Official Android releases require the package name
+`io.github.georgexie2333.usque` and current official release certificate to be
+registered to a verified developer identity through Android developer
+verification. Registration records package-name and signing-key ownership; it
+is not an app-content review or Google Play distribution. This document does
+not verify the live console registration state.
 
 Every official Android release must use that application ID and the certificate
 identified by `ANDROID_SIGNER_SHA256`, and that pair must remain **Registered**
@@ -32,7 +34,7 @@ before distribution. Developer verification does not authorize key rotation.
 
 | Artifact | Signer |
 | --- | --- |
-| Official Windows installer bundle and its detached Burn engine | project Authenticode identity |
+| Official Windows installer bundle, its detached Burn engine and embedded native setup EXE | project Authenticode identity |
 | Official Windows MSI | project Authenticode identity |
 | Every EXE/DLL in the Windows application payload inside that MSI, including Usque binaries and the Flutter engine and plugin DLLs from the Flutter release build, except the official Wintun DLL | same identity |
 | Official per-ABI and universal APKs | project Android release certificate |
@@ -40,7 +42,7 @@ before distribution. Developer verification does not authorize key rotation.
 | Local validation MSI/APK | a throwaway identity created on the build machine; never official |
 
 Unsigned project binaries must not ship in an official Windows package. The
-release signs the MSI before embedding it, then follows WiX's detach/sign/
+release signs the MSI and native setup EXE before embedding them, then follows WiX's detach/sign/
 reattach/sign sequence so both the Burn engine and final bundle carry the same
 project identity. A signer mismatch, a modified Wintun DLL, a malformed
 language transform, or a missing official fingerprint fails the release.
@@ -59,6 +61,16 @@ Public fingerprints are repository or environment variables (`WINDOWS_SIGNER_SHA
 
 Only the release maintainer may approve `release-signing` and `release-publish`. A local bundle, MSI, or APK cannot replace a failed or missing GitHub Actions build.
 
+For `v0.3.0`, retain both pre-1.0 identities. Before approving signing, confirm
+the live environment protection settings, the two public certificate
+fingerprints, and Android's **Registered** application-ID/certificate pair.
+Before approving publication, review the exact tagged commit and staged
+`release-manifest.json`; its eight package names, sizes, SHA-256 values and
+signer fingerprints must describe the candidate produced by that release run.
+A documentation review, a previous release's signatures or a local compile is
+not that evidence. The coordinated `v0.3.0` contract and required checks are
+described in [Preparing v0.3.0](RELEASE.md#preparing-v030).
+
 ## What users should check
 
 Follow [Verify before installing](INSTALLATION.md#verify-before-installing) for
@@ -70,7 +82,11 @@ shows how to verify GitHub's build attestation.
 
 Do not import a signing certificate from an unofficial package, and do not turn off antivirus or the firewall to make an installer run.
 
-On Windows, after install, the Agent accepts the official self-signed identity only when Windows has checked the Authenticode digest and the certificate fingerprint matches the packaged value. Any other chain result is rejected.
+On Windows, after install, the Agent accepts the official self-signed identity
+only when Windows has checked the Authenticode digest and signature, the chain
+result is success (`0`) or the expected `CERT_E_UNTRUSTEDROOT`, and the
+certificate's DER SHA-256 matches the packaged value. Every other trust result
+is rejected; success never bypasses the fixed fingerprint check.
 
 ## Rotation and compromise
 

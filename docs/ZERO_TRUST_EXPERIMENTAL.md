@@ -1,6 +1,6 @@
-# Experimental Cloudflare Zero Trust enrollment
+# Experimental Cloudflare® Zero Trust enrollment
 
-Usque can experimentally register a new account with a Cloudflare Zero Trust organization on Windows and Android. This feature is intentionally narrower than the Cloudflare One Client: it uses the organization account to create a persistent device identity, then carries Internet traffic through Usque's existing MASQUE tunnel.
+Usque can experimentally register a new account with a Cloudflare Zero Trust organization on Windows and Android. This feature is intentionally narrower than the Cloudflare One™ Client: it uses the organization account to create a persistent device identity, then carries Internet traffic through Usque's existing MASQUE tunnel.
 
 It does not implement organization policy synchronization, device posture, managed DNS, Split Tunnels, private-network routing, WARP-to-WARP, service-token enrollment, or automatic client-session reauthentication. The Android per-app proxy picker is a local UID filter on this device; it is not Cloudflare One Split Tunnel or organization policy sync. Gateway policy can still affect traffic on Cloudflare's side, but Usque does not claim full Cloudflare One Client compatibility.
 
@@ -10,13 +10,45 @@ It does not implement organization policy synchronization, device posture, manag
 2. Enter the organization's single-label team name.
 3. Accept the existing Cloudflare terms and open `https://<team>.cloudflareaccess.com/warp` in the system browser.
 4. Complete the organization's Access/IdP login.
-5. After Access login, return to Usque. Android may show an app chooser if the official WARP client is also installed. On Windows, starting login temporarily registers Usque as the current-user Access callback handler so Windows can forward the callback to the open window. The handler is released when a valid callback arrives. You can also paste the complete `com.cloudflare.warp://.../auth?token=...` callback or fill it from the clipboard. Manual paste remains available on both platforms.
+5. After Access login, return to Usque. Android may show an app chooser if the official WARP® client is also installed. On Windows, starting login temporarily registers Usque as the current-user Access callback handler so Windows can forward the callback to the open window. The handler is released when a valid callback arrives. You can also paste the complete `com.cloudflare.warp://.../auth?token=...` callback or fill it from the clipboard. Manual paste remains available on both platforms.
 6. Wait for Usque to finish registration, then connect with the new account.
-   Its IPv4 and IPv6 entry addresses come from registration and cannot be edited.
+   Its initial IPv4 and IPv6 entry addresses come from registration.
    Port and SNI are shared network settings, initially `443` and
    `speed.cloudflare.com`.
 
 The Access assertion is never written to the profile, vault, Android saved state, or logs. It is bounded to 64 KiB, accepted only for the expected team and exact callback shape, held in memory, consumed once, and discarded after submission. A restarted Android process has no active login and rejects the callback.
+
+## Edit endpoint addresses
+
+Open **Settings → Advanced network settings**, choose **Edit Zero Trust
+endpoints**, read the red fullscreen warning, and check that you understand the
+risks and are authorized to use the endpoint. Only then can you continue editing
+IPv4 and IPv6. Use numeric IP addresses from a trusted, authorized source; an
+incorrect address may prevent connection. The editor does not restrict manual
+addresses to Cloudflare ranges. Existing TLS and endpoint public-key checks
+still apply, so an arbitrary server is not guaranteed to work.
+
+Choose **Apply changes** to save. The addresses belong only to the current ZT
+account. Cancel or Back leaves them locked; each new visit requires confirmation.
+ZT has no Automatic picker. Port and SNI remain shared settings.
+Home also keeps a non-dismissible privacy and data-security risk notice visible
+for the selected account's saved custom addresses and any still-active custom ZT
+session. Restoring saved defaults alone cannot dismiss the notice while the old
+custom session is still running.
+
+**Reset network defaults** stages the latest registered addresses in the draft
+without unlocking risky editing. Apply to restore them. Signing in again also
+restores the newly registered addresses and removes custom addresses. A failed
+save or interrupted sign-in preserves the previous settings.
+
+在 **设置 → 高级网络设置** 中选择 **编辑 Zero Trust 端点**，阅读红色全屏警告，
+勾选确认风险及使用授权后继续编辑 IPv4/IPv6，再点击 **应用修改**。取消或返回不会
+解锁，每次重新进入都需确认。只使用可信且获授权的端点；地址不限制 Cloudflare
+网段，但仍需通过现有 TLS 和端点公钥校验。地址仅属于当前 ZT 账号，端口和 SNI
+继续共享。“恢复网络默认值”暂存注册地址，应用后恢复；重新登录成功也会恢复
+注册地址并移除自定义地址。保存失败或登录中断会保留之前的设置。
+当前账号配置自定义地址，或当前 ZT 连接仍在使用自定义地址时，首页还会常驻
+不可关闭的隐私和数据安全风险提示；仅恢复已保存设置不会提前清除仍在运行的连接警告。
 
 ## Account and registration rules
 
@@ -27,9 +59,9 @@ identity and profile together. The rules below also cover interrupted saves.
 
 - A profile with no provider binding, identity material, or pending identity transaction may select Consumer WARP or Zero Trust during its first provisioning. Once a provider is claimed, the existing provider boundary applies.
 - Consumer profiles cannot be converted to Zero Trust profiles.
-- A Zero Trust profile can sign in again only to the same organization. This refreshes its device registration, credentials, and registration-owned IPv4/IPv6 endpoint addresses without replacing the shared port or SNI. Credential replacement is journaled so an interrupted local commit restores the previous credentials and address pair on the next startup.
+- A Zero Trust profile can sign in again only to the same organization. This refreshes its device registration, credentials, and registration-owned IPv4/IPv6 endpoint addresses and clears any custom override without replacing the shared port or SNI. Credential replacement is journaled so an interrupted local commit restores the previous credentials, registered address pair and custom override on the next startup.
 - Provider and organization are mirrored in a versioned, non-secret profile binding. The vault metadata must match it; missing or conflicting metadata is invalid and may only be repaired by signing in to the bound organization. Unbound pre-feature profiles remain legacy Consumer identities.
-- Zero Trust IPv4/IPv6 endpoint addresses come only from registration and are account-specific. Port and SNI are device-wide settings shared by Consumer and Zero Trust profiles; editing or resetting either from any account updates every profile. Upgrading a legacy or schema-10 configuration keeps the historical registered address pair while moving port and SNI to the shared values. An experimental schema-11 build recovers the pair from its preserved migration backup when possible; without recoverable data the identity is marked invalid and must sign in again instead of silently using Consumer addresses.
+- Zero Trust IPv4/IPv6 endpoint addresses are account-specific and may use a local override. Registration-owned addresses remain separately stored for reset and sign-in. Port and SNI are device-wide settings shared by Consumer and Zero Trust profiles; editing or resetting either from any account updates every profile. Upgrading a legacy or schema-10 configuration keeps the historical registered address pair while moving port and SNI to the shared values. An experimental schema-11 build recovers the pair from its preserved migration backup when possible; without recoverable data the identity is marked invalid and must sign in again instead of silently using Consumer addresses.
 - Zero Trust profiles have no Usque WARP License operation. License copy, bind/unbind, and WARP Secret export are hidden and rejected by the engine.
 - Deleting a profile removes only local credentials. It does not revoke the device registration in the organization dashboard; an administrator must remove residual or test registrations there.
 - Registration never falls back to a Consumer identity after a Zero Trust failure.
@@ -65,3 +97,7 @@ promote it to production-supported status. Product publication follows
 [Release process](RELEASE.md) and its required gates; supplemental protected-runner
 results do not block publication. Do not silently fall back to Consumer
 registration or probe undocumented API variants.
+
+---
+
+Cloudflare, WARP and Cloudflare One are trademarks and/or registered trademarks of Cloudflare, Inc. in the United States and other jurisdictions.

@@ -11,6 +11,7 @@ import 'package:usque/models/app_models.dart';
 import 'package:usque/models/network_settings.dart';
 import 'package:usque/screens/advanced_settings_screen.dart';
 import 'package:usque/screens/diagnostics_screen.dart';
+import 'package:usque/screens/home_screen.dart';
 import 'package:usque/screens/onboarding_screen.dart';
 import 'package:usque/screens/shell_screen.dart';
 import 'package:usque/screens/vpn_gate_screen.dart';
@@ -22,15 +23,19 @@ import 'package:usque/widgets/common.dart';
 import 'package:usque/widgets/connection_ring.dart';
 import 'package:usque/widgets/country_flag.dart';
 import 'package:usque/widgets/usque_dialog.dart';
+import 'package:usque/widgets/usque_logo.dart';
 import 'package:usque/widgets/vpn_gate_entry.dart';
 import 'package:usque/widgets/vpn_gate_server_row.dart';
+import 'package:usque/widgets/warp_dns_editor.dart';
 import 'package:usque/widgets/window_titlebar.dart';
+import 'package:usque/widgets/zero_trust_endpoint_warning.dart';
 
 import 'quality_test_support.dart' show qualityFixture;
 import 'ui_workflow_test.dart' show WorkflowEngine, workflowHost;
 import 'vpn_gate_server_row_test.dart' show observationNow, observationServer;
 import 'vpn_gate_summary_test.dart' show current;
 import 'vpngate_test.dart' show GateEngine, server;
+import 'zero_trust_endpoint_test.dart' show ztEngine;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +61,14 @@ void main() {
       await loader.load();
     }
     if (Platform.isWindows) {
+      await (FontLoader('Tahoma')..addFont(
+            SynchronousFuture(
+              ByteData.sublistView(
+                File(r'C:\Windows\Fonts\tahoma.ttf').readAsBytesSync(),
+              ),
+            ),
+          ))
+          .load();
       await (FontLoader('Microsoft YaHei UI')..addFont(
             SynchronousFuture(
               ByteData.sublistView(
@@ -66,6 +79,188 @@ void main() {
           .load();
     }
   });
+
+  for (final fixture in [
+    (
+      name: 'zt_warning_desktop_dark',
+      locale: LocalePreference.english,
+      size: const Size(1280, 900),
+      dark: true,
+      rtl: false,
+    ),
+    (
+      name: 'zt_warning_phone_light',
+      locale: LocalePreference.simplifiedChinese,
+      size: const Size(375, 812),
+      dark: false,
+      rtl: false,
+    ),
+    (
+      name: 'zt_warning_persian_landscape',
+      locale: LocalePreference.persian,
+      size: const Size(812, 375),
+      dark: true,
+      rtl: true,
+    ),
+  ]) {
+    testWidgets('ZT warning golden ${fixture.name}', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = fixture.size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      final boundary = GlobalKey();
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: boundary,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: fixture.dark ? UsqueTheme.dark() : UsqueTheme.light(),
+            home: Directionality(
+              textDirection: fixture.rtl
+                  ? TextDirection.rtl
+                  : TextDirection.ltr,
+              child: ZeroTrustEndpointWarning(
+                strings: AppStrings(fixture.locale),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await expectLater(
+        find.byKey(boundary),
+        matchesGoldenFile('goldens/${fixture.name}.png'),
+      );
+    }, tags: 'golden');
+  }
+
+  for (final fixture in [
+    (
+      name: 'zt_home_risk_desktop_dark',
+      locale: LocalePreference.english,
+      size: const Size(1280, 900),
+      dark: true,
+      rtl: false,
+    ),
+    (
+      name: 'zt_home_risk_phone_light',
+      locale: LocalePreference.simplifiedChinese,
+      size: const Size(375, 812),
+      dark: false,
+      rtl: false,
+    ),
+    (
+      name: 'zt_home_risk_persian_landscape',
+      locale: LocalePreference.persian,
+      size: const Size(812, 375),
+      dark: true,
+      rtl: true,
+    ),
+  ]) {
+    testWidgets('ZT Home risk golden ${fixture.name}', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = fixture.size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      final engine = ztEngine(custom: true);
+      final app = AppController(engine)
+        ..profiles = engine.storedProfiles
+        ..activeProfileId = engine.storedActiveProfileId
+        ..profileIdentityStatuses = engine.storedIdentityStatuses
+        ..localePreference = fixture.locale;
+      try {
+        final boundary = GlobalKey();
+        await tester.pumpWidget(
+          RepaintBoundary(
+            key: boundary,
+            child: workflowHost(
+              app,
+              dark: fixture.dark,
+              home: Directionality(
+                textDirection: fixture.rtl
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                child: HomeScreen(controller: app),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey('home-zero-trust-endpoint-risk')),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+        await expectLater(
+          find.byKey(boundary),
+          matchesGoldenFile('goldens/${fixture.name}.png'),
+        );
+        await tester.pumpWidget(const SizedBox.shrink());
+      } finally {
+        app.dispose();
+      }
+    }, tags: 'golden');
+  }
+
+  for (final doh in [true, false]) {
+    testWidgets('compact WARP DNS ${doh ? 'doh_en_light' : 'dot_zh_dark'}', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(420, 650);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      final boundary = GlobalKey();
+      final strings = AppStrings(
+        doh ? LocalePreference.english : LocalePreference.simplifiedChinese,
+      );
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: boundary,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: doh ? UsqueTheme.light() : UsqueTheme.dark(),
+            home: Scaffold(
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  child: ContentSection(
+                    icon: LucideIcons.network,
+                    title: strings.get('ip_dns'),
+                    children: [
+                      WarpDnsEditor(
+                        value: WarpDnsSettings(
+                          mode: doh ? WarpDnsMode.doh : WarpDnsMode.dot,
+                          serverName: 'dns.example.com',
+                          dohPath: doh ? '/dns-query' : '',
+                          port: doh ? 443 : 853,
+                          bootstrapIps: const ['192.0.2.1', '2001:db8::1'],
+                        ),
+                        enabled: true,
+                        strings: strings,
+                        onChanged: (_) {},
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text(strings.get('nq_dns_scope')), findsNothing);
+      expect(find.text(strings.get('nq_dns_no_fallback')), findsNothing);
+      await expectLater(
+        find.byKey(boundary),
+        matchesGoldenFile(
+          'goldens/warp_dns_${doh ? 'doh_en_light' : 'dot_zh_dark'}.png',
+        ),
+      );
+    }, tags: 'golden');
+  }
 
   for (final custom in [false, true]) {
     testWidgets('endpoint selection ${custom ? 'custom_zh' : 'automatic_en'}', (
@@ -468,7 +663,9 @@ void main() {
           final context = tester.element(find.byType(ShellScreen));
           await Future.wait([
             precacheImage(
-              const AssetImage('assets/branding/usque-ui-icon.png'),
+              AssetImage(
+                UsqueLogo.assetFor(dark ? Brightness.dark : Brightness.light),
+              ),
               context,
             ),
             if (phone)
@@ -554,10 +751,7 @@ void main() {
         final context = tester.element(find.byType(VpnGateScreen));
         await Future.wait([
           precacheImage(const AssetImage('assets/flags/w80/jp.png'), context),
-          precacheImage(
-            const AssetImage('assets/branding/usque-ui-icon.png'),
-            context,
-          ),
+          precacheImage(const AssetImage(UsqueLogo.darkAsset), context),
         ]);
       });
       await tester.pumpAndSettle();
@@ -627,10 +821,7 @@ void main() {
         await Future.wait([
           precacheImage(const AssetImage('assets/flags/w80/jp.png'), context),
           precacheImage(const AssetImage('assets/flags/w80/kr.png'), context),
-          precacheImage(
-            const AssetImage('assets/branding/usque-ui-icon.png'),
-            context,
-          ),
+          precacheImage(const AssetImage(UsqueLogo.darkAsset), context),
         ]);
       });
       await tester.pumpAndSettle();
@@ -817,6 +1008,11 @@ void main() {
               );
               await tester.pumpAndSettle();
               final reason = '$size dpi=$dpi connected=$connected zh=$zh';
+              expect(
+                tester.getTopLeft(find.text(app.strings.get('duration'))).dy,
+                tester.getTopLeft(find.text(app.strings.get('protocol'))).dy,
+                reason: reason,
+              );
               expect(tester.getSize(find.byType(WindowTitleBar)).height, 40);
               final scrollable = find
                   .descendant(
@@ -880,7 +1076,7 @@ void main() {
               if (dpi == 1.25 && !connected && zh) {
                 await tester.runAsync(
                   () => precacheImage(
-                    const AssetImage('assets/branding/usque-ui-icon.png'),
+                    const AssetImage(UsqueLogo.lightAsset),
                     tester.element(find.byType(MaterialApp)),
                   ),
                 );
@@ -1409,7 +1605,11 @@ void main() {
         await tester.runAsync(() async {
           final context = tester.element(find.byType(MaterialApp));
           await precacheImage(
-            const AssetImage('assets/branding/usque-ui-icon.png'),
+            AssetImage(
+              UsqueLogo.assetFor(
+                scene.dark ? Brightness.dark : Brightness.light,
+              ),
+            ),
             context,
           );
           if (scene.connected) {
@@ -1546,7 +1746,9 @@ void main() {
           );
           await tester.runAsync(
             () => precacheImage(
-              const AssetImage('assets/branding/usque-ui-icon.png'),
+              AssetImage(
+                UsqueLogo.assetFor(phone ? Brightness.light : Brightness.dark),
+              ),
               tester.element(find.byType(MaterialApp)),
             ),
           );

@@ -299,6 +299,7 @@ impl AppConfig {
                         id: profile.id,
                         name: profile.name,
                         managed_endpoint_ips,
+                        zero_trust_endpoint_override: None,
                     }
                 })
                 .collect(),
@@ -454,6 +455,16 @@ fn migrate_app_config(config: &mut AppConfig) {
         config.initial_identity_operation = None;
         config.schema_version = 21;
     }
+    if config.schema_version < 22 {
+        config.network.warp_dns = crate::WarpDnsSettings::default();
+        config.schema_version = 22;
+    }
+    if config.schema_version < 23 {
+        for account in &mut config.profiles {
+            account.zero_trust_endpoint_override = None;
+        }
+        config.schema_version = 23;
+    }
 }
 
 #[cfg(not(windows))]
@@ -552,10 +563,67 @@ mod tests {
         };
         store.save(&config).unwrap();
         let loaded = store.load().unwrap();
-        assert_eq!(loaded.schema_version, 21);
+        assert_eq!(loaded.schema_version, CURRENT_SCHEMA_VERSION);
         assert!(loaded.initial_identity_operation.is_none());
         assert_eq!(loaded.profiles, config.profiles);
         assert_eq!(loaded.network, config.network);
+    }
+
+    #[test]
+    fn zero_trust_override_persists_and_schema_twenty_two_retains_registration() {
+        let directory = tempfile::tempdir().unwrap();
+        let store = super::ConfigStore::new(directory.path().join("config.json"));
+        let mut config = crate::AppConfig::default();
+        let id = config.active_profile_id.unwrap();
+        let registered = ManagedEndpointIps {
+            ipv4: "162.159.197.2".parse().unwrap(),
+            ipv6: "2606:4700:102::2".parse().unwrap(),
+        };
+        config
+            .set_managed_endpoint_ips(id, registered.clone())
+            .unwrap();
+        config.schema_version = 22;
+        store.save(&config).unwrap();
+        let mut loaded = store.load().unwrap();
+        assert_eq!(loaded.schema_version, 23);
+        assert_eq!(
+            loaded.account(id).unwrap().managed_endpoint_ips,
+            Some(registered.clone())
+        );
+        assert!(
+            loaded
+                .account(id)
+                .unwrap()
+                .zero_trust_endpoint_override
+                .is_none()
+        );
+        let custom = ManagedEndpointIps {
+            ipv4: "192.0.2.45".parse().unwrap(),
+            ipv6: "2001:db8::45".parse().unwrap(),
+        };
+        loaded.account_mut(id).unwrap().zero_trust_endpoint_override = Some(custom.clone());
+        store.save(&loaded).unwrap();
+        let restored = store.load().unwrap();
+        assert_eq!(
+            restored.account(id).unwrap().managed_endpoint_ips,
+            Some(registered.clone())
+        );
+        assert_eq!(
+            restored.active_profile().unwrap().endpoint.ipv4,
+            custom.ipv4
+        );
+        assert_eq!(
+            restored.account(id).unwrap().zero_trust_endpoint_override,
+            Some(custom)
+        );
+        loaded.set_managed_endpoint_ips(id, registered).unwrap();
+        assert!(
+            loaded
+                .account(id)
+                .unwrap()
+                .zero_trust_endpoint_override
+                .is_none()
+        );
     }
     use super::*;
 
@@ -1193,6 +1261,37 @@ mod tests {
         };
         assert_eq!(migrated.network.endpoint, legacy_defaults);
         assert_eq!(migrated.active_profile().unwrap().endpoint, legacy_defaults);
+    }
+
+    #[test]
+    fn schema_twenty_one_adds_plain_warp_dns_and_preserves_numeric_servers() {
+        let directory = tempfile::tempdir().unwrap();
+        let store = ConfigStore::new(directory.path().join("config.json"));
+        let mut config = AppConfig::default();
+        config.network.dns_servers =
+            vec!["9.9.9.9".parse().unwrap(), "2620:fe::fe".parse().unwrap()];
+        let saved_servers = config.network.dns_servers.clone();
+        let mut value = serde_json::to_value(config).unwrap();
+        value["schema_version"] = serde_json::json!(21);
+        value["network"].as_object_mut().unwrap().remove("warp_dns");
+        fs::write(store.path(), serde_json::to_vec_pretty(&value).unwrap()).unwrap();
+
+        let migrated = store.load().unwrap();
+        assert_eq!(migrated.schema_version, CURRENT_SCHEMA_VERSION);
+        assert_eq!(migrated.network.warp_dns, crate::WarpDnsSettings::default());
+        assert_eq!(migrated.network.dns_servers, saved_servers);
+        assert_eq!(store.load().unwrap(), migrated);
+        assert!(store.backup_path().exists());
+    }
+
+    #[test]
+    fn stored_unknown_warp_dns_mode_fails_closed() {
+        let directory = tempfile::tempdir().unwrap();
+        let store = ConfigStore::new(directory.path().join("config.json"));
+        let mut value = serde_json::to_value(AppConfig::default()).unwrap();
+        value["network"]["warp_dns"] = serde_json::json!({"mode": "future"});
+        fs::write(store.path(), serde_json::to_vec_pretty(&value).unwrap()).unwrap();
+        assert!(store.load().is_err());
     }
 
     #[test]

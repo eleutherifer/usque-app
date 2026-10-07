@@ -1,5 +1,14 @@
 /// French UI catalog.
 const Map<String, String> kFrCatalog = <String, String>{
+  'warp_dns_type': 'DNS WARP',
+  'warp_dns_bootstrap_optional': 'Facultatif',
+  'warp_dns_plain': 'DNS classique',
+  'warp_dns_unsupported': 'DNS chiffré indisponible',
+  'warp_dns_invalid_mode': 'Type DNS non pris en charge',
+  'warp_dns_invalid_name': 'Saisissez le nom du serveur',
+  'warp_dns_invalid_path': 'Saisissez un chemin valide',
+  'warp_dns_invalid_bootstrap': 'Saisissez 1 à 8 adresses IP',
+
   'disable_quic': "Désactiver QUIC",
   'disable_quic_managed': 'Géré automatiquement par cette connexion',
   'disable_quic_help':
@@ -30,6 +39,13 @@ const Map<String, String> kFrCatalog = <String, String>{
   'tray_connect_profile': 'Connecter le compte actif',
   'tray_disconnect_profile': 'Déconnecter le compte actif',
   'tray_disconnect_exit': 'Déconnecter et quitter',
+  'notice_connection_interrupted':
+      'La connexion a été interrompue. Usque tente de la rétablir.',
+  'notice_connection_failed':
+      'Usque n’a pas pu maintenir la connexion. Ouvrez Usque pour en savoir plus.',
+  'notice_connection_restored': 'La connexion a été rétablie.',
+  'notice_kill_switch_blocking':
+      'Le Kill Switch bloque le trafic réseau jusqu’au rétablissement de la connexion ou à votre déconnexion.',
   'connection_status': 'État de la connexion',
   'outputs': '{tunnel} et proxys locaux',
   'home': 'Accueil',
@@ -111,8 +127,24 @@ const Map<String, String> kFrCatalog = <String, String>{
       'Reconnectez-vous à la même organisation pour rétablir la connexion de ce compte.',
   'zero_trust_metadata_missing':
       'Les informations enregistrées sur l’organisation sont incomplètes. Ajoutez un nouveau compte Zero Trust et reconnectez-vous.',
-  'zero_trust_endpoint_managed':
-      'L’adresse du serveur est définie par le compte de l’organisation et ne peut pas être modifiée ici.',
+  "zero_trust_endpoint_home_risk_title":
+      "Risques des points de terminaison Zero Trust personnalisés",
+  "zero_trust_endpoint_home_risk_body":
+      "Les points de terminaison Zero Trust personnalisés peuvent compromettre votre confidentialité et la sécurité de vos données. Utilisez uniquement des points de terminaison fiables auxquels vous êtes autorisé à accéder.",
+  "zero_trust_endpoint_edit": "Modifier les points de terminaison Zero Trust",
+  "zero_trust_endpoint_risk_title":
+      "Risques liés à la modification des points de terminaison Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Les points de terminaison de source inconnue peuvent compromettre votre confidentialité et la sécurité de vos données.\n\nDes adresses incorrectes peuvent empêcher la connexion.\n\nUtilisez uniquement des points de terminaison fiables auxquels vous êtes autorisé à accéder et respectez les exigences de votre organisation.",
+  "zero_trust_endpoint_risk_ack":
+      "Je comprends les risques et confirme être autorisé à utiliser ce point de terminaison.",
+  "zero_trust_endpoint_risk_continue": "Accepter les risques et poursuivre",
+  "zero_trust_endpoint_risk_locked":
+      "Confirmez les risques avant de modifier ces adresses.",
+  "zero_trust_endpoint_unsupported":
+      "Mettez Usque à jour pour modifier les points de terminaison Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Une nouvelle connexion rétablit les adresses enregistrées et supprime vos adresses personnalisées.",
   'experimental': 'Expérimental',
   'show_license': 'Afficher la License Key',
   'hide_license': 'Masquer la License Key',
@@ -333,7 +365,7 @@ const Map<String, String> kFrCatalog = <String, String>{
       'Vérifiez les problèmes de connexion, exportez les journaux et gérez les données locales.',
   'engine_status': 'Informations de connexion',
   'version': 'Version',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Journaux locaux',
   'export_diagnostics': 'Exporter l’archive de diagnostics',
   'diagnostics_saved': 'Archive de diagnostics enregistrée dans',
@@ -347,7 +379,9 @@ const Map<String, String> kFrCatalog = <String, String>{
   'clear_all_data_complete':
       'Toutes les données locales Usque ont été effacées.',
   'unofficial':
-      'Client non officiel compatible avec Cloudflare WARP. Non affilié à Cloudflare ni approuvé par Cloudflare.',
+      'Client non officiel compatible avec les services Cloudflare® WARP®. Ni affilié à Cloudflare, Inc., ni parrainé ou approuvé par cette société.',
+  'trademark_attribution':
+      'Cloudflare et WARP sont des marques commerciales et/ou des marques déposées de Cloudflare, Inc. aux États-Unis et dans d’autres juridictions.',
   'welcome_title': 'Bienvenue dans Usque',
   'setup_progress': 'Étape {current} sur {total}',
   'get_started': 'Commencer',

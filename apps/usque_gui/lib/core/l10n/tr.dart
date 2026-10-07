@@ -1,5 +1,14 @@
 /// Turkish UI catalog.
 const Map<String, String> kTrCatalog = <String, String>{
+  'warp_dns_type': 'WARP DNS',
+  'warp_dns_bootstrap_optional': 'İsteğe bağlı',
+  'warp_dns_plain': 'Normal DNS',
+  'warp_dns_unsupported': 'Şifreli DNS kullanılamıyor',
+  'warp_dns_invalid_mode': 'Desteklenmeyen DNS türü',
+  'warp_dns_invalid_name': 'Sunucu adını girin',
+  'warp_dns_invalid_path': 'Geçerli bir yol girin',
+  'warp_dns_invalid_bootstrap': '1–8 IP adresi girin',
+
   'disable_quic': "QUIC’i devre dışı bırak",
   'disable_quic_managed': 'Bu bağlantı tarafından otomatik olarak yönetilir',
   'disable_quic_help':
@@ -28,6 +37,13 @@ const Map<String, String> kTrCatalog = <String, String>{
   'tray_connect_profile': 'Etkin hesabı bağla',
   'tray_disconnect_profile': 'Etkin hesabın bağlantısını kes',
   'tray_disconnect_exit': 'Bağlantıyı kes ve çık',
+  'notice_connection_interrupted':
+      'Bağlantı kesildi. Usque bağlantıyı geri yüklemeye çalışıyor.',
+  'notice_connection_failed':
+      'Usque bağlantıyı sürdüremedi. Ayrıntılar için Usque’yu açın.',
+  'notice_connection_restored': 'Bağlantı geri yüklendi.',
+  'notice_kill_switch_blocking':
+      'Bağlantı geri yüklenene veya bağlantıyı kesene kadar Kill Switch ağ trafiğini engelliyor.',
   'connection_status': 'Bağlantı durumu',
   'outputs': '{tunnel} ve yerel proxy’ler',
   'home': 'Ana sayfa',
@@ -107,8 +123,23 @@ const Map<String, String> kTrCatalog = <String, String>{
       'Bu hesabın bağlantısını geri yüklemek için aynı kuruluşta yeniden oturum açın.',
   'zero_trust_metadata_missing':
       'Kaydedilen kuruluş bilgileri eksik. Yeni bir Zero Trust hesabı ekleyip oturum açın.',
-  'zero_trust_endpoint_managed':
-      'Sunucu adresini kuruluş hesabı belirler. Bu adres burada değiştirilemez.',
+  "zero_trust_endpoint_home_risk_title": "Özel Zero Trust uç noktası riski",
+  "zero_trust_endpoint_home_risk_body":
+      "Özel Zero Trust uç noktaları gizliliğinizi ve veri güvenliğinizi riske atabilir. Yalnızca erişim yetkiniz olan güvenilir uç noktaları kullanın.",
+  "zero_trust_endpoint_edit": "Zero Trust uç noktalarını düzenle",
+  "zero_trust_endpoint_risk_title":
+      "Zero Trust uç noktalarını değiştirme riskleri",
+  "zero_trust_endpoint_risk_body":
+      "Kaynağı bilinmeyen uç noktalar gizliliğinizi ve veri güvenliğinizi riske atabilir.\n\nYanlış adresler bağlantının başarısız olmasına neden olabilir.\n\nYalnızca erişim yetkiniz olan güvenilir uç noktaları kullanın ve kuruluşunuzun gereksinimlerine uyun.",
+  "zero_trust_endpoint_risk_ack":
+      "Riskleri anlıyorum ve bu uç noktayı kullanmaya yetkili olduğumu onaylıyorum.",
+  "zero_trust_endpoint_risk_continue": "Riskleri kabul et ve devam et",
+  "zero_trust_endpoint_risk_locked":
+      "Bu adresleri düzenlemeden önce riskleri onaylayın.",
+  "zero_trust_endpoint_unsupported":
+      "Zero Trust uç noktalarını düzenlemek için Usque'yi güncelleyin.",
+  "zero_trust_reauth_endpoints":
+      "Tekrar giriş yapmak kayıtlı uç nokta adreslerini geri yükler ve özel adreslerinizi kaldırır.",
   'experimental': 'Deneysel',
   'show_license': 'License Key’i göster',
   'hide_license': 'License Key’i gizle',
@@ -325,7 +356,7 @@ const Map<String, String> kTrCatalog = <String, String>{
       'Bağlantı sorunlarını kontrol edin, günlükleri dışa aktarın ve yerel verileri yönetin.',
   'engine_status': 'Bağlantı bilgileri',
   'version': 'Sürüm',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Yerel günlükler',
   'export_diagnostics': 'Tanılama paketini dışa aktar',
   'diagnostics_saved': 'Tanılama paketi şuraya kaydedildi',
@@ -338,7 +369,9 @@ const Map<String, String> kTrCatalog = <String, String>{
       'Bu işlem geri alınamaz. Bağlantı kesilir, tüm hesaplar ve oturum açma bilgileri silinir, ilk kurulum ekranı açılır.',
   'clear_all_data_complete': 'Tüm yerel Usque verileri temizlendi.',
   'unofficial':
-      'Cloudflare WARP ile uyumlu, resmi olmayan bir istemci. Cloudflare ile bağlantılı değildir ve Cloudflare tarafından onaylanmamıştır.',
+      'Cloudflare® WARP® hizmetleriyle uyumlu, resmi olmayan bir istemci. Cloudflare, Inc. ile bağlantılı değildir; şirket tarafından desteklenmez veya onaylanmaz.',
+  'trademark_attribution':
+      'Cloudflare ve WARP, Cloudflare, Inc. şirketinin Amerika Birleşik Devletleri ve diğer yargı bölgelerindeki ticari markaları ve/veya tescilli ticari markalarıdır.',
   'welcome_title': 'Usque’ye hoş geldiniz',
   'setup_progress': 'Kurulum adımı {current} / {total}',
   'get_started': 'Başlayın',

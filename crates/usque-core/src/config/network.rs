@@ -6,10 +6,11 @@ use serde::{Deserialize, Serialize};
 use super::{
     Account, CongestionControlAlgorithm, DataPlaneMode, DirectDnsSettings, DnsMode,
     EndpointSettings, FrontendSettings, IpPolicy, Profile, ProxySettings, TransportPolicy,
+    WarpDnsSettings,
 };
 
 /// Device-wide MASQUE, DNS, proxy, and output settings. A Zero Trust account
-/// overlays its registration-owned endpoint IPv4/IPv6 pair during hydration.
+/// overlays its registered or explicitly overridden IPv4/IPv6 pair.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct SharedNetworkSettings {
     pub frontends: FrontendSettings,
@@ -23,6 +24,8 @@ pub struct SharedNetworkSettings {
     pub mtu: u16,
     pub dns_mode: DnsMode,
     pub dns_servers: Vec<IpAddr>,
+    #[serde(default)]
+    pub warp_dns: WarpDnsSettings,
     pub allow_lan: bool,
     #[serde(default)]
     pub disable_quic: bool,
@@ -67,6 +70,7 @@ impl SharedNetworkSettings {
             mtu: profile.mtu,
             dns_mode: profile.dns_mode,
             dns_servers: profile.dns_servers.clone(),
+            warp_dns: profile.warp_dns.clone(),
             allow_lan: profile.allow_lan,
             disable_quic: profile.disable_quic,
             split_exclusions: profile.split_exclusions.clone(),
@@ -84,6 +88,10 @@ impl SharedNetworkSettings {
     pub fn hydrate(&self, account: &Account) -> Profile {
         let mut endpoint = self.endpoint.clone();
         if let Some(managed) = &account.managed_endpoint_ips {
+            let managed = account
+                .zero_trust_endpoint_override
+                .as_ref()
+                .unwrap_or(managed);
             endpoint.ipv4 = managed.ipv4;
             endpoint.ipv6 = managed.ipv6;
             endpoint.selection = super::EndpointSelection::Custom;
@@ -101,6 +109,7 @@ impl SharedNetworkSettings {
             mtu: self.mtu,
             dns_mode: self.dns_mode,
             dns_servers: self.dns_servers.clone(),
+            warp_dns: self.warp_dns.clone(),
             allow_lan: self.allow_lan,
             disable_quic: self.disable_quic,
             split_exclusions: self.split_exclusions.clone(),
@@ -117,6 +126,7 @@ impl SharedNetworkSettings {
         profile.proxy.normalize_auth();
         let _ = profile.canonicalize_geo_direct();
         profile.canonicalize_direct_dns();
+        profile.canonicalize_warp_dns();
         profile
     }
 

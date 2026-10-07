@@ -6,6 +6,7 @@ const Map<String, String> kUiWorkflowTr = <String, String>{
   'preview_restart_onboarding': 'İlk kurulumu yeniden başlat',
   'home_local_proxies': 'Yerel proxy’ler',
   'home_manage_proxies': 'Proxy’leri yönet',
+  'home_exit_ip': 'Çıkış IP:',
   'home_enabled_interfaces': 'Etkin: {interfaces}',
   'home_system_proxy': 'Sistem proxy’si',
   'home_tun_hint': 'Bu cihazdaki uygulamaların trafiğini üstlenir',
@@ -66,6 +67,7 @@ const Map<String, String> kUiWorkflowTr = <String, String>{
   'tools_group': 'Araçlar',
   'reset_draft_hint':
       'Varsayılanlar bu forma yüklenecek. Geçerli olmaları için değişiklikleri uygulayın.',
+  'error_generic': 'Bir hata oluştu',
 };
 
 const kNetworkQualityTr = <String, String>{

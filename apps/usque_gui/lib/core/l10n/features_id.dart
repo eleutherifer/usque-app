@@ -6,6 +6,7 @@ const Map<String, String> kUiWorkflowId = <String, String>{
   'preview_restart_onboarding': 'Mulai ulang penyiapan awal',
   'home_local_proxies': 'Proksi lokal',
   'home_manage_proxies': 'Kelola proksi',
+  'home_exit_ip': 'IP keluar:',
   'home_enabled_interfaces': 'Diaktifkan: {interfaces}',
   'home_system_proxy': 'Proksi sistem',
   'home_tun_hint': 'Menangkap lalu lintas aplikasi di perangkat ini',
@@ -65,6 +66,7 @@ const Map<String, String> kUiWorkflowId = <String, String>{
   'tools_group': 'Alat',
   'reset_draft_hint':
       'Nilai default akan dimuat ke formulir ini. Terapkan perubahan agar berlaku.',
+  'error_generic': 'Terjadi kesalahan',
 };
 
 const Map<String, String> kNetworkQualityId = <String, String>{

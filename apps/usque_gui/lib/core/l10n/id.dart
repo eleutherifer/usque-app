@@ -1,5 +1,14 @@
 /// Indonesian UI catalog.
 const Map<String, String> kIdCatalog = <String, String>{
+  'warp_dns_type': 'DNS WARP',
+  'warp_dns_bootstrap_optional': 'Opsional',
+  'warp_dns_plain': 'DNS biasa',
+  'warp_dns_unsupported': 'DNS terenkripsi tidak tersedia',
+  'warp_dns_invalid_mode': 'Jenis DNS tidak didukung',
+  'warp_dns_invalid_name': 'Masukkan nama server',
+  'warp_dns_invalid_path': 'Masukkan jalur yang valid',
+  'warp_dns_invalid_bootstrap': 'Masukkan 1–8 alamat IP',
+
   'disable_quic': "Nonaktifkan QUIC",
   'disable_quic_managed': 'Dikelola otomatis oleh koneksi ini',
   'disable_quic_help':
@@ -27,6 +36,13 @@ const Map<String, String> kIdCatalog = <String, String>{
   'tray_connect_profile': 'Hubungkan akun aktif',
   'tray_disconnect_profile': 'Putuskan akun aktif',
   'tray_disconnect_exit': 'Putuskan dan keluar',
+  'notice_connection_interrupted':
+      'Koneksi terputus. Usque sedang mencoba memulihkannya.',
+  'notice_connection_failed':
+      'Usque tidak dapat mempertahankan koneksi. Buka Usque untuk melihat detailnya.',
+  'notice_connection_restored': 'Koneksi telah dipulihkan.',
+  'notice_kill_switch_blocking':
+      'Kill Switch memblokir lalu lintas jaringan hingga koneksi pulih atau Anda memutuskan koneksi.',
   'connection_status': 'Status koneksi',
   'outputs': '{tunnel} dan proksi lokal',
   'home': 'Beranda',
@@ -106,8 +122,22 @@ const Map<String, String> kIdCatalog = <String, String>{
       'Masuk kembali ke organisasi yang sama untuk memulihkan koneksi akun ini.',
   'zero_trust_metadata_missing':
       'Informasi organisasi yang tersimpan tidak lengkap. Tambahkan akun Zero Trust baru dan masuk lagi.',
-  'zero_trust_endpoint_managed':
-      'Alamat server ini diatur oleh akun organisasi dan tidak dapat diubah di sini.',
+  "zero_trust_endpoint_home_risk_title": "Risiko endpoint Zero Trust khusus",
+  "zero_trust_endpoint_home_risk_body":
+      "Endpoint Zero Trust khusus dapat membahayakan privasi dan keamanan data Anda. Gunakan hanya endpoint tepercaya yang boleh Anda akses.",
+  "zero_trust_endpoint_edit": "Edit endpoint Zero Trust",
+  "zero_trust_endpoint_risk_title": "Risiko mengubah endpoint Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Endpoint dari sumber yang tidak dikenal dapat membahayakan privasi dan keamanan data Anda.\n\nAlamat yang salah dapat menyebabkan koneksi gagal.\n\nGunakan hanya endpoint tepercaya yang boleh Anda akses, dan patuhi persyaratan organisasi.",
+  "zero_trust_endpoint_risk_ack":
+      "Saya memahami risikonya dan memastikan bahwa saya berwenang menggunakan endpoint ini.",
+  "zero_trust_endpoint_risk_continue": "Terima risiko dan lanjutkan mengedit",
+  "zero_trust_endpoint_risk_locked":
+      "Konfirmasikan risiko sebelum mengedit alamat ini.",
+  "zero_trust_endpoint_unsupported":
+      "Perbarui Usque untuk mengedit endpoint Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Masuk kembali memulihkan alamat endpoint terdaftar dan menghapus alamat khusus Anda.",
   'experimental': 'Eksperimental',
   'show_license': 'Tampilkan License Key',
   'hide_license': 'Sembunyikan License Key',
@@ -323,7 +353,7 @@ const Map<String, String> kIdCatalog = <String, String>{
       'Periksa masalah koneksi, ekspor log, dan kelola data lokal.',
   'engine_status': 'Informasi koneksi',
   'version': 'Versi',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Log lokal',
   'export_diagnostics': 'Ekspor bundel diagnostik',
   'diagnostics_saved': 'Bundel diagnostik disimpan ke',
@@ -336,7 +366,9 @@ const Map<String, String> kIdCatalog = <String, String>{
       'Tidak dapat dibatalkan. Usque akan memutuskan koneksi, menghapus semua akun dan informasi masuk, lalu kembali ke penyiapan awal.',
   'clear_all_data_complete': 'Semua data Usque lokal telah dihapus.',
   'unofficial':
-      'Klien tidak resmi yang kompatibel dengan Cloudflare WARP. Tidak berafiliasi dengan atau didukung oleh Cloudflare.',
+      'Klien tidak resmi yang kompatibel dengan layanan Cloudflare® WARP®. Tidak berafiliasi dengan, disponsori, atau didukung oleh Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare dan WARP adalah merek dagang dan/atau merek dagang terdaftar milik Cloudflare, Inc. di Amerika Serikat dan yurisdiksi lainnya.',
   'welcome_title': 'Selamat datang di Usque',
   'setup_progress': 'Langkah penyiapan {current} dari {total}',
   'get_started': 'Mulai',

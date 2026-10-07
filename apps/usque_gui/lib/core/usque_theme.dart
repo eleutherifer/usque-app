@@ -66,8 +66,8 @@ class UsqueRadii {
 class UsqueColors {
   const UsqueColors._();
 
-  /// Brand mark only: the logo, the onboarding pane, the scanning arc.
-  static const Color orange = Color(0xFFF48120);
+  /// Legacy alias for the light brand accent; themed decoration uses tokens.
+  static const Color orange = ember;
 
   /// Interactive accent, light theme. Reaches 4.5:1 on white.
   static const Color ember = Color(0xFFC2500C);
@@ -88,8 +88,11 @@ class UsqueColors {
 
   static const Color inbound = Color(0xFF17708C);
   static const Color inboundLight = Color(0xFF7FCEE8);
-  static const Color outbound = Color(0xFFA8480A);
-  static const Color outboundLight = Color(0xFFFFB783);
+
+  /// Upload traffic. A violet hue keeps data apart from the orange interactive
+  /// accent; contrast on each canvas matches [inbound].
+  static const Color outbound = Color(0xFF7A4CC9);
+  static const Color outboundLight = Color(0xFFC4A5FF);
 
   /// Legacy alias kept for call sites that still reference the deep orange.
   static const Color deepOrange = ember;
@@ -210,7 +213,7 @@ class UsqueTokens extends ThemeExtension<UsqueTokens> {
     canvas: UsqueColors.canvas,
     hairline: Color(0xFFE4E1DA),
     hairlineStrong: Color(0xFFCFCABF),
-    brand: UsqueColors.orange,
+    brand: UsqueColors.ember,
     brandSoft: Color(0xFFFFEDDD),
     success: UsqueColors.success,
     caution: UsqueColors.caution,
@@ -225,7 +228,7 @@ class UsqueTokens extends ThemeExtension<UsqueTokens> {
     canvas: UsqueColors.canvasDark,
     hairline: Color(0xFF2A2A2F),
     hairlineStrong: Color(0xFF3C3C43),
-    brand: UsqueColors.orange,
+    brand: UsqueColors.emberLight,
     brandSoft: Color(0xFF2A1A0E),
     success: UsqueColors.successLight,
     caution: UsqueColors.cautionLight,
@@ -320,7 +323,13 @@ class UsqueTheme {
     surfaceTint: Color(0x00000000),
   );
 
-  /// Machine values: addresses, ports, keys, identifiers.
+  /// Digits share one advance width in every bundled face that supports it.
+  static const List<FontFeature> tabularFigures = <FontFeature>[
+    FontFeature.tabularFigures(),
+  ];
+
+  /// Opaque machine text: keys, hashes, identifiers, package names,
+  /// configuration and logs. Addresses and counts use [address].
   static TextStyle mono(
     BuildContext context, {
     double? size,
@@ -334,6 +343,46 @@ class UsqueTheme {
       fontWeight: weight,
       height: 1.35,
       letterSpacing: 0,
+      color: color ?? Theme.of(context).colorScheme.onSurface,
+    );
+  }
+
+  /// Addresses, ports, versions and counts. The body face with tabular figures
+  /// keeps digits aligned without a typewriter texture beside the UI text.
+  static TextStyle address(
+    BuildContext context, {
+    double? size,
+    FontWeight weight = FontWeight.w400,
+    Color? color,
+  }) {
+    return TextStyle(
+      fontFamily: UsqueFonts.body,
+      fontFamilyFallback: UsqueFonts.fallback,
+      fontSize: size ?? 13,
+      fontWeight: weight,
+      height: 1.35,
+      letterSpacing: 0,
+      fontFeatures: tabularFigures,
+      color: color ?? Theme.of(context).colorScheme.onSurface,
+    );
+  }
+
+  /// Live readouts such as rates, protocols and durations. Tabular figures
+  /// keep changing digits from shifting adjacent text.
+  static TextStyle readout(
+    BuildContext context, {
+    double? size,
+    FontWeight weight = FontWeight.w600,
+    Color? color,
+  }) {
+    return TextStyle(
+      fontFamily: UsqueFonts.display,
+      fontFamilyFallback: UsqueFonts.fallback,
+      fontSize: size ?? 13.5,
+      fontWeight: weight,
+      height: 1.3,
+      letterSpacing: 0,
+      fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
       color: color ?? Theme.of(context).colorScheme.onSurface,
     );
   }

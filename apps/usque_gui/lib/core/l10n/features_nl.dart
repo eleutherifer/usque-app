@@ -6,6 +6,7 @@ const Map<String, String> kUiWorkflowNl = <String, String>{
   'preview_restart_onboarding': 'Eerste configuratie opnieuw starten',
   'home_local_proxies': 'Lokale proxy’s',
   'home_manage_proxies': 'Proxy’s beheren',
+  'home_exit_ip': 'Uitgaand IP:',
   'home_enabled_interfaces': 'Ingeschakeld: {interfaces}',
   'home_system_proxy': 'Systeemproxy',
   'home_tun_hint': 'Vangt het verkeer van apps op dit apparaat op',
@@ -69,6 +70,7 @@ const Map<String, String> kUiWorkflowNl = <String, String>{
   'reset_draft_hint':
       'Standaardwaarden worden in dit formulier geladen. Pas de wijzigingen '
       'toe om ze door te voeren.',
+  'error_generic': 'Er is een fout opgetreden',
 };
 
 const Map<String, String> kNetworkQualityNl = <String, String>{

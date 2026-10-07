@@ -1,5 +1,14 @@
 /// Persian UI catalog.
 const Map<String, String> kFaCatalog = <String, String>{
+  'warp_dns_type': 'DNS ‏WARP',
+  'warp_dns_bootstrap_optional': 'اختیاری',
+  'warp_dns_plain': 'DNS معمولی',
+  'warp_dns_unsupported': 'DNS رمزگذاری‌شده در دسترس نیست',
+  'warp_dns_invalid_mode': 'نوع DNS پشتیبانی نمی‌شود',
+  'warp_dns_invalid_name': 'نام سرور را وارد کنید',
+  'warp_dns_invalid_path': 'مسیر معتبر وارد کنید',
+  'warp_dns_invalid_bootstrap': '۱ تا ۸ آدرس IP وارد کنید',
+
   'disable_quic': "غیرفعال کردن QUIC",
   'disable_quic_managed': 'به‌طور خودکار توسط اتصال فعلی مدیریت می‌شود',
   'disable_quic_help':
@@ -28,6 +37,13 @@ const Map<String, String> kFaCatalog = <String, String>{
   'tray_connect_profile': 'اتصال حساب فعال',
   'tray_disconnect_profile': 'قطع اتصال حساب فعال',
   'tray_disconnect_exit': 'قطع اتصال و خروج',
+  'notice_connection_interrupted':
+      'اتصال قطع شد. Usque در حال تلاش برای بازیابی آن است.',
+  'notice_connection_failed':
+      'Usque نتوانست اتصال را حفظ کند. برای جزئیات، Usque را باز کنید.',
+  'notice_connection_restored': 'اتصال بازیابی شد.',
+  'notice_kill_switch_blocking':
+      'Kill Switch تا زمان بازیابی اتصال یا قطع اتصال توسط شما، ترافیک شبکه را مسدود می‌کند.',
   'connection_status': 'وضعیت اتصال',
   'outputs': '{tunnel} و پروکسی‌های محلی',
   'home': 'خانه',
@@ -106,8 +122,22 @@ const Map<String, String> kFaCatalog = <String, String>{
       'برای بازیابی اتصال این حساب، دوباره وارد همان سازمان شوید.',
   'zero_trust_metadata_missing':
       'اطلاعات ذخیره‌شدهٔ سازمان ناقص است. یک حساب Zero Trust جدید اضافه کنید و وارد شوید.',
-  'zero_trust_endpoint_managed':
-      'نشانی سرور را حساب سازمان تعیین می‌کند و نمی‌توان آن را اینجا تغییر داد.',
+  "zero_trust_endpoint_home_risk_title": "خطر نقطهٔ پایانی سفارشی Zero Trust",
+  "zero_trust_endpoint_home_risk_body":
+      "نقاط پایانی سفارشی Zero Trust ممکن است حریم خصوصی و امنیت داده‌های شما را به خطر بیندازند. فقط از نقاط پایانی مورد اعتماد که اجازهٔ استفاده از آن‌ها را دارید استفاده کنید.",
+  "zero_trust_endpoint_edit": "ویرایش نقاط پایانی Zero Trust",
+  "zero_trust_endpoint_risk_title": "خطرهای تغییر نقاط پایانی Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "نقاط پایانی با منشأ ناشناخته ممکن است حریم خصوصی و امنیت داده‌های شما را به خطر بیندازند.\n\nنشانی‌های نادرست ممکن است باعث شکست اتصال شوند.\n\nفقط از نقاط پایانی مورد اعتماد که اجازهٔ استفاده از آن‌ها را دارید استفاده کنید و الزامات سازمان را رعایت کنید.",
+  "zero_trust_endpoint_risk_ack":
+      "خطرها را می‌دانم و تأیید می‌کنم که اجازهٔ استفاده از این نقطهٔ پایانی را دارم.",
+  "zero_trust_endpoint_risk_continue": "پذیرش خطرها و ادامهٔ ویرایش",
+  "zero_trust_endpoint_risk_locked":
+      "پیش از ویرایش نشانی‌ها، خطرها را تأیید کنید.",
+  "zero_trust_endpoint_unsupported":
+      "برای ویرایش نقاط پایانی Zero Trust، Usque را به‌روز کنید.",
+  "zero_trust_reauth_endpoints":
+      "ورود دوباره نشانی‌های ثبت‌شدهٔ نقاط پایانی را بازیابی و نشانی‌های سفارشی را حذف می‌کند.",
   'experimental': 'آزمایشی',
   'show_license': 'نمایش License Key',
   'hide_license': 'پنهان کردن License Key',
@@ -323,7 +353,7 @@ const Map<String, String> kFaCatalog = <String, String>{
       'مشکلات اتصال را بررسی کنید، گزارش‌ها را خروجی بگیرید و داده‌های محلی را مدیریت کنید.',
   'engine_status': 'اطلاعات اتصال',
   'version': 'نسخه',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'گزارش‌های محلی',
   'export_diagnostics': 'صادر کردن بستهٔ عیب‌یابی',
   'diagnostics_saved': 'بستهٔ عیب‌یابی در این مسیر ذخیره شد:',
@@ -336,7 +366,9 @@ const Map<String, String> kFaCatalog = <String, String>{
       'این کار برگشت‌پذیر نیست. اتصال قطع می‌شود، همهٔ حساب‌ها و اطلاعات ورود حذف می‌شوند و برنامه به صفحهٔ راه‌اندازی اولیه برمی‌گردد.',
   'clear_all_data_complete': 'همهٔ داده‌های محلی Usque پاک شد.',
   'unofficial':
-      'کلاینت غیررسمی سازگار با Cloudflare WARP. وابسته به Cloudflare نیست و از سوی آن تأیید نشده است.',
+      'کلاینت غیررسمی سازگار با خدمات Cloudflare® WARP®. به Cloudflare, Inc. وابسته نیست و از سوی این شرکت حمایت مالی یا تأیید نمی‌شود.',
+  'trademark_attribution':
+      'Cloudflare و WARP علائم تجاری و/یا علائم تجاری ثبت‌شدهٔ Cloudflare, Inc. در ایالات متحده و سایر حوزه‌های قضایی هستند.',
   'welcome_title': 'به Usque خوش آمدید',
   'setup_progress': 'گام راه‌اندازی {current} از {total}',
   'get_started': 'شروع کنید',

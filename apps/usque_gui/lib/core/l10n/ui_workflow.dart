@@ -27,6 +27,7 @@ const Map<String, String> kUiWorkflowEn = <String, String>{
   'home_local_proxies': 'Local proxies',
   'home_manage_proxies': 'Manage proxies',
   'home_enabled_interfaces': 'Enabled: {interfaces}',
+  'home_exit_ip': 'Exit IP:',
   'home_system_proxy': 'System proxy',
   'home_tun_hint': 'Captures traffic from apps on this device',
   'home_system_proxy_hint':
@@ -83,6 +84,7 @@ const Map<String, String> kUiWorkflowEn = <String, String>{
   'proxy_switches_hint': 'Switches take effect immediately.',
   'reset_draft_hint':
       'Defaults will be loaded into this form. Apply changes to make them take effect.',
+  'error_generic': 'Something went wrong',
 };
 
 const Map<String, String> kUiWorkflowZhCn = <String, String>{
@@ -92,6 +94,7 @@ const Map<String, String> kUiWorkflowZhCn = <String, String>{
   'home_local_proxies': '本地代理',
   'home_manage_proxies': '管理代理',
   'home_enabled_interfaces': '已启用：{interfaces}',
+  'home_exit_ip': '出口 IP：',
   'home_system_proxy': '系统代理',
   'home_tun_hint': '接管本机应用的流量',
   'home_system_proxy_hint': '让遵循系统代理的应用使用 HTTP 代理',
@@ -145,6 +148,7 @@ const Map<String, String> kUiWorkflowZhCn = <String, String>{
   'tools_group': '工具',
   'proxy_switches_hint': '开关更改立即生效。',
   'reset_draft_hint': '默认值将填入表单，点击“应用修改”后才会生效。',
+  'error_generic': '出错了',
 };
 
 const Map<String, Map<String, String>> kUiWorkflowCatalogs =

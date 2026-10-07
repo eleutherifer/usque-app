@@ -1,5 +1,14 @@
 /// Traditional Chinese (Hong Kong) UI catalog.
 const Map<String, String> kZhHkCatalog = <String, String>{
+  'warp_dns_type': 'WARP DNS',
+  'warp_dns_bootstrap_optional': '可選',
+  'warp_dns_plain': '普通 DNS',
+  'warp_dns_unsupported': '暫不支援加密 DNS',
+  'warp_dns_invalid_mode': '不支援的 DNS 類型',
+  'warp_dns_invalid_name': '請輸入伺服器網域',
+  'warp_dns_invalid_path': '請輸入有效路徑',
+  'warp_dns_invalid_bootstrap': '請輸入 1–8 個 IP 位址',
+
   'disable_quic': "停用 QUIC",
   'disable_quic_managed': '由目前連線自動管理',
   'disable_quic_help':
@@ -26,6 +35,10 @@ const Map<String, String> kZhHkCatalog = <String, String>{
   'tray_connect_profile': '連線目前帳戶',
   'tray_disconnect_profile': '中斷目前帳戶',
   'tray_disconnect_exit': '中斷並結束',
+  'notice_connection_interrupted': '連線已中斷，Usque 正在嘗試恢復。',
+  'notice_connection_failed': 'Usque 無法保持連線。開啟 Usque 查看詳情。',
+  'notice_connection_restored': '連線已恢復。',
+  'notice_kill_switch_blocking': 'Kill Switch 正在攔截網絡流量，直至連線恢復或你中斷連線。',
   'connection_status': '連線狀態',
   'outputs': '{tunnel} 與本機代理',
   'home': '主頁',
@@ -94,7 +107,18 @@ const Map<String, String> kZhHkCatalog = <String, String>{
   'zero_trust_scope_note': '實驗性功能：僅提供公開互聯網存取，不支援更新組織政策或檢查裝置是否符合組織的安全要求。',
   'zero_trust_repair_same_team': '請重新登入同一個組織，以恢復此帳戶的連接。',
   'zero_trust_metadata_missing': '已儲存的組織資料不完整。請新增 Zero Trust 帳戶並登入。',
-  'zero_trust_endpoint_managed': '伺服器地址由組織帳戶設定，無法在此修改。',
+  "zero_trust_endpoint_home_risk_title": "自訂 Zero Trust 端點風險",
+  "zero_trust_endpoint_home_risk_body":
+      "自訂 Zero Trust 端點可能帶來私隱和資料安全風險。請只使用可信且獲得授權的端點。",
+  "zero_trust_endpoint_edit": "編輯 Zero Trust 端點",
+  "zero_trust_endpoint_risk_title": "修改 Zero Trust 端點的風險",
+  "zero_trust_endpoint_risk_body":
+      "不明來源的端點可能帶來私隱和資料安全風險。\n\n錯誤地址可能導致連線失敗。\n\n請只使用可信且獲得授權的端點，並遵守組織要求。",
+  "zero_trust_endpoint_risk_ack": "我已了解風險，並確認有權使用此端點。",
+  "zero_trust_endpoint_risk_continue": "承擔風險並繼續編輯",
+  "zero_trust_endpoint_risk_locked": "修改這些地址前需要確認風險。",
+  "zero_trust_endpoint_unsupported": "請更新 Usque 以編輯 Zero Trust 端點。",
+  "zero_trust_reauth_endpoints": "重新登入會恢復註冊傳回的端點地址，並移除自訂地址。",
   'experimental': '實驗性',
   'show_license': '顯示 License Key',
   'hide_license': '隱藏 License Key',
@@ -290,7 +314,7 @@ const Map<String, String> kZhHkCatalog = <String, String>{
   'diagnostics_subtitle': '檢查連接問題、匯出紀錄及管理本機資料。',
   'engine_status': '連接資料',
   'version': '版本',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': '本機日誌',
   'export_diagnostics': '匯出診斷套件',
   'diagnostics_saved': '診斷套件已儲存至',
@@ -300,7 +324,10 @@ const Map<String, String> kZhHkCatalog = <String, String>{
   'clear_all_data_help': '中斷連接，並永久刪除此裝置上的所有帳戶、WARP 登入資料、設定、快取和診斷資料。',
   'clear_all_data_confirm': '此操作無法復原。連接將中斷，所有帳戶和登入資料將刪除，並返回初始設定畫面。',
   'clear_all_data_complete': '已清除所有本機 Usque 資料。',
-  'unofficial': '相容於 Cloudflare WARP 的非官方用戶端。與 Cloudflare 沒有從屬或認可關係。',
+  'unofficial':
+      '相容於 Cloudflare® WARP® 服務的非官方用戶端。Usque 與 Cloudflare, Inc. 沒有從屬、贊助或認可關係。',
+  'trademark_attribution':
+      'Cloudflare 和 WARP 是 Cloudflare, Inc. 在美國及其他司法管轄區的商標及／或註冊商標。',
   'welcome_title': '歡迎使用 Usque',
   'setup_progress': '設定步驟 {current}／{total}',
   'get_started': '開始使用',

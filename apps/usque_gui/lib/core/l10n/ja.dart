@@ -1,5 +1,14 @@
 /// Japanese UI catalog.
 const Map<String, String> kJaCatalog = <String, String>{
+  'warp_dns_type': 'WARP DNS',
+  'warp_dns_bootstrap_optional': '任意',
+  'warp_dns_plain': '通常の DNS',
+  'warp_dns_unsupported': '暗号化 DNS は利用不可',
+  'warp_dns_invalid_mode': '未対応の DNS タイプ',
+  'warp_dns_invalid_name': 'サーバー名を入力',
+  'warp_dns_invalid_path': '有効なパスを入力',
+  'warp_dns_invalid_bootstrap': 'IP アドレスを 1〜8 個入力',
+
   'disable_quic': "QUIC を無効化",
   'disable_quic_managed': '現在の接続が自動的に管理します',
   'disable_quic_help':
@@ -27,6 +36,11 @@ const Map<String, String> kJaCatalog = <String, String>{
   'tray_connect_profile': '現在のアカウントに接続',
   'tray_disconnect_profile': '現在のアカウントを切断',
   'tray_disconnect_exit': '切断して終了',
+  'notice_connection_interrupted': '接続が中断されました。Usque が復旧を試みています。',
+  'notice_connection_failed': 'Usque は接続を維持できませんでした。詳細は Usque を開いて確認してください。',
+  'notice_connection_restored': '接続が復旧しました。',
+  'notice_kill_switch_blocking':
+      '接続が復旧するか切断するまで、Kill Switch がネットワーク通信をブロックしています。',
   'connection_status': '接続状態',
   'outputs': '{tunnel} とローカルプロキシ',
   'home': 'ホーム',
@@ -101,7 +115,19 @@ const Map<String, String> kJaCatalog = <String, String>{
   'zero_trust_repair_same_team': '同じ組織に再度ログインして、このアカウントの接続を復旧してください。',
   'zero_trust_metadata_missing':
       '保存された組織情報が不足しています。新しい Zero Trust アカウントを追加し、再度ログインしてください。',
-  'zero_trust_endpoint_managed': 'このサーバーアドレスは組織アカウントが設定するため、ここでは変更できません。',
+  "zero_trust_endpoint_home_risk_title": "カスタム Zero Trust エンドポイントのリスク",
+  "zero_trust_endpoint_home_risk_body":
+      "カスタム Zero Trust エンドポイントはプライバシーやデータの安全性を損なう可能性があります。利用を許可された信頼できるエンドポイントのみを使用してください。",
+  "zero_trust_endpoint_edit": "Zero Trust エンドポイントを編集",
+  "zero_trust_endpoint_risk_title": "Zero Trust エンドポイント変更のリスク",
+  "zero_trust_endpoint_risk_body":
+      "出所不明のエンドポイントは、プライバシーやデータの安全性を損なう可能性があります。\n\n誤ったアドレスは接続失敗の原因になります。\n\n利用を許可された信頼できるエンドポイントのみを使用し、組織の要件に従ってください。",
+  "zero_trust_endpoint_risk_ack": "リスクを理解し、このエンドポイントを利用する権限があることを確認しました。",
+  "zero_trust_endpoint_risk_continue": "リスクを受け入れて編集を続ける",
+  "zero_trust_endpoint_risk_locked": "アドレスの編集前にリスクを確認してください。",
+  "zero_trust_endpoint_unsupported":
+      "Zero Trust エンドポイントを編集するには Usque を更新してください。",
+  "zero_trust_reauth_endpoints": "再ログインすると登録時のエンドポイントアドレスに戻り、カスタムアドレスは削除されます。",
   'experimental': '実験的',
   'show_license': 'License Key を表示',
   'hide_license': 'License Key を隠す',
@@ -307,7 +333,7 @@ const Map<String, String> kJaCatalog = <String, String>{
   'diagnostics_subtitle': '接続の問題を調べ、ログの出力や端末内データの管理を行います。',
   'engine_status': '接続情報',
   'version': 'バージョン',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'ローカルログ',
   'export_diagnostics': '診断バンドルをエクスポート',
   'diagnostics_saved': '診断バンドルの保存先',
@@ -319,7 +345,10 @@ const Map<String, String> kJaCatalog = <String, String>{
   'clear_all_data_confirm':
       'この操作は取り消せません。Usque は接続を切断して全アカウントとログイン情報を削除し、初期設定に戻ります。',
   'clear_all_data_complete': 'Usque のローカルデータをすべて消去しました。',
-  'unofficial': 'Cloudflare WARP と互換性のある非公式クライアントです。Cloudflare との提携や承認はありません。',
+  'unofficial':
+      'Cloudflare® WARP® サービスと互換性のある非公式クライアントです。Usque は Cloudflare, Inc. と提携しておらず、同社からの支援や推奨も受けていません。',
+  'trademark_attribution':
+      'Cloudflare および WARP は、米国およびその他の法域における Cloudflare, Inc. の商標または登録商標です。',
   'welcome_title': 'Usque へようこそ',
   'setup_progress': 'セットアップ手順 {current} / {total}',
   'get_started': '始める',

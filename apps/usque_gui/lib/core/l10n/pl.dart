@@ -1,5 +1,14 @@
 /// Polish UI catalog.
 const Map<String, String> kPlCatalog = <String, String>{
+  'warp_dns_type': 'DNS WARP',
+  'warp_dns_bootstrap_optional': 'Opcjonalnie',
+  'warp_dns_plain': 'Zwykły DNS',
+  'warp_dns_unsupported': 'Szyfrowany DNS jest niedostępny',
+  'warp_dns_invalid_mode': 'Nieobsługiwany typ DNS',
+  'warp_dns_invalid_name': 'Wpisz nazwę serwera',
+  'warp_dns_invalid_path': 'Wpisz poprawną ścieżkę',
+  'warp_dns_invalid_bootstrap': 'Wpisz 1–8 adresów IP',
+
   'disable_quic': "Wyłącz QUIC",
   'disable_quic_managed': 'Zarządzane automatycznie przez bieżące połączenie',
   'disable_quic_help':
@@ -27,6 +36,13 @@ const Map<String, String> kPlCatalog = <String, String>{
   'tray_connect_profile': 'Połącz aktywne konto',
   'tray_disconnect_profile': 'Rozłącz aktywne konto',
   'tray_disconnect_exit': 'Rozłącz i zakończ',
+  'notice_connection_interrupted':
+      'Połączenie zostało przerwane. Usque próbuje je przywrócić.',
+  'notice_connection_failed':
+      'Usque nie mógł utrzymać połączenia. Otwórz Usque, aby zobaczyć szczegóły.',
+  'notice_connection_restored': 'Połączenie zostało przywrócone.',
+  'notice_kill_switch_blocking':
+      'Kill Switch blokuje ruch sieciowy do czasu przywrócenia połączenia lub rozłączenia.',
   'connection_status': 'Stan połączenia',
   'outputs': '{tunnel} i lokalne proxy',
   'home': 'Główna',
@@ -106,8 +122,24 @@ const Map<String, String> kPlCatalog = <String, String>{
       'Zaloguj się ponownie do tej samej organizacji, aby przywrócić połączenie konta.',
   'zero_trust_metadata_missing':
       'Zapisane informacje o organizacji są niepełne. Dodaj nowe konto Zero Trust i zaloguj się.',
-  'zero_trust_endpoint_managed':
-      'Adres serwera jest ustawiany przez konto organizacji. Nie można go tutaj zmienić.',
+  "zero_trust_endpoint_home_risk_title":
+      "Ryzyko niestandardowych punktów końcowych Zero Trust",
+  "zero_trust_endpoint_home_risk_body":
+      "Niestandardowe punkty końcowe Zero Trust mogą zagrozić prywatności i bezpieczeństwu danych. Korzystaj tylko z zaufanych punktów końcowych, do których masz uprawnienia.",
+  "zero_trust_endpoint_edit": "Edytuj punkty końcowe Zero Trust",
+  "zero_trust_endpoint_risk_title":
+      "Ryzyko zmiany punktów końcowych Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Punkty końcowe nieznanego pochodzenia mogą zagrozić prywatności i bezpieczeństwu danych.\n\nNieprawidłowe adresy mogą uniemożliwić połączenie.\n\nKorzystaj tylko z zaufanych punktów końcowych, do których masz uprawnienia, i przestrzegaj wymagań organizacji.",
+  "zero_trust_endpoint_risk_ack":
+      "Rozumiem ryzyko i potwierdzam, że mam prawo korzystać z tego punktu końcowego.",
+  "zero_trust_endpoint_risk_continue": "Akceptuj ryzyko i kontynuuj",
+  "zero_trust_endpoint_risk_locked":
+      "Potwierdź ryzyko przed edycją tych adresów.",
+  "zero_trust_endpoint_unsupported":
+      "Zaktualizuj Usque, aby edytować punkty końcowe Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Ponowne logowanie przywraca zarejestrowane adresy i usuwa adresy niestandardowe.",
   'experimental': 'Eksperymentalne',
   'show_license': 'Pokaż License Key',
   'hide_license': 'Ukryj License Key',
@@ -324,7 +356,7 @@ const Map<String, String> kPlCatalog = <String, String>{
       'Sprawdzaj problemy z połączeniem, eksportuj dzienniki i zarządzaj danymi lokalnymi.',
   'engine_status': 'Informacje o połączeniu',
   'version': 'Wersja',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Dzienniki lokalne',
   'export_diagnostics': 'Eksportuj pakiet diagnostyczny',
   'diagnostics_saved': 'Pakiet diagnostyczny zapisano w',
@@ -338,7 +370,9 @@ const Map<String, String> kPlCatalog = <String, String>{
   'clear_all_data_complete':
       'Wszystkie lokalne dane Usque zostały wyczyszczone.',
   'unofficial':
-      'Nieoficjalny klient zgodny z Cloudflare WARP. Niepowiązany z Cloudflare i niezatwierdzony przez Cloudflare.',
+      'Nieoficjalny klient zgodny z usługami Cloudflare® WARP®. Niepowiązany z Cloudflare, Inc., niesponsorowany i niezatwierdzony przez tę firmę.',
+  'trademark_attribution':
+      'Cloudflare i WARP są znakami towarowymi i/lub zarejestrowanymi znakami towarowymi Cloudflare, Inc. w Stanach Zjednoczonych i innych jurysdykcjach.',
   'welcome_title': 'Witamy w Usque',
   'setup_progress': 'Krok konfiguracji {current} z {total}',
   'get_started': 'Rozpocznij',

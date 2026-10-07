@@ -1,5 +1,14 @@
 /// Italian UI catalog.
 const Map<String, String> kItCatalog = <String, String>{
+  'warp_dns_type': 'DNS WARP',
+  'warp_dns_bootstrap_optional': 'Facoltativo',
+  'warp_dns_plain': 'DNS normale',
+  'warp_dns_unsupported': 'DNS crittografato non disponibile',
+  'warp_dns_invalid_mode': 'Tipo DNS non supportato',
+  'warp_dns_invalid_name': 'Inserisci il nome del server',
+  'warp_dns_invalid_path': 'Inserisci un percorso valido',
+  'warp_dns_invalid_bootstrap': 'Inserisci da 1 a 8 indirizzi IP',
+
   'disable_quic': "Disattiva QUIC",
   'disable_quic_managed': 'Gestito automaticamente da questa connessione',
   'disable_quic_help':
@@ -30,6 +39,13 @@ const Map<String, String> kItCatalog = <String, String>{
   'tray_connect_profile': 'Connetti l’account attivo',
   'tray_disconnect_profile': 'Disconnetti l’account attivo',
   'tray_disconnect_exit': 'Disconnetti e chiudi',
+  'notice_connection_interrupted':
+      'La connessione si è interrotta. Usque sta tentando di ripristinarla.',
+  'notice_connection_failed':
+      'Usque non è riuscito a mantenere la connessione. Apri Usque per i dettagli.',
+  'notice_connection_restored': 'La connessione è stata ripristinata.',
+  'notice_kill_switch_blocking':
+      'Il Kill Switch blocca il traffico di rete finché la connessione non viene ripristinata o non ti disconnetti.',
   'connection_status': 'Stato della connessione',
   'outputs': '{tunnel} e proxy locali',
   'home': 'Inizio',
@@ -109,8 +125,24 @@ const Map<String, String> kItCatalog = <String, String>{
       'Accedi di nuovo alla stessa organizzazione per ripristinare la connessione dell’account.',
   'zero_trust_metadata_missing':
       'Le informazioni salvate sull’organizzazione sono incomplete. Aggiungi un nuovo account Zero Trust e accedi di nuovo.',
-  'zero_trust_endpoint_managed':
-      'L’indirizzo del server è impostato dall’account dell’organizzazione e non può essere modificato qui.',
+  "zero_trust_endpoint_home_risk_title":
+      "Rischio degli endpoint Zero Trust personalizzati",
+  "zero_trust_endpoint_home_risk_body":
+      "Gli endpoint Zero Trust personalizzati possono mettere a rischio la privacy e la sicurezza dei dati. Usa solo endpoint affidabili ai quali sei autorizzato ad accedere.",
+  "zero_trust_endpoint_edit": "Modifica endpoint Zero Trust",
+  "zero_trust_endpoint_risk_title":
+      "Rischi della modifica degli endpoint Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Gli endpoint di origine sconosciuta possono mettere a rischio la privacy e la sicurezza dei dati.\n\nGli indirizzi errati possono impedire la connessione.\n\nUsa solo endpoint affidabili ai quali sei autorizzato ad accedere e rispetta i requisiti della tua organizzazione.",
+  "zero_trust_endpoint_risk_ack":
+      "Comprendo i rischi e confermo di essere autorizzato a usare questo endpoint.",
+  "zero_trust_endpoint_risk_continue": "Accetta i rischi e continua",
+  "zero_trust_endpoint_risk_locked":
+      "Conferma i rischi prima di modificare questi indirizzi.",
+  "zero_trust_endpoint_unsupported":
+      "Aggiorna Usque per modificare gli endpoint Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Un nuovo accesso ripristina gli indirizzi registrati e rimuove quelli personalizzati.",
   'experimental': 'Sperimentale',
   'show_license': 'Mostra License Key',
   'hide_license': 'Nascondi License Key',
@@ -329,7 +361,7 @@ const Map<String, String> kItCatalog = <String, String>{
       'Controlla i problemi di connessione, esporta i registri e gestisci i dati locali.',
   'engine_status': 'Informazioni sulla connessione',
   'version': 'Versione',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Log locali',
   'export_diagnostics': 'Esporta pacchetto diagnostico',
   'diagnostics_saved': 'Pacchetto diagnostico salvato in',
@@ -343,7 +375,9 @@ const Map<String, String> kItCatalog = <String, String>{
   'clear_all_data_complete':
       'Tutti i dati locali di Usque sono stati cancellati.',
   'unofficial':
-      'Client non ufficiale compatibile con Cloudflare WARP. Non affiliato né approvato da Cloudflare.',
+      'Client non ufficiale compatibile con i servizi Cloudflare® WARP®. Non affiliato, sponsorizzato né approvato da Cloudflare, Inc.',
+  'trademark_attribution':
+      'Cloudflare e WARP sono marchi e/o marchi registrati di Cloudflare, Inc. negli Stati Uniti e in altre giurisdizioni.',
   'welcome_title': 'Benvenuti in Usque',
   'setup_progress': 'Passaggio {current} di {total}',
   'get_started': 'Inizia',

@@ -1,5 +1,14 @@
 /// Ukrainian UI catalog.
 const Map<String, String> kUkCatalog = <String, String>{
+  'warp_dns_type': 'DNS WARP',
+  'warp_dns_bootstrap_optional': 'Необов’язково',
+  'warp_dns_plain': 'Звичайний DNS',
+  'warp_dns_unsupported': 'Шифрований DNS недоступний',
+  'warp_dns_invalid_mode': 'Тип DNS не підтримується',
+  'warp_dns_invalid_name': 'Введіть ім’я сервера',
+  'warp_dns_invalid_path': 'Введіть допустимий шлях',
+  'warp_dns_invalid_bootstrap': 'Введіть 1–8 IP-адрес',
+
   'disable_quic': "Вимкнути QUIC",
   'disable_quic_managed': 'Автоматично керується поточним з’єднанням',
   'disable_quic_help':
@@ -27,6 +36,13 @@ const Map<String, String> kUkCatalog = <String, String>{
   'tray_connect_profile': 'Зʼєднати поточний обліковий запис',
   'tray_disconnect_profile': 'Відʼєднати поточний обліковий запис',
   'tray_disconnect_exit': 'Відʼєднати й вийти',
+  'notice_connection_interrupted':
+      'Зʼєднання перервано. Usque намагається його відновити.',
+  'notice_connection_failed':
+      'Usque не вдалося зберегти зʼєднання. Відкрийте Usque, щоб переглянути подробиці.',
+  'notice_connection_restored': 'Зʼєднання відновлено.',
+  'notice_kill_switch_blocking':
+      'Kill Switch блокує мережевий трафік, доки зʼєднання не відновиться або ви не відʼєднаєтеся.',
   'connection_status': 'Стан зʼєднання',
   'outputs': '{tunnel} і локальні проксі',
   'home': 'Головна',
@@ -107,8 +123,22 @@ const Map<String, String> kUkCatalog = <String, String>{
       'Щоб відновити з’єднання цього облікового запису, увійдіть знову до тієї самої організації.',
   'zero_trust_metadata_missing':
       'Збережені відомості про організацію неповні. Додайте новий обліковий запис Zero Trust і увійдіть.',
-  'zero_trust_endpoint_managed':
-      'Адресу сервера визначає обліковий запис організації. Тут її змінити не можна.',
+  "zero_trust_endpoint_home_risk_title": "Ризики власних адрес Zero Trust",
+  "zero_trust_endpoint_home_risk_body":
+      "Власні вузли Zero Trust можуть загрожувати конфіденційності та безпеці даних. Використовуйте лише довірені вузли, доступ до яких вам дозволено.",
+  "zero_trust_endpoint_edit": "Змінити адреси Zero Trust",
+  "zero_trust_endpoint_risk_title": "Ризики зміни адрес Zero Trust",
+  "zero_trust_endpoint_risk_body":
+      "Вузли невідомого походження можуть загрожувати конфіденційності та безпеці даних.\n\nНеправильні адреси можуть спричинити збій з’єднання.\n\nВикористовуйте лише довірені вузли, доступ до яких вам дозволено, і дотримуйтеся вимог організації.",
+  "zero_trust_endpoint_risk_ack":
+      "Я розумію ризики та підтверджую, що маю право використовувати цей вузол.",
+  "zero_trust_endpoint_risk_continue": "Прийняти ризики й продовжити",
+  "zero_trust_endpoint_risk_locked":
+      "Підтвердьте ризики перед зміною цих адрес.",
+  "zero_trust_endpoint_unsupported":
+      "Оновіть Usque, щоб змінювати адреси Zero Trust.",
+  "zero_trust_reauth_endpoints":
+      "Повторний вхід відновлює зареєстровані адреси та видаляє власні адреси.",
   'experimental': 'Експериментально',
   'show_license': 'Показати License Key',
   'hide_license': 'Сховати License Key',
@@ -324,7 +354,7 @@ const Map<String, String> kUkCatalog = <String, String>{
       'Перевірте проблеми зі з’єднанням, експортуйте журнали та керуйте локальними даними.',
   'engine_status': 'Відомості про з’єднання',
   'version': 'Версія',
-  'app_version': 'Usque 0.2.9',
+  'app_version': 'Usque 0.3.0',
   'logs': 'Локальні журнали',
   'export_diagnostics': 'Експортувати діагностичний пакет',
   'diagnostics_saved': 'Діагностичний пакет збережено до',
@@ -337,7 +367,9 @@ const Map<String, String> kUkCatalog = <String, String>{
       'Цю дію неможливо скасувати. З’єднання буде розірвано, всі облікові записи й дані входу видалено, а програма повернеться до початкового налаштування.',
   'clear_all_data_complete': 'Усі локальні дані Usque очищено.',
   'unofficial':
-      'Неофіційний клієнт, сумісний із Cloudflare WARP. Не повʼязаний із Cloudflare і не схвалений Cloudflare.',
+      'Неофіційний клієнт, сумісний із сервісами Cloudflare® WARP®. Не пов’язаний із Cloudflare, Inc., не спонсорується й не схвалений цією компанією.',
+  'trademark_attribution':
+      'Cloudflare і WARP є торговельними марками та/або зареєстрованими торговельними марками Cloudflare, Inc. у США та інших юрисдикціях.',
   'welcome_title': 'Вітаємо в Usque',
   'setup_progress': 'Крок налаштування {current} з {total}',
   'get_started': 'Почати',

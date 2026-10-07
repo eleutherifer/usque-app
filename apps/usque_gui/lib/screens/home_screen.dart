@@ -19,6 +19,7 @@ import '../widgets/live_duration.dart';
 import '../widgets/mobile_home_panels.dart';
 import '../widgets/profile_identity_dialog.dart';
 import '../widgets/sparkline.dart';
+import '../widgets/usque_logo.dart';
 import 'chain_proxy_screen.dart';
 
 /// The instrument panel: one connection control, one status readout, and the
@@ -40,27 +41,26 @@ class HomeScreen extends StatelessWidget {
         viewport.width < 760 ||
         defaultTargetPlatform == TargetPlatform.android &&
             viewport.shortestSide < 600;
-    return PageFrame(
-      title: strings.get('home'),
-      showHeading: defaultTargetPlatform != TargetPlatform.windows || compact,
-      titleWidget: compact ? const _NarrowBrandHeader() : null,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          if (!compact) _ErrorSlot(controller: controller, strings: strings),
-          if (compact && defaultTargetPlatform == TargetPlatform.android)
-            _VpnGateReadout(
-              controller: controller,
-              strings: strings,
-              onOpen:
-                  onOpenVpnGate ??
-                  () => Navigator.of(context).push<void>(
-                    MaterialPageRoute(
-                      builder: (_) => ChainProxyScreen(controller: controller),
-                    ),
-                  ),
-            ),
-          if (compact)
+    void openChainProxy() => Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ChainProxyScreen(controller: controller),
+      ),
+    );
+    final notice = _ZeroTrustEndpointRiskNotice(controller: controller);
+    if (compact) {
+      return PageFrame(
+        title: strings.get('home'),
+        titleWidget: const _NarrowBrandHeader(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            notice,
+            if (defaultTargetPlatform == TargetPlatform.android)
+              _VpnGateReadout(
+                controller: controller,
+                strings: strings,
+                onOpen: onOpenVpnGate ?? openChainProxy,
+              ),
             PanelStack(
               spacing: 24 + mobileHomeExpansion(context) * 8,
               children: [
@@ -75,34 +75,68 @@ class HomeScreen extends StatelessWidget {
                   details: _HomeDetails(
                     controller: controller,
                     strings: strings,
+                    compact: true,
                   ),
                 ),
               ],
-            )
-          else
-            _DesktopHomeConnection(
-              controller: controller,
-              strings: strings,
-              onOpenChainProxy:
-                  onOpenVpnGate ??
-                  () => Navigator.of(context).push<void>(
-                    MaterialPageRoute(
-                      builder: (_) => ChainProxyScreen(controller: controller),
-                    ),
-                  ),
             ),
-          if (!compact) ...[
-            const SizedBox(height: 32),
-            Divider(height: 1, color: UsqueTokens.of(context).hairline),
-            _DesktopLocalProxies(controller: controller),
-            Divider(height: 1, color: UsqueTokens.of(context).hairline),
-            const SizedBox(height: 20),
-            _TrafficGrid(controller: controller, strings: strings),
           ],
+        ),
+      );
+    }
+    // Traffic is last so its charts take up the height left in the window and
+    // the page ends at the bottom margin rather than above an empty band.
+    return PageFrame(
+      title: strings.get('home'),
+      showHeading: defaultTargetPlatform != TargetPlatform.windows,
+      fillViewport: true,
+      child: FillColumn(
+        children: <Widget>[
+          notice,
+          _ErrorSlot(controller: controller, strings: strings),
+          _DesktopHomeConnection(
+            controller: controller,
+            strings: strings,
+            onOpenChainProxy: onOpenVpnGate ?? openChainProxy,
+          ),
+          const SizedBox(height: 32),
+          Divider(height: 1, color: UsqueTokens.of(context).hairline),
+          _DesktopLocalProxies(controller: controller),
+          Divider(height: 1, color: UsqueTokens.of(context).hairline),
+          const SizedBox(height: 20),
+          _TrafficGrid(controller: controller, strings: strings),
         ],
       ),
     );
   }
+}
+
+class _ZeroTrustEndpointRiskNotice extends StatelessWidget {
+  const _ZeroTrustEndpointRiskNotice({required this.controller});
+
+  final AppController controller;
+
+  @override
+  Widget build(BuildContext context) => ControllerSelector<bool>(
+    controller: controller,
+    active: (app) => app.section == AppSection.home,
+    selector: (app) => app.hasCustomZeroTrustEndpointRisk,
+    builder: (context, show) => show
+        ? Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: WarningBanner(
+              key: const ValueKey('home-zero-trust-endpoint-risk'),
+              danger: true,
+              title: controller.strings.get(
+                'zero_trust_endpoint_home_risk_title',
+              ),
+              message: controller.strings.get(
+                'zero_trust_endpoint_home_risk_body',
+              ),
+            ),
+          )
+        : const SizedBox.shrink(),
+  );
 }
 
 class _DesktopHomeConnection extends StatelessWidget {
@@ -179,7 +213,11 @@ class _DesktopLocalProxies extends StatelessWidget {
               const SizedBox(width: 8),
               Text(name, style: Theme.of(context).textTheme.bodySmall),
               const SizedBox(width: 8),
-              Flexible(child: MonoValue(value: enabled ? address : '—')),
+              Flexible(
+                child: enabled
+                    ? _ListenerAddresses(addresses: address)
+                    : const MonoValue(value: '—'),
+              ),
             ],
           );
       final values = Wrap(
@@ -226,6 +264,55 @@ class _DesktopLocalProxies extends StatelessWidget {
   );
 }
 
+/// Selectable listener list; IPv6 listeners are secondary to the IPv4 one.
+class _ListenerAddresses extends StatefulWidget {
+  const _ListenerAddresses({required this.addresses});
+
+  /// Comma-separated listeners, kept as one string so selector equality holds.
+  final String addresses;
+
+  @override
+  State<_ListenerAddresses> createState() => _ListenerAddressesState();
+}
+
+class _ListenerAddressesState extends State<_ListenerAddresses> {
+  // See MonoValue: SelectableText must not inherit the page's storage slot.
+  final _textStorage = PageStorageBucket();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final parts = widget.addresses.split(', ');
+    final spans = <InlineSpan>[];
+    for (var i = 0; i < parts.length; i++) {
+      if (i > 0) {
+        spans.add(
+          TextSpan(
+            text: ', ',
+            style: TextStyle(color: scheme.onSurfaceVariant),
+          ),
+        );
+      }
+      spans.add(
+        TextSpan(
+          text: parts[i],
+          style: parts[i].startsWith('[')
+              // One weight per line; colour alone ranks the IPv6 listener.
+              ? TextStyle(color: scheme.onSurfaceVariant)
+              : null,
+        ),
+      );
+    }
+    return PageStorage(
+      bucket: _textStorage,
+      child: SelectableText.rich(
+        TextSpan(children: spans),
+        style: UsqueTheme.address(context, weight: FontWeight.w500),
+      ),
+    );
+  }
+}
+
 class _NarrowBrandHeader extends StatelessWidget {
   const _NarrowBrandHeader();
 
@@ -236,12 +323,7 @@ class _NarrowBrandHeader extends StatelessWidget {
       header: true,
       child: Row(
         children: <Widget>[
-          Image.asset(
-            'assets/branding/usque-ui-icon.png',
-            width: 40,
-            height: 40,
-            filterQuality: FilterQuality.medium,
-          ),
+          const UsqueLogo(size: 40),
           const SizedBox(width: 12),
           Text('Usque', style: Theme.of(context).textTheme.titleLarge),
         ],
@@ -378,7 +460,9 @@ class _VpnGateReadout extends StatelessWidget {
                         Expanded(
                           child: Text(
                             '${strings.get(status.connected ? 'gate_current' : 'gate_draft')}: ${server.countryCode ?? '—'} · ${server.ip}',
-                            style: const TextStyle(fontFamily: UsqueFonts.mono),
+                            style: const TextStyle(
+                              fontFeatures: UsqueTheme.tabularFigures,
+                            ),
                           ),
                         ),
                       ],
@@ -399,16 +483,21 @@ class _ErrorSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ControllerSelector<String?>(
+    return ControllerSelector<({String? error, bool failed})>(
       controller: controller,
       active: (controller) => controller.section == AppSection.home,
-      selector: (controller) => controller.lastError,
-      builder: (context, error) => BannerSlot(
-        child: error == null
+      selector: (controller) => (
+        error: controller.lastError,
+        failed: controller.snapshot.phase == ConnectionPhase.error,
+      ),
+      builder: (context, view) => BannerSlot(
+        child: view.error == null
             ? null
             : WarningBanner(
-                title: strings.get('error'),
-                message: error,
+                // The connection heading already names a failed connection.
+                // Other operations share this slot and get a neutral title.
+                title: view.failed ? null : strings.get('error_generic'),
+                message: view.error!,
                 danger: true,
                 onDismiss: controller.clearError,
               ),
@@ -580,7 +669,7 @@ class _ConnectionHero extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
-                      style: theme.textTheme.titleLarge,
+                      style: theme.textTheme.titleMedium,
                     ),
                   ),
                 ),
@@ -612,30 +701,23 @@ class _ConnectionHero extends StatelessWidget {
     Widget overview() => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              strings.get('active_profile'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Tooltip(
-                message: view.profileName,
-                child: Text(
-                  view.profileName,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium,
-                ),
-              ),
-            ),
-          ],
+        Text(
+          strings.get('active_profile'),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 5),
+        Tooltip(
+          message: view.profileName,
+          child: Text(
+            view.profileName,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleMedium,
+          ),
+        ),
+        const SizedBox(height: 14),
         statusText(),
         const SizedBox(height: 20),
         _DesktopSessionReadout(controller: controller),
@@ -654,12 +736,12 @@ class _ConnectionHero extends StatelessWidget {
               constraints.maxWidth >= 560 &&
               MediaQuery.textScalerOf(context).scale(14) <= 21;
           if (split) {
-            final size = (constraints.maxWidth - 200 - 32).clamp(240.0, 330.0);
+            final size = (constraints.maxWidth - 220 - 24).clamp(224.0, 330.0);
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(width: size, child: ring(size)),
-                const SizedBox(width: 32),
+                const SizedBox(width: 24),
                 Expanded(child: overview()),
               ],
             );
@@ -696,6 +778,8 @@ class _ConnectionHero extends StatelessWidget {
   }
 }
 
+/// Desktop and phone charts share timestamped observations, including zeros
+/// and gaps. Widget rebuilds and unchanged values never alter the history.
 class _TrafficGrid extends StatelessWidget {
   const _TrafficGrid({required this.controller, required this.strings});
   final AppController controller;
@@ -727,9 +811,8 @@ class _TrafficGrid extends StatelessWidget {
                 up.any((value) => value != null),
           ),
         );
-        Widget card(bool download) => _TrafficReadout(
+        Widget readout(bool download) => _TrafficRate(
           direction: download ? 'download' : 'upload',
-          note: note,
           icon: download ? LucideIcons.arrowDown : LucideIcons.arrowUp,
           label: strings.get(download ? 'download' : 'upload'),
           bytesPerSecond: !snapshot.isConnected
@@ -738,98 +821,127 @@ class _TrafficGrid extends StatelessWidget {
               ? snapshot.downloadBytesPerSecond
               : snapshot.uploadBytesPerSecond,
           color: download ? tokens.inbound : tokens.outbound,
-          samples: download ? down : up,
         );
-        return ContentSection(
+        Widget trace(bool download) {
+          final direction = download ? 'download' : 'upload';
+          return Sparkline(
+            key: ValueKey('home-desktop-$direction-trace'),
+            samples: download ? down : up,
+            color: download ? tokens.inbound : tokens.outbound,
+            height: _minTraceHeight,
+            semanticLabel: '${strings.get(direction)} · $note',
+          );
+        }
+
+        final theme = Theme.of(context);
+        final heading = ContentHeading(
           title: strings.get('home_traffic'),
-          trailing: Text(note, style: Theme.of(context).textTheme.bodySmall),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth >= 560 &&
-                  MediaQuery.textScalerOf(context).scale(14) <= 21) {
-                return Row(
-                  children: [
-                    Expanded(child: card(true)),
-                    const SizedBox(width: 16),
-                    Expanded(child: card(false)),
-                  ],
-                );
-              }
-              return Column(
-                children: [card(true), const SizedBox(height: 16), card(false)],
-              );
-            },
+          trailing: Text(
+            note,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
+        );
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 560 ||
+                MediaQuery.textScalerOf(context).scale(14) > 21) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  heading,
+                  const SizedBox(height: 16),
+                  readout(true),
+                  const SizedBox(height: 14),
+                  trace(true),
+                  const SizedBox(height: 24),
+                  readout(false),
+                  const SizedBox(height: 14),
+                  trace(false),
+                ],
+              );
+            }
+            // The fixed trace height is a minimum here: the chart row
+            // stretches to whatever height the page offers below it.
+            return FillColumn(
+              maxLastExtent: _maxTraceHeight,
+              children: [
+                heading,
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(child: readout(true)),
+                    const SizedBox(width: _traceGap),
+                    Expanded(child: readout(false)),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: _minTraceHeight,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: trace(true)),
+                      const SizedBox(width: _traceGap),
+                      Expanded(child: trace(false)),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     ),
   );
+
+  static const double _minTraceHeight = 96;
+  static const double _maxTraceHeight = 240;
+  static const double _traceGap = 32;
 }
 
-/// Desktop and phone charts share timestamped observations, including zeros
-/// and gaps. Widget rebuilds and unchanged values never alter the history.
-class _TrafficReadout extends StatelessWidget {
-  const _TrafficReadout({
+class _TrafficRate extends StatelessWidget {
+  const _TrafficRate({
     required this.direction,
-    required this.note,
     required this.icon,
     required this.label,
     required this.bytesPerSecond,
     required this.color,
-    required this.samples,
   });
   final String direction;
-  final String note;
   final IconData icon;
   final String label;
   final int? bytesPerSecond;
   final Color color;
-  final List<int?> samples;
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final rate = bytesPerSecond;
-    return ContentSection(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Icon(icon, size: 20, color: color),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                rate == null ? '—' : formatRate(rate),
-                key: ValueKey('home-desktop-$direction-rate'),
-                style: UsqueTheme.mono(
-                  context,
-                  size: theme.textTheme.titleMedium?.fontSize,
-                  weight: FontWeight.w500,
-                  color: rate == null
-                      ? theme.colorScheme.onSurfaceVariant
-                      : null,
-                ),
-              ),
-            ],
+    return Row(
+      children: <Widget>[
+        Icon(icon, size: 20, color: color),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-          const SizedBox(height: 14),
-          Sparkline(
-            key: ValueKey('home-desktop-$direction-trace'),
-            samples: samples,
-            color: color,
-            height: 96,
-            semanticLabel: '$label · $note',
+        ),
+        const SizedBox(width: 10),
+        Text(
+          rate == null ? '—' : formatRate(rate),
+          key: ValueKey('home-desktop-$direction-rate'),
+          style: UsqueTheme.readout(
+            context,
+            size: 16,
+            color: rate == null ? theme.colorScheme.onSurfaceVariant : null,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -920,8 +1032,8 @@ class _DesktopSessionReadout extends StatelessWidget {
         family: snapshot.addressFamily,
         since: snapshot.connectedAt,
         connected: snapshot.isConnected,
-        location: snapshot.exit.hasLocation
-            ? snapshot.exit.location
+        location: snapshot.exit.country?.trim().isNotEmpty == true
+            ? snapshot.exit.country!.trim()
             : strings.get('not_available'),
         countryCode: snapshot.exit.countryCode,
         killKey: killSwitchStatusKey(
@@ -961,13 +1073,13 @@ class _DesktopSessionReadout extends StatelessWidget {
                 strings.get('protocol'),
                 view.transport == null
                     ? const EmptyValue(label: '—')
-                    : MonoValue(value: view.transport!),
+                    : Text(view.transport!, style: UsqueTheme.readout(context)),
               ),
               metric(
                 strings.get('address_family'),
                 view.family == null
                     ? const EmptyValue(label: '—')
-                    : MonoValue(value: view.family!),
+                    : Text(view.family!, style: UsqueTheme.readout(context)),
               ),
               metric(strings.get('duration'), LiveDuration(since: view.since)),
             ],
@@ -1015,19 +1127,27 @@ class _DesktopSessionReadout extends StatelessWidget {
             key: const ValueKey('home-exit-location'),
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (view.connected)
-                CountryFlag(countryCode: view.countryCode)
-              else
-                const Icon(LucideIcons.mapPin, size: 16),
+              const Icon(LucideIcons.mapPin, size: 16),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  view.connected
-                      ? view.location
-                      : strings.get('location_disconnected'),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (view.connected) ...[
+                      CountryFlag(countryCode: view.countryCode),
+                      const SizedBox(width: 8),
+                    ],
+                    Expanded(
+                      child: Text(
+                        view.connected
+                            ? view.location
+                            : strings.get('location_disconnected'),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -1039,25 +1159,43 @@ class _DesktopSessionReadout extends StatelessWidget {
 }
 
 class _HomeDetails extends StatelessWidget {
-  const _HomeDetails({required this.controller, required this.strings});
+  const _HomeDetails({
+    required this.controller,
+    required this.strings,
+    this.compact = false,
+  });
   final AppController controller;
   final AppStrings strings;
+  final bool compact;
+
+  // Leading geometry matches the neighbouring rows: ReadoutRow on phones and
+  // the Kill Switch/location rows on desktop.
   @override
   Widget build(BuildContext context) => Material(
     color: Colors.transparent,
-    child: ExpansionTile(
-      key: const PageStorageKey('home-connection-details'),
-      leading: const Icon(LucideIcons.slidersHorizontal, size: 16),
-      title: Text(
-        strings.get('connection_details'),
-        style: Theme.of(context).textTheme.bodyMedium,
+    child: ListTileTheme.merge(
+      minLeadingWidth: compact ? 22 : 16,
+      horizontalTitleGap: compact ? 11 : 8,
+      child: ExpansionTile(
+        key: const PageStorageKey('home-connection-details'),
+        leading: compact
+            ? Icon(
+                LucideIcons.slidersHorizontal,
+                size: 17,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              )
+            : const Icon(LucideIcons.slidersHorizontal, size: 16),
+        title: Text(
+          strings.get('connection_details'),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        dense: true,
+        minTileHeight: 48,
+        tilePadding: EdgeInsets.zero,
+        shape: const Border(),
+        collapsedShape: const Border(),
+        children: [_ConnectionDetailsReadout(controller: controller)],
       ),
-      dense: true,
-      minTileHeight: 48,
-      tilePadding: EdgeInsets.zero,
-      shape: const Border(),
-      collapsedShape: const Border(),
-      children: [_ConnectionDetailsReadout(controller: controller)],
     ),
   );
 }
@@ -1090,14 +1228,11 @@ class _ConnectionDetailsReadout extends StatelessWidget {
     builder: (context, view) {
       final strings = controller.strings;
       final theme = Theme.of(context);
-      Widget address(String label, String? value) => ReadoutRow(
-        stackWhenNarrow: true,
-        icon: LucideIcons.network,
-        label: label,
-        value: value == null
-            ? const EmptyValue(label: '—')
-            : MonoValue(value: value),
-      );
+      final addresses = [view.ipv4, view.ipv6]
+          .whereType<String>()
+          .map((value) => value.trim())
+          .where((value) => value.isNotEmpty)
+          .toList();
       final interfaces = [
         if (view.tunnel) strings.tunnelOutputLabel(theme.platform),
         if (view.systemProxy) strings.get('home_system_proxy'),
@@ -1115,15 +1250,22 @@ class _ConnectionDetailsReadout extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            address(strings.get('ipv4'), view.ipv4),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Divider(
-                height: 1,
-                color: UsqueTokens.of(context).hairline,
-              ),
+            Wrap(
+              key: const ValueKey('home-exit-ip'),
+              spacing: 8,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  strings.get('home_exit_ip'),
+                  style: theme.textTheme.bodyMedium,
+                ),
+                if (addresses.isEmpty)
+                  const EmptyValue(label: '—')
+                else
+                  for (final value in addresses) MonoValue(value: value),
+              ],
             ),
-            address(strings.get('ipv6'), view.ipv6),
             if (interfaces.isNotEmpty) ...[
               const SizedBox(height: 16),
               Text(

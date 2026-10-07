@@ -4,12 +4,15 @@
 #include <windows.h>
 
 #include <algorithm>
+#include <optional>
 #include <string>
 #include <vector>
 
 #include "flutter_window.h"
+#include "shell_integration.h"
 #include "utils.h"
 #include "window_geometry.h"
+#include "window_placement.h"
 #include "zero_trust_callback.h"
 
 namespace {
@@ -44,21 +47,16 @@ bool HasArgument(const std::vector<std::string>& arguments,
          arguments.end();
 }
 
-void RemoveStartupEntry() {
-  HKEY key = nullptr;
-  if (::RegOpenKeyExW(
-          HKEY_CURRENT_USER,
-          L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0,
-          KEY_SET_VALUE, &key) == ERROR_SUCCESS) {
-    ::RegDeleteValueW(key, L"Usque");
-    ::RegCloseKey(key);
-  }
-}
-
 }  // namespace
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
+  std::vector<std::string> command_line_arguments = GetCommandLineArguments();
+  if (const auto result =
+          usque::shell::HandleCommandLine(command_line_arguments)) {
+    return *result;
+  }
+
   // Attach to console when present (e.g., 'flutter run') or create a
   // new console when running with a debugger.
   if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
@@ -70,15 +68,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
   flutter::DartProject project(L"data");
-
-  std::vector<std::string> command_line_arguments =
-      GetCommandLineArguments();
-
-  if (HasArgument(command_line_arguments, "--remove-startup")) {
-    RemoveStartupEntry();
-    ::CoUninitialize();
-    return EXIT_SUCCESS;
-  }
 
   const std::wstring sid = CurrentUserSid();
   if (sid.empty()) {
@@ -99,7 +88,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     HWND existing =
         ::FindWindowW(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Usque");
     if (existing != nullptr) {
-      ::ShowWindow(existing, SW_RESTORE);
+      // SW_RESTORE would also un-maximize a window hidden in the tray.
+      ::ShowWindow(existing, ::IsIconic(existing) ? SW_RESTORE : SW_SHOW);
       ::SetForegroundWindow(existing);
       if (forwarded_callback.has_value()) {
         ForwardZeroTrustCallback(existing, *forwarded_callback);
@@ -115,11 +105,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
-  FlutterWindow window(project, start_hidden);
-  Win32Window::Point origin(10, 10);
+  const std::optional<usque::WindowPlacement> placement =
+      usque::ReadWindowPlacement(HKEY_CURRENT_USER, usque::kUsqueSettingsKey);
+  FlutterWindow window(project, start_hidden,
+                       placement.has_value() && placement->maximized);
   // Reserve space for both Home and the Flutter-drawn caption.
   Win32Window::Size size(usque::kDefaultWindowWidth, usque::kDefaultWindowHeight);
-  if (!window.Create(L"Usque", origin, size)) {
+  if (!window.Create(L"Usque", size, placement)) {
     ::CloseHandle(instance_mutex);
     return EXIT_FAILURE;
   }

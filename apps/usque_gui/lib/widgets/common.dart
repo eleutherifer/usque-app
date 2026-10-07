@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../core/usque_motion.dart';
@@ -15,10 +18,12 @@ class PageFrame extends StatelessWidget {
     this.header,
     this.titleWidget,
     this.showHeading = true,
+    this.fillViewport = false,
     this.contentWidth = maxContentWidth,
     this.actions = const <Widget>[],
     super.key,
-  }) : assert((child == null) != (slivers == null));
+  }) : assert((child == null) != (slivers == null)),
+       assert(!fillViewport || child != null);
 
   final String title;
   final Widget? child;
@@ -31,15 +36,32 @@ class PageFrame extends StatelessWidget {
 
   /// Hide the visual header while retaining the page's scroll-storage identity.
   final bool showHeading;
+
+  /// Give [child] at least the viewport height left below the heading and
+  /// above the bottom margin. Taller content still scrolls.
+  final bool fillViewport;
   final double contentWidth;
   final List<Widget> actions;
 
   static const double maxContentWidth = 1120;
+  static const double _bottomMargin = 34;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final double gutter = MediaQuery.sizeOf(context).width < 600 ? 16 : 32;
+    Widget content(double minHeight) => SliverToBoxAdapter(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: contentWidth,
+            minHeight: minHeight,
+          ),
+          child: child,
+        ),
+      ),
+    );
     return Material(
       color: UsqueTokens.of(context).canvas,
       child: CustomScrollView(
@@ -124,7 +146,7 @@ class PageFrame extends StatelessWidget {
               gutter,
               showHeading ? 0 : gutter,
               gutter,
-              34,
+              _bottomMargin,
             ),
             sliver: slivers != null
                 ? SliverLayoutBuilder(
@@ -140,15 +162,18 @@ class PageFrame extends StatelessWidget {
                       sliver: SliverMainAxisGroup(slivers: slivers!),
                     ),
                   )
-                : SliverToBoxAdapter(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: contentWidth),
-                        child: child,
+                : fillViewport
+                ? SliverLayoutBuilder(
+                    builder: (context, constraints) => content(
+                      math.max(
+                        0,
+                        constraints.viewportMainAxisExtent -
+                            constraints.precedingScrollExtent -
+                            _bottomMargin,
                       ),
                     ),
-                  ),
+                  )
+                : content(0),
           ),
         ],
       ),
@@ -236,6 +261,87 @@ class PanelStack extends StatelessWidget {
       ],
     );
   }
+}
+
+/// A stretched column whose last child is offered the height its siblings
+/// leave under the column's minimum, up to [maxLastExtent].
+///
+/// The offer is a minimum, so the last child keeps its natural height when
+/// space is short and the column grows instead. A [Column] cannot do this:
+/// flexible children need a bounded height, which a scroll view never gives.
+class FillColumn extends MultiChildRenderObjectWidget {
+  const FillColumn({
+    required super.children,
+    this.maxLastExtent = double.infinity,
+    super.key,
+  });
+
+  final double maxLastExtent;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderFillColumn(maxLastExtent);
+
+  @override
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
+    (renderObject as _RenderFillColumn).maxLastExtent = maxLastExtent;
+  }
+}
+
+class _FillColumnParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _RenderFillColumn extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _FillColumnParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _FillColumnParentData> {
+  _RenderFillColumn(this._maxLastExtent);
+
+  double _maxLastExtent;
+  set maxLastExtent(double value) {
+    if (value == _maxLastExtent) return;
+    _maxLastExtent = value;
+    markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _FillColumnParentData) {
+      child.parentData = _FillColumnParentData();
+    }
+  }
+
+  @override
+  void performLayout() {
+    final width = constraints.maxWidth;
+    var offset = 0.0;
+    var child = firstChild;
+    while (child != null) {
+      final data = child.parentData! as _FillColumnParentData;
+      final minHeight = child == lastChild
+          ? (constraints.minHeight - offset).clamp(0.0, _maxLastExtent)
+          : 0.0;
+      child.layout(
+        BoxConstraints(minWidth: width, maxWidth: width, minHeight: minHeight),
+        parentUsesSize: true,
+      );
+      data.offset = Offset(0, offset);
+      offset += child.size.height;
+      child = data.nextSibling;
+    }
+    size = constraints.constrain(Size(width, offset));
+  }
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) =>
+      defaultComputeDistanceToFirstActualBaseline(baseline);
+
+  @override
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
 }
 
 /// An open content region. Grouping comes from its heading and spacing, never
@@ -712,13 +818,7 @@ Color statusToneColor(BuildContext context, StatusTone tone) {
     StatusTone.success => tokens.success,
     StatusTone.warning => tokens.caution,
     StatusTone.danger => tokens.danger,
-    // The logo orange is deliberately vivid and misses the 3:1 graphical
-    // contrast threshold on its own light tint. Use the accessible ember for
-    // status indicators in light mode; dark surfaces can keep the brand hue.
-    StatusTone.brand =>
-      theme.brightness == Brightness.light
-          ? theme.colorScheme.primary
-          : tokens.brand,
+    StatusTone.brand => tokens.brand,
     StatusTone.neutral => theme.colorScheme.onSurfaceVariant,
   };
 }
@@ -820,7 +920,8 @@ class WarningBanner extends StatelessWidget {
     super.key,
   });
 
-  final String title;
+  /// Omitted when an adjacent heading already names the failure.
+  final String? title;
   final String message;
   final VoidCallback? onDismiss;
   final bool danger;
@@ -856,14 +957,16 @@ class WarningBanner extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: foreground,
-                        fontWeight: FontWeight.w700,
+                    if (title case final title?) ...<Widget>[
+                      Text(
+                        title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: foreground,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 3),
+                      const SizedBox(height: 3),
+                    ],
                     Text(message, style: theme.textTheme.bodyMedium),
                   ],
                 ),
@@ -1048,7 +1151,7 @@ class _MonoValueState extends State<MonoValue> {
       child: SelectableText(
         widget.value,
         textAlign: TextAlign.end,
-        style: UsqueTheme.mono(
+        style: UsqueTheme.address(
           context,
           size: widget.size,
           weight: FontWeight.w500,
