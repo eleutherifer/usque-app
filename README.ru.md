@@ -14,7 +14,7 @@
 
 Некоторые SNI на замену speed.cloudflare.com, которые на протоколе MASQUE h3 (TCP) работают, если для HTTP/3 (QUIC) включится проверка по белым спискам:  
 360tv.ru, nplus1.ru (эти два находятся в сети Cloudflare),  
-а также 2gis.ru, apteka.ru, autonews.ru, beeline.ru, deepseek.com, joomag.com, profi.ru, psbank.ru, pypi.org, rt.ru, rutube.ru
+а также apteka.ru, autonews.ru, deepseek.com, joomag.com, profi.ru, pypi.org, rutube.ru
 
 <p align="center">
   <img src="assets/branding/usque-readme-banner.png" alt="Usque — Неофициальный клиент, совместимый с сервисами Cloudflare® WARP®" width="100%">
