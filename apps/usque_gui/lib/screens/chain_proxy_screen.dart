@@ -16,7 +16,7 @@ import '../widgets/save_changes_bar.dart';
 import '../widgets/unsaved_changes_guard.dart';
 import '../widgets/usque_dialog.dart';
 import '../widgets/warp_wireguard_panel.dart';
-import 'vpn_gate_screen.dart';
+import 'vpn_gate_chain_editor.dart';
 
 part 'chain_batch_import.dart';
 part 'chain_proxy_form.dart';
@@ -25,10 +25,12 @@ class ChainProxyScreen extends StatefulWidget {
   const ChainProxyScreen({
     required this.controller,
     this.active = true,
+    this.now = DateTime.now,
     super.key,
   });
   final AppController controller;
   final bool active;
+  final DateTime Function() now;
   @override
   State<ChainProxyScreen> createState() => _ChainProxyScreenState();
 }
@@ -136,7 +138,7 @@ class _ChainProxyScreenState extends State<ChainProxyScreen> {
     }
     return current != ChainSource.vpnGate &&
         _gateDraft != null &&
-        VpnGateScreen.chainPending(
+        VpnGateChainEditor.chainPending(
           profile,
           _gateDraft!.copyWith(enabled: _enabled),
         );
@@ -150,9 +152,10 @@ class _ChainProxyScreenState extends State<ChainProxyScreen> {
   @override
   Widget build(BuildContext context) {
     if (_source == ChainSource.vpnGate) {
-      return VpnGateScreen(
+      return VpnGateChainEditor(
         controller: _app,
         active: widget.active,
+        now: widget.now,
         leaveGuardKey: _guard,
         chainPageBuilder: _buildPage,
         initialDraft: _gateDraft?.copyWith(enabled: _enabled),
@@ -198,17 +201,20 @@ class _ChainProxyScreenState extends State<ChainProxyScreen> {
           child: PanelStack(
             spacing: 20,
             children: [
-              SwitchListTile.adaptive(
-                key: ValueKey(
-                  _source == ChainSource.vpnGate
-                      ? 'vpn-gate-toggle'
-                      : 'chain-proxy-toggle',
+              RowTileTheme(
+                child: SwitchListTile.adaptive(
+                  key: ValueKey(
+                    _source == ChainSource.vpnGate
+                        ? 'vpn-gate-toggle'
+                        : 'chain-proxy-toggle',
+                  ),
+                  contentPadding: EdgeInsets.zero,
+                  secondary: const Icon(LucideIcons.link),
+                  title: Text(_app.strings.chain('enable')),
+                  subtitle: Text(_app.strings.chain('scope')),
+                  value: enabled,
+                  onChanged: onEnabledChanged,
                 ),
-                contentPadding: EdgeInsets.zero,
-                title: Text(_app.strings.chain('enable')),
-                subtitle: Text(_app.strings.chain('scope')),
-                value: enabled,
-                onChanged: onEnabledChanged,
               ),
               ChainSourcePicker(
                 controller: _app,
@@ -711,6 +717,8 @@ class _CustomChainEditorState extends State<_CustomChainEditor> {
                         ),
                 ),
                 if (_loading) const LinearProgressIndicator(minHeight: 2),
+                // Explanations keep a gap below the action buttons.
+                if (!_loading && profiles.isEmpty) const SizedBox(height: 8),
                 if (!_loading && profiles.isEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

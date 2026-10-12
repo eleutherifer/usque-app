@@ -6,19 +6,24 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:usque/core/app_strings.dart';
+import 'package:usque/core/chain_strings.dart';
 import 'package:usque/core/usque_theme.dart';
 import 'package:usque/models/app_models.dart';
+import 'package:usque/models/encrypted_dns_endpoint.dart';
 import 'package:usque/models/network_settings.dart';
 import 'package:usque/screens/advanced_settings_screen.dart';
+import 'package:usque/screens/chain_proxy_screen.dart';
 import 'package:usque/screens/diagnostics_screen.dart';
+import 'package:usque/screens/geo_direct_settings_screen.dart';
 import 'package:usque/screens/home_screen.dart';
 import 'package:usque/screens/onboarding_screen.dart';
 import 'package:usque/screens/shell_screen.dart';
-import 'package:usque/screens/vpn_gate_screen.dart';
+import 'package:usque/screens/vpn_gate_chain_editor.dart';
 import 'package:usque/state/app_controller.dart';
 import 'package:usque/state/network_quality_controller.dart';
 import 'package:usque/state/window_frame.dart';
 import 'package:usque/widgets/chain_proxy_entry.dart';
+import 'package:usque/widgets/chain_source_picker.dart';
 import 'package:usque/widgets/common.dart';
 import 'package:usque/widgets/connection_ring.dart';
 import 'package:usque/widgets/country_flag.dart';
@@ -31,10 +36,11 @@ import 'package:usque/widgets/window_titlebar.dart';
 import 'package:usque/widgets/zero_trust_endpoint_warning.dart';
 
 import 'quality_test_support.dart' show qualityFixture;
-import 'ui_workflow_test.dart' show WorkflowEngine, workflowHost;
+import 'ui_workflow_test.dart'
+    show WorkflowEngine, fieldWithLabel, workflowHost;
 import 'vpn_gate_server_row_test.dart' show observationNow, observationServer;
 import 'vpn_gate_summary_test.dart' show current;
-import 'vpngate_test.dart' show GateEngine, server;
+import 'vpngate_test.dart' show GateEngine, server, showGateControl;
 import 'zero_trust_endpoint_test.dart' show ztEngine;
 
 void main() {
@@ -79,6 +85,72 @@ void main() {
           .load();
     }
   });
+
+  for (final scene in [
+    (
+      name: 'routing_en_desktop',
+      size: Size(1200, 900),
+      locale: LocalePreference.english,
+      dark: false,
+      scale: 1.0,
+    ),
+    (
+      name: 'routing_zh_phone',
+      size: Size(400, 960),
+      locale: LocalePreference.simplifiedChinese,
+      dark: true,
+      scale: 1.0,
+    ),
+    (
+      name: 'routing_en_tv_large',
+      size: Size(1280, 900),
+      locale: LocalePreference.english,
+      dark: true,
+      scale: 2.0,
+    ),
+  ]) {
+    testWidgets('routing golden ${scene.name}', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = scene.size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      final app = AppController(WorkflowEngine())
+        ..localePreference = scene.locale
+        ..engineCapabilities = const EngineCapabilities(
+          routingRules: true,
+          automaticEndpoints: true,
+        );
+      app.sharedNetwork = app.sharedNetwork.copyWith(
+        routing: RoutingSettings(
+          adsEnabled: true,
+          rules: [
+            RoutingRule.create('example.com', RoutingAction.direct),
+            RoutingRule.create('ads.example.com', RoutingAction.reject),
+            RoutingRule.create('192.0.2.7', RoutingAction.proxy),
+          ],
+        ),
+      );
+      addTearDown(app.dispose);
+      final boundary = GlobalKey();
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: boundary,
+          child: workflowHost(
+            app,
+            dark: scene.dark,
+            scale: scene.scale,
+            home: GeoDirectSettingsScreen(controller: app),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await expectLater(
+        find.byKey(boundary),
+        matchesGoldenFile('goldens/${scene.name}.png'),
+      );
+    }, tags: 'golden');
+  }
 
   for (final fixture in [
     (
@@ -226,16 +298,18 @@ void main() {
                 padding: const EdgeInsets.all(24),
                 child: Form(
                   child: ContentSection(
-                    icon: LucideIcons.network,
-                    title: strings.get('ip_dns'),
+                    icon: LucideIcons.globeLock,
+                    title: strings.get('warp_dns_type'),
                     children: [
                       WarpDnsEditor(
                         value: WarpDnsSettings(
                           mode: doh ? WarpDnsMode.doh : WarpDnsMode.dot,
-                          serverName: 'dns.example.com',
+                          serverName: doh
+                              ? 'cloudflare-dns.com'
+                              : cloudflareDotServer,
                           dohPath: doh ? '/dns-query' : '',
                           port: doh ? 443 : 853,
-                          bootstrapIps: const ['192.0.2.1', '2001:db8::1'],
+                          bootstrapIps: cloudflareDnsBootstrapIps,
                         ),
                         enabled: true,
                         strings: strings,
@@ -429,101 +503,128 @@ void main() {
     }
   }, tags: 'golden');
 
-  testWidgets('VPN Gate selection layout on desktop and phone', (tester) async {
-    addTearDown(tester.view.resetDevicePixelRatio);
-    addTearDown(tester.view.resetPhysicalSize);
-    tester.view.devicePixelRatio = 1;
-    for (final phone in [false, true]) {
-      tester.view.physicalSize = phone
-          ? const Size(390, 844)
-          : const Size(1080, 920);
-      final engine = GateEngine()..fetchedAt = DateTime(2026, 9, 12, 8);
-      final app = AppController(engine)
-        ..engineCapabilities = const EngineCapabilities(
-          automaticEndpoints: true,
-          vpnGateTcp: true,
-          vpnGatePoolFavorites: true,
-        )
-        ..localePreference = phone
-            ? LocalePreference.simplifiedChinese
-            : LocalePreference.english;
-      final boundary = GlobalKey();
-      try {
-        await tester.pumpWidget(
-          RepaintBoundary(
-            key: boundary,
-            child: workflowHost(
-              app,
-              dark: phone,
-              home: VpnGateScreen(
-                controller: app,
-                now: () => DateTime(2020, 1, 3, 14),
+  testWidgets(
+    'Chain proxy VPN Gate selection and favorites on desktop and phone',
+    (tester) async {
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      tester.view.devicePixelRatio = 1;
+      for (final phone in [false, true]) {
+        tester.view.physicalSize = phone
+            ? const Size(390, 844)
+            : const Size(1080, 920);
+        final engine = GateEngine()..fetchedAt = DateTime(2026, 9, 12, 8);
+        final app = AppController(engine)
+          ..engineCapabilities = const EngineCapabilities(
+            automaticEndpoints: true,
+            vpnGateTcp: true,
+            vpnGatePoolFavorites: true,
+          )
+          ..localePreference = phone
+              ? LocalePreference.simplifiedChinese
+              : LocalePreference.english
+          ..sharedNetwork = UsqueProfile.defaultProfile().copyWith(
+            chainExit: const ChainExitSettings(source: ChainSource.vpnGate),
+          );
+        final boundary = GlobalKey();
+        try {
+          await tester.pumpWidget(
+            RepaintBoundary(
+              key: boundary,
+              child: workflowHost(
+                app,
+                dark: phone,
+                home: ChainProxyScreen(
+                  controller: app,
+                  now: () => DateTime(2020, 1, 3, 14),
+                ),
               ),
             ),
-          ),
-        );
-        await tester.pump(const Duration(seconds: 2));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey('vpn-gate-toggle')));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey('vpn-gate-node-v1:node')));
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey('vpn-gate-toggle')));
-        await tester.pumpAndSettle();
-        expect(tester.takeException(), isNull);
-        await tester.runAsync(
-          () => precacheImage(
-            const AssetImage('assets/flags/w80/jp.png'),
-            tester.element(find.byType(VpnGateScreen)),
-          ),
-        );
-        await tester.pumpAndSettle();
-        await expectLater(
-          find.byKey(boundary),
-          matchesGoldenFile(
-            'goldens/vpngate_${phone ? 'phone_dark' : 'desktop_light'}.png',
-          ),
-        );
-        engine.favorites[server.id] = VpnGateServer(
-          id: server.id,
-          ip: server.ip,
-          hostname: server.hostname,
-          configSha256: 'saved-configuration',
-          countryCode: 'JP',
-          countryName: 'Japan',
-          favorite: VpnGateFavoriteMetadata(
+          );
+          await tester.pump(const Duration(seconds: 2));
+          await tester.pumpAndSettle();
+          expect(find.byType(ChainProxyScreen), findsOneWidget);
+          expect(find.text(app.strings.chain('title')), findsOneWidget);
+          expect(
+            tester
+                .widget<ChainSourcePicker>(find.byType(ChainSourcePicker))
+                .source,
+            ChainSource.vpnGate,
+          );
+          final toggle = find.byKey(const ValueKey('vpn-gate-toggle'));
+          final node = find.byKey(const ValueKey('vpn-gate-node-v1:node'));
+          await showGateControl(tester, toggle);
+          await tester.tap(toggle);
+          await tester.pumpAndSettle();
+          await showGateControl(tester, node);
+          await tester.tap(node);
+          await tester.pumpAndSettle();
+          await showGateControl(tester, toggle);
+          await tester.tap(toggle);
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+          await showGateControl(
+            tester,
+            find.text(app.strings.chain('title')),
+            delta: -200,
+          );
+          await tester.pumpAndSettle();
+          await tester.runAsync(
+            () => precacheImage(
+              const AssetImage('assets/flags/w80/jp.png'),
+              tester.element(find.byType(VpnGateChainEditor)),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await expectLater(
+            find.byKey(boundary),
+            matchesGoldenFile(
+              'goldens/chain_vpngate_${phone ? 'phone_dark' : 'desktop_light'}.png',
+            ),
+          );
+          engine.favorites[server.id] = VpnGateServer(
+            id: server.id,
+            ip: server.ip,
+            hostname: server.hostname,
             configSha256: 'saved-configuration',
-            savedAt: DateTime(2020),
-            latestConfigSha256: 'new-configuration',
-          ),
-          pool: VpnGatePoolMetadata(
-            firstSeenAt: DateTime.utc(2020),
-            lastSeenAt: DateTime.utc(2020, 1, 2),
-            checkedAt: DateTime.utc(2020, 1, 2),
-            tcpStatus: 'reachable',
-            inPool: false,
-          ),
-        );
-        final favoritesTab = find.byKey(const ValueKey('vpn-gate-favorites'));
-        await tester.ensureVisible(favoritesTab);
-        await tester.tap(favoritesTab);
-        await tester.pumpAndSettle();
-        await tester.ensureVisible(
-          find.byKey(const ValueKey('vpn-gate-update-v1:node')),
-        );
-        await tester.pumpAndSettle();
-        await expectLater(
-          find.byKey(boundary),
-          matchesGoldenFile(
-            'goldens/vpngate_favorites_${phone ? 'phone_dark' : 'desktop_light'}.png',
-          ),
-        );
-        await tester.pumpWidget(const SizedBox.shrink());
-      } finally {
-        app.dispose();
+            countryCode: 'JP',
+            countryName: 'Japan',
+            favorite: VpnGateFavoriteMetadata(
+              configSha256: 'saved-configuration',
+              savedAt: DateTime(2020),
+              latestConfigSha256: 'new-configuration',
+            ),
+            pool: VpnGatePoolMetadata(
+              firstSeenAt: DateTime.utc(2020),
+              lastSeenAt: DateTime.utc(2020, 1, 2),
+              checkedAt: DateTime.utc(2020, 1, 2),
+              tcpStatus: 'reachable',
+              inPool: false,
+            ),
+          );
+          final favoritesTab = find.byKey(const ValueKey('vpn-gate-favorites'));
+          await showGateControl(tester, favoritesTab);
+          await tester.tap(favoritesTab);
+          await tester.pumpAndSettle();
+          await showGateControl(
+            tester,
+            find.byKey(const ValueKey('vpn-gate-update-v1:node')),
+          );
+          await tester.pumpAndSettle();
+          await expectLater(
+            find.byKey(boundary),
+            matchesGoldenFile(
+              'goldens/chain_vpngate_favorites_${phone ? 'phone_dark' : 'desktop_light'}.png',
+            ),
+          );
+          await tester.pumpWidget(const SizedBox.shrink());
+        } finally {
+          app.dispose();
+        }
       }
-    }
-  }, tags: 'golden');
+    },
+    tags: 'golden',
+  );
 
   testWidgets('VPN Gate observation summaries and details', (tester) async {
     tester.view.devicePixelRatio = 1;
@@ -743,12 +844,12 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('proxy-chain-proxy-entry')));
       await tester.pumpAndSettle();
-      if (find.byType(VpnGateScreen).evaluate().isEmpty) {
+      if (find.byType(VpnGateChainEditor).evaluate().isEmpty) {
         await tester.tap(find.byKey(const ValueKey('chain-source-vpn_gate')));
       }
       await tester.pumpAndSettle();
       await tester.runAsync(() async {
-        final context = tester.element(find.byType(VpnGateScreen));
+        final context = tester.element(find.byType(VpnGateChainEditor));
         await Future.wait([
           precacheImage(const AssetImage('assets/flags/w80/jp.png'), context),
           precacheImage(const AssetImage(UsqueLogo.darkAsset), context),
@@ -810,14 +911,14 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('proxy-chain-proxy-entry')));
       await tester.pumpAndSettle();
-      if (find.byType(VpnGateScreen).evaluate().isEmpty) {
+      if (find.byType(VpnGateChainEditor).evaluate().isEmpty) {
         await tester.tap(find.byKey(const ValueKey('chain-source-vpn_gate')));
       }
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(ValueKey('vpn-gate-node-${server.id}')));
       await tester.pumpAndSettle();
       await tester.runAsync(() async {
-        final context = tester.element(find.byType(VpnGateScreen));
+        final context = tester.element(find.byType(VpnGateChainEditor));
         await Future.wait([
           precacheImage(const AssetImage('assets/flags/w80/jp.png'), context),
           precacheImage(const AssetImage('assets/flags/w80/kr.png'), context),
@@ -1278,6 +1379,17 @@ void main() {
                   final apply = find.widgetWithText(
                     FilledButton,
                     app.strings.get('save_changes'),
+                  );
+                  expect(apply, findsNothing);
+                  await tester.enterText(
+                    fieldWithLabel(app.strings.get('port')),
+                    '9090',
+                  );
+                  await tester.pumpAndSettle();
+                  expect(
+                    tester.takeException(),
+                    isNull,
+                    reason: 'proxy draft $size $locale',
                   );
                   final rect = tester.getRect(apply);
                   expect(rect.height, greaterThanOrEqualTo(48));

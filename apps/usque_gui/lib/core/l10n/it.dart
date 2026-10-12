@@ -1,5 +1,7 @@
 /// Italian UI catalog.
 const Map<String, String> kItCatalog = <String, String>{
+  'dns_doh_url': 'URL DoH',
+  'dns_invalid_doh_url': 'Inserisci un URL HTTPS DNS valido',
   'warp_dns_type': 'DNS WARP',
   'warp_dns_bootstrap_optional': 'Facoltativo',
   'warp_dns_plain': 'DNS normale',
@@ -53,7 +55,7 @@ const Map<String, String> kItCatalog = <String, String>{
   'profiles_subtitle': 'Cambia e gestisci gli account WARP.',
   'proxy': 'Proxy',
   'proxy_subtitle':
-      'Configura indirizzi proxy e DNS condivisi da tutti gli account.',
+      'Configura gli indirizzi di ascolto e l’autenticazione condivisi del proxy.',
   'settings': 'Impostazioni',
   'settings_subtitle': 'Impostazioni di connessione, proxy e applicazione.',
   'diagnostics': 'Diagnostica',
@@ -186,7 +188,7 @@ const Map<String, String> kItCatalog = <String, String>{
   'proxy_dns_system': 'DNS di sistema',
   'dns_leak_warning': 'Il DNS locale può rivelare i nomi richiesti',
   'dns_leak_warning_body':
-      'Il DNS personalizzato e quello di sistema non vengono risolti tramite il tunnel, quindi la rete attuale può vedere i domini che visiti. Usa “Remoto tramite il tunnel”, a meno che tu non lo accetti.',
+      'Il DNS locale e di sistema può rivelare i domini richiesti alla rete attuale.',
   'system_proxy': 'Configura il proxy di sistema',
   'output_disabled_in_profile': 'Disattivato in Impostazioni',
   'auto_connect': 'Connetti automaticamente l’account corrente all’avvio',
@@ -210,11 +212,9 @@ const Map<String, String> kItCatalog = <String, String>{
       'La password è impostata. Immettere una nuova password per sostituirla.',
   'proxy_auth_clear': 'Rimuovi protezione con password',
   'general': 'Generale',
-  'system_integration': 'Integrazione di sistema',
   'start_on_boot': 'Avvia Usque all’accesso',
   'close_to_tray': 'Chiudi la finestra nell’area di notifica',
   'add_quick_settings_tile': 'Aggiungi riquadro Impostazioni rapide',
-  'appearance': 'Aspetto',
   'theme': 'Tema',
   'theme_system': 'Sistema',
   'theme_light': 'Chiaro',
@@ -277,13 +277,13 @@ const Map<String, String> kItCatalog = <String, String>{
   'advanced_subtitle': 'Endpoint, DNS, MTU, instradamento e Kill Switch.',
   'advanced_warning':
       'Endpoint, SNI, DNS o MTU non corretti possono impedire la connessione del tunnel.',
-  'ip_dns': 'IP e DNS',
   'routing_protection': 'Instradamento e protezione',
   'transport': 'Trasporto',
   'automatic': 'Auto',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Selezione endpoint',
+  'endpoint_section': 'Endpoint',
   'endpoint_automatic': 'Automatica',
   'endpoint_custom': 'Personalizzata',
   'endpoint_automatic_help':
@@ -361,7 +361,7 @@ const Map<String, String> kItCatalog = <String, String>{
       'Controlla i problemi di connessione, esporta i registri e gestisci i dati locali.',
   'engine_status': 'Informazioni sulla connessione',
   'version': 'Versione',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Log locali',
   'export_diagnostics': 'Esporta pacchetto diagnostico',
   'diagnostics_saved': 'Pacchetto diagnostico salvato in',
@@ -404,7 +404,7 @@ const Map<String, String> kItCatalog = <String, String>{
   'profile_required': 'Mantenere almeno un account.',
   'socks_capabilities': 'TCP e UDP',
   'http_capabilities': 'CONNECT e inoltro ordinario',
-  'geo_direct': 'Impostazioni bypass {tunnel}',
+  'geo_direct': 'Impostazioni di bypass',
   'bypass_custom': 'Destinazioni personalizzate',
   'bypass_countries': 'Paesi / regioni',
   'bypass_targets_hint':
@@ -416,7 +416,7 @@ const Map<String, String> kItCatalog = <String, String>{
   'bypass_summary':
       '{countries} regioni · {targets} destinazioni personalizzate',
   'geo_direct_help':
-      'Il traffico corrispondente a questi paesi o regioni non passa nella VPN. Il fornitore DNS della rete può vedere i domini richiesti. Le app con DNS cifrato vengono associate solo in base all’IP.',
+      'Il traffico corrispondente a questi paesi o regioni evita la VPN/TUN di Usque e i proxy locali HTTP e SOCKS5. Il fornitore DNS della rete può vedere i domini richiesti. Le app con DNS cifrato vengono associate solo in base all’IP.',
   'geo_update_all': 'Aggiorna dati geografici',
   'geo_last_updated': 'Ultimo aggiornamento riuscito: {current}',
   'geo_never_updated': 'Non ancora aggiornato',
@@ -672,4 +672,21 @@ const Map<String, String> kItCatalog = <String, String>{
   'dns_duplicate_address': 'Rimuovi gli indirizzi IP duplicati.',
   'dns_address_not_allowed':
       'Un indirizzo non è adatto alla connessione a un server DNS. Usa gli IP forniti dal tuo provider DNS.',
+  "routing_rules": "Regole di instradamento personalizzate",
+  "routing_add": "Aggiungi regola",
+  "routing_batch": "Incolla regole",
+  "routing_action": "Azione",
+  "routing_target": "Dominio, IP o CIDR",
+  "routing_priority":
+      "Prevale la regola più specifica. Le regole personalizzate prevalgono su Ads e paesi; il blocco IP resta attivo.",
+  "routing_conflict":
+      "Azioni diverse per la stessa destinazione. Modifica queste regole.",
+  "routing_overlap": "La regola più specifica prevale su quella più ampia.",
+  "routing_duplicate": "I duplicati verranno uniti al salvataggio.",
+  "routing_ads": "Ads · pubblicità e tracciamento",
+  "routing_ads_ready": "I dati Ads sono disponibili.",
+  "routing_ads_unavailable":
+      "Dati Ads non disponibili. Connessioni e regole personalizzate restano disponibili.",
+  "routing_pending": "Le regole scaricate si applicano dopo la riconnessione.",
+  'routing_current': "Connessione attuale",
 };

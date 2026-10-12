@@ -51,7 +51,7 @@ Usque 为独立项目，与 Cloudflare, Inc. 无隶属、赞助或背书关系�
 
 ## 下载与安装
 
-本文描述 **v0.3.0** 的功能，源码声明的应用版本为 **0.3.0**。版本声明不代表已完成发布，请从 [GitHub Releases](https://github.com/GeorgeXie2333/usque-app/releases) 获取经过审批的官方软件包。[发布准备审查](docs/RELEASE_V0.3.0_READINESS.md) 保留其历史源码范围与验证限制。提供六种安装包，另外提供两个仅供应用内更新使用的 Windows MSI 文件：
+本文为 **v0.3.1** 准备开发文档；应用版本元数据与发布流程已同步为 **v0.3.1 / 0.3.1+25**。[v0.3.1 发布准备审查](docs/RELEASE_V0.3.1_READINESS.md) 记录了检查结果与发布待办。安装已发布版本时，请以 [GitHub Releases](https://github.com/GeorgeXie2333/usque-app/releases) 及对应标签下文档为准。计划提供六种安装包，另有两个仅供应用内更新使用的 Windows MSI 文件：
 
 | 平台 | 最低系统 | 安装包 |
 | --- | --- | --- |
@@ -65,13 +65,13 @@ Usque 为独立项目，与 Cloudflare, Inc. 无隶属、赞助或背书关系�
 
 升级、卸载、恢复及 Android 开发者验证说明见[安装指南](docs/INSTALLATION.md)，官方签名身份见[代码签名策略](docs/CODE_SIGNING.md)。更新下载需要用户确认，安装通过平台安装程序完成，不会未经确认自动安装。
 
-升级会将本地配置迁移至 v0.2.9 无法读取的格式。请先阅读[配置兼容性说明](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)，按需要安排升级前备份；重新安装旧包不会逆转迁移。
+从 v0.3.0 升级会将配置从 schema 23 迁移至 24，v0.3.0 及更旧客户端无法读取。请先阅读[配置兼容性说明](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)，按需要安排升级前备份；重新安装旧包不会逆转迁移。
 
 ## 首次连接
 
 1. 按[安装指南](docs/INSTALLATION.md#verify-before-installing)核验正式安装包，安装后打开 Usque。
 2. 完成首次启动的权限与条款步骤。Android 完成引导需要 VPN 授权，授权可能断开其他 VPN，但不会启动 Usque 连接；通知权限可选。注册个人版 WARP® 账号，也可以填写 WARP License Key。若设置中断，先检查已保存结果再重新注册。目前不支持导入新的 WARP Secret。
-3. 在 Windows 的“代理 → 虚拟网卡与本地代理”或 Android 的“代理 → VPN 与本地代理”中选择联网方式，然后在主页连接。开关立即生效，监听地址与 DNS 表单修改需要点击“应用修改”。仅代理运行不会因已授权而启动 VPN。
+3. 在 Windows 的“代理 → 虚拟网卡与本地代理”或 Android 的“代理 → VPN 与本地代理”中选择联网方式，然后在主页连接。开关立即生效，监听地址表单修改需要点击“应用修改”。仅代理运行不会因已授权而启动 VPN。
 
 | 联网方式 | 用途 |
 | --- | --- |
@@ -94,8 +94,8 @@ VPN、SOCKS5 和 HTTP 默认开启，Windows 系统代理默认关闭。它们�
   未启用 OpenVPN TCP 链式出口时，它不转发普通 UDP 流量，需要 UDP 的应用可能无法正常使用。自动模式不会选择 L4。
 - 自动尝试 HTTP/3，失败时回退到 HTTP/2，并尝试通过 IPv4 和 IPv6 寻找可达入口。
   H3 在支持的网络切换场景下可以迁移连接，详见[路径行为](docs/h3-path-infrastructure.md)。
-- 全隧道 VPN、隧道内 DNS、Kill Switch（断网保护）、局域网访问和[自定义 CIDR、IP、域名绕过规则](docs/encrypted-direct-dns.md#custom-bypass-targets--自定义绕过目标)。域名包含子域名，自定义规则无需下载国家规则。
-- 自定义 [WARP 出口 DNS](docs/WARP_DNS.md)：打开“设置 → 高级网络设置 → IP 与 DNS”，选择普通 DNS、DoH 或 DoT，再点击“应用修改”。修改 DNS 会重新连接当前会话；最终链式出口仍使用自己的 DNS 策略。
+- 全隧道 VPN、隧道内 DNS、Kill Switch（断网保护）、局域网访问和 [DIRECT／REJECT／PROXY 分流及 Ads 广告拦截](docs/ROUTING.md)。自定义域名、IP 和 CIDR 支持更具体的例外规则，保存时检查冲突。
+- 自定义 [WARP 出口 DNS](docs/WARP_DNS.md)：打开“设置 → 高级网络设置 → WARP DNS”，选择普通 DNS、DoH 或 DoT，再点击“应用修改”。修改 DNS 会重新连接当前会话；最终链式出口仍使用自己的 DNS 策略。
 - 可选的按国家直连：单独下载所选国家的 GeoIP 数据和全局 GeoSite 域名规则。
   能看到域名时按域名判断，否则按 IP 判断；无法识别的目标继续走隧道。
 - 本地[网络诊断](docs/network-doctor.md)和网络质量页面，展示延迟、丢包率及其测量状态、队列和最近 60 秒的趋势。
@@ -125,14 +125,14 @@ Android 的“分应用代理”对所有账号生效。关闭时，所有应用
 
 ### DNS 隐私
 
-按国家及自定义域名直连默认使用 **System**：匹配规则的域名查询会发送给当前网络使用的 DNS 服务器，位于 VPN 隧道之外。
-也可以选择 **DoH** 或 **DoT**，自行填写加密 DNS 服务器的域名和 IP 地址。
+按国家及自定义域名直连默认使用 **当前网络的 DNS**：匹配规则的域名查询会发送给当前网络使用的 DNS 服务器，位于 VPN 隧道之外。
+也可以选择 **DoH** 并填写完整 HTTPS 地址，或选择 **DoT** 并填写服务器域名和端口。
+新草稿预填 Cloudflare，已保存的自定义配置保持不变。
 查询会发送给该服务器；连接失败时不会改用明文 DNS。详见[配置步骤与示例](docs/encrypted-direct-dns.md)。
 
 其他远程 VPN 查询使用 WARP 隧道或所选最终链式出口。HTTP/SOCKS5 链 DNS 默认经该代理使用
 校验 TLS 的 Cloudflare® DoH；自定义或非默认继承 DNS 保留 TCP。在这两种出口下，应用指定的 UDP/53
 查询转换为发往该解析器的 TCP，不回退到物理 DNS。详见[链 DNS 选择](docs/CHAIN_PROXY.md#http-and-socks5-exits--http-与-socks5-出口)。
-手动设置的本地 DNS 和代理 DNS 仍按各自规则生效。
 应用自行使用加密 DNS 时，Usque 看不到域名，此时按 IP 判断是否直连。
 断开连接后下载规则，也仍受 Android 系统阻断设置和尚未解除的 Windows 断网保护约束。
 
@@ -158,7 +158,11 @@ Android 的“分应用代理”对所有账号生效。关闭时，所有应用
 | SOCKS5 | `127.0.0.1:1080`、`[::1]:1080` |
 | HTTP 代理 | `127.0.0.1:8080`、`[::1]:8080` |
 
-修改代理地址、端口和 DNS 后，需要点击 **应用修改** 才会提交。高级设置中的重置只会填入默认值，仍需提交才会生效。Zero Trust 端点初始使用注册地址。在高级网络设置中选择 **编辑 Zero Trust 端点**，阅读红色全屏警告，勾选确认风险及使用授权后编辑 IPv4/IPv6，再点击 **应用修改**。恢复默认会暂存注册地址；重新登录会恢复注册地址并移除自定义地址。当前账号配置自定义 Zero Trust 地址，或当前 ZT 连接仍在使用自定义地址时，首页会常驻不可关闭的风险提示。
+修改代理地址和端口后，需要点击 **应用修改** 才会提交。代理默认通过当前出口解析：在高级设置中配置 [WARP DNS](docs/WARP_DNS.md)，或在链式配置中设置最终出口 DNS。代理页不再提供 DNS 设置；旧版本保存的代理 DNS 选择继续生效。
+
+高级设置中的重置只会填入默认值，仍需提交才会生效。
+
+Zero Trust 端点初始使用注册地址。在高级网络设置中选择 **编辑 Zero Trust 端点**，阅读红色全屏警告，勾选确认风险及使用授权后编辑 IPv4/IPv6，再点击 **应用修改**。恢复默认会暂存注册地址；重新登录会恢复注册地址并移除自定义地址。当前账号配置自定义 Zero Trust 地址，或当前 ZT 连接仍在使用自定义地址时，首页会常驻不可关闭的风险提示。
 
 高级网络设置的“自动选择”会并发连接账号可用的端点；“自定义”保留手动地址。端口和 SNI 在两种模式均可修改。详见[自动选择端点](docs/NETWORK_SETTINGS.md#automatic-endpoints--自动选择端点)。
 

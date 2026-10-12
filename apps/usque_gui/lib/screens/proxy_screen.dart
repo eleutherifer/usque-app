@@ -38,20 +38,23 @@ import 'chain_proxy_screen.dart';
 }
 
 class ProxyScreen extends StatefulWidget {
-  const ProxyScreen({required this.controller, this.onOpenVpnGate, super.key});
+  const ProxyScreen({
+    required this.controller,
+    this.onOpenChainProxy,
+    super.key,
+  });
   final AppController controller;
-  final VoidCallback? onOpenVpnGate;
+  final VoidCallback? onOpenChainProxy;
   @override
   State<ProxyScreen> createState() => _ProxyScreenState();
 }
 
 class _ProxyScreenState extends State<ProxyScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _fields = List.generate(8, (_) => TextEditingController());
-  final _focus = List.generate(8, (_) => FocusNode());
+  final _fields = List.generate(6, (_) => TextEditingController());
+  final _focus = List.generate(6, (_) => FocusNode());
   final _listeners = List.generate(2, (_) => TextEditingController());
   bool _customSocks = false, _customHttp = false;
-  late ProxyDnsMode _dnsMode;
   late List<Object> _baseline;
   late String _editingAccountId;
   bool _saving = false;
@@ -63,7 +66,6 @@ class _ProxyScreenState extends State<ProxyScreen> {
 
   List<Object> get _values => [
     for (final field in _fields) field.text.trim(),
-    _dnsMode,
     _listeners[0].text.trim(),
     _listeners[1].text.trim(),
   ];
@@ -96,9 +98,6 @@ class _ProxyScreenState extends State<ProxyScreen> {
     proxy.httpIpv4,
     proxy.httpIpv6,
     '${proxy.httpPort}',
-    proxy.dnsIpv4,
-    proxy.dnsIpv6,
-    proxy.dnsMode,
     proxy.socksListeners.join('\n'),
     proxy.httpListeners.join('\n'),
   ];
@@ -110,7 +109,6 @@ class _ProxyScreenState extends State<ProxyScreen> {
     for (var i = 0; i < _fields.length; i++) {
       if (_fields[i].text != values[i]) _fields[i].text = values[i] as String;
     }
-    _dnsMode = proxy.dnsMode;
     _customSocks = proxy.hasCustomSocksListeners;
     _customHttp = proxy.hasCustomHttpListeners;
     _listeners[0].text = proxy.socksListeners.join('\n');
@@ -151,7 +149,7 @@ class _ProxyScreenState extends State<ProxyScreen> {
           ? strings.get('invalid_port')
           : null;
     }
-    final ipv4 = index == 0 || index == 3 || index == 6;
+    final ipv4 = index == 0 || index == 3;
     final expected = ipv4 ? InternetAddressType.IPv4 : InternetAddressType.IPv6;
     return InternetAddress.tryParse(text)?.type != expected
         ? strings.get(ipv4 ? 'invalid_ipv4' : 'invalid_ipv6')
@@ -173,11 +171,7 @@ class _ProxyScreenState extends State<ProxyScreen> {
       setState(
         () => _validationError = widget.controller.strings.get('form_errors'),
       );
-      for (
-        var i = 0;
-        i < (_dnsMode == ProxyDnsMode.localConfigured ? 8 : 6);
-        i++
-      ) {
+      for (var i = 0; i < _fields.length; i++) {
         if (_validate(i, _fields[i].text) != null) {
           _focus[i].requestFocus();
           final fieldContext = _focus[i].context;
@@ -206,9 +200,6 @@ class _ProxyScreenState extends State<ProxyScreen> {
       'proxy.http_listeners',
       'proxy.http_listeners',
       'proxy.http_listeners',
-      'proxy.dns_servers',
-      'proxy.dns_servers',
-      'proxy.dns_mode',
       'proxy.socks5_listeners',
       'proxy.http_listeners',
     ];
@@ -228,13 +219,6 @@ class _ProxyScreenState extends State<ProxyScreen> {
           httpPort: _customHttp ? null : int.parse(_fields[5].text.trim()),
           socksListeners: _customSocks ? _listenerValues(0) : null,
           httpListeners: _customHttp ? _listenerValues(1) : null,
-          dnsMode: _dnsMode,
-          dnsIpv4: _dnsMode == ProxyDnsMode.localConfigured
-              ? _fields[6].text.trim()
-              : profile.proxy.dnsIpv4,
-          dnsIpv6: _dnsMode == ProxyDnsMode.localConfigured
-              ? _fields[7].text.trim()
-              : profile.proxy.dnsIpv6,
         ),
       ),
       changedFields: changedFields,
@@ -262,8 +246,23 @@ class _ProxyScreenState extends State<ProxyScreen> {
       httpIpv6: _customHttp ? null : _fields[4].text.trim(),
       socksListeners: _customSocks ? _listenerValues(0) : null,
       httpListeners: _customHttp ? _listenerValues(1) : null,
-      dnsMode: _dnsMode,
     );
+    final settings = widget.controller.networkSettings;
+    final statusLabel =
+        !_dirty || settings.unconfirmed || settings.saveError != null
+        ? widget.controller.networkSettingsMessage
+        : null;
+    final onReconnect = widget.controller.networkSettingsCanReconnect
+        ? widget.controller.retry
+        : null;
+    final showBar =
+        _dirty ||
+        _saving ||
+        _saved ||
+        _saveError != null ||
+        _validationError != null ||
+        statusLabel != null ||
+        onReconnect != null;
     return Column(
       children: [
         Expanded(
@@ -294,13 +293,9 @@ class _ProxyScreenState extends State<ProxyScreen> {
                   BannerSlot(
                     child:
                         const {
-                              ProxyDnsMode.localConfigured,
-                              ProxyDnsMode.system,
-                            }.contains(_dnsMode) ||
-                            const {
-                              ProxyDnsMode.localConfigured,
-                              ProxyDnsMode.system,
-                            }.contains(profile.proxy.dnsMode)
+                          ProxyDnsMode.localConfigured,
+                          ProxyDnsMode.system,
+                        }.contains(profile.proxy.dnsMode)
                         ? WarningBanner(
                             title: strings.get('dns_leak_warning'),
                             message: strings.get('dns_leak_warning_body'),
@@ -313,7 +308,7 @@ class _ProxyScreenState extends State<ProxyScreen> {
                       ChainProxyEntry(
                         controller: widget.controller,
                         onOpen:
-                            widget.onOpenVpnGate ??
+                            widget.onOpenChainProxy ??
                             () => Navigator.of(context).push<void>(
                               MaterialPageRoute(
                                 builder: (_) => ChainProxyScreen(
@@ -328,103 +323,6 @@ class _ProxyScreenState extends State<ProxyScreen> {
                       ),
                       _listenerPanel(profile, socks5: true),
                       _listenerPanel(profile, socks5: false),
-                      ContentSection(
-                        icon: LucideIcons.server,
-                        title: strings.get('proxy_dns_mode'),
-                        subtitle: strings.get('proxy_dns_subtitle'),
-                        children: [
-                          DropdownButtonFormField<ProxyDnsMode>(
-                            key: const ValueKey<String>('proxy-dns-mode'),
-                            initialValue: _dnsMode,
-                            isExpanded: true,
-                            decoration: InputDecoration(
-                              labelText: strings.get('proxy_dns_mode'),
-                              errorText: _invalidDnsMode
-                                  ? strings.get('l4_edge_requires_l4')
-                                  : null,
-                            ),
-                            items: ProxyDnsMode.values
-                                .where(
-                                  (mode) =>
-                                      mode != ProxyDnsMode.edgeResolved ||
-                                      mode == _dnsMode ||
-                                      (profile.dataPlane ==
-                                              DataPlaneMode.l4Proxy ||
-                                          profile.chainExit?.enabled == true &&
-                                              profile.chainSource.isProxy),
-                                )
-                                .map(
-                                  (mode) => DropdownMenuItem(
-                                    value: mode,
-                                    enabled:
-                                        mode != ProxyDnsMode.edgeResolved ||
-                                        (profile.dataPlane ==
-                                                DataPlaneMode.l4Proxy ||
-                                            profile.chainExit?.enabled ==
-                                                    true &&
-                                                profile.chainSource.isProxy),
-                                    child: Text(
-                                      strings.get(switch (mode) {
-                                        ProxyDnsMode.remote =>
-                                          'proxy_dns_remote',
-                                        ProxyDnsMode.localConfigured =>
-                                          'proxy_dns_configured',
-                                        ProxyDnsMode.system =>
-                                          'proxy_dns_system',
-                                        ProxyDnsMode.edgeResolved =>
-                                          'proxy_dns_edge_resolved',
-                                      }),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: _saving
-                                ? null
-                                : (mode) {
-                                    if (mode != null) {
-                                      setState(() {
-                                        _dnsMode = mode;
-                                        _saved = false;
-                                        _validationError = null;
-                                        _saveError = null;
-                                      });
-                                    }
-                                  },
-                          ),
-                          Builder(
-                            builder: (context) {
-                              final fields =
-                                  _dnsMode == ProxyDnsMode.localConfigured
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: _responsiveFields([
-                                        _field(
-                                          6,
-                                          'dns_ipv4',
-                                          key: const ValueKey('proxy-dns-ipv4'),
-                                        ),
-                                        _field(
-                                          7,
-                                          'dns_ipv6',
-                                          key: const ValueKey('proxy-dns-ipv6'),
-                                        ),
-                                      ]),
-                                    )
-                                  : const SizedBox(width: double.infinity);
-                              // Skip the size animation entirely under reduced
-                              // motion, including offstage viewport changes.
-                              if (UsqueMotion.reduced(context)) return fields;
-                              return AnimatedSize(
-                                duration: UsqueMotion.gentle,
-                                alignment: Alignment.topCenter,
-                                curve: UsqueMotion.emphasized,
-                                child: fields,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
                       _AuthPanel(
                         controller: widget.controller,
                         enabled: !_saving,
@@ -436,24 +334,33 @@ class _ProxyScreenState extends State<ProxyScreen> {
             ),
           ),
         ),
-        SaveChangesBar(
-          key: const ValueKey('proxy-save-bar'),
-          strings: strings,
-          dirty: _dirty,
-          saving: _saving,
-          saved: _saved,
-          statusLabel:
-              !_dirty ||
-                  widget.controller.networkSettings.unconfirmed ||
-                  widget.controller.networkSettings.saveError != null
-              ? widget.controller.networkSettingsMessage
-              : null,
-          onReconnect: widget.controller.networkSettingsCanReconnect
-              ? widget.controller.retry
-              : null,
-          error: _saveError,
-          validationError: _validationError,
-          onSave: _save,
+        // With nothing to apply or report, the bar would only hold a disabled
+        // button, so it appears with the first edit, save or status instead.
+        AnimatedSwitcher(
+          duration: UsqueMotion.of(context, UsqueMotion.fast),
+          switchInCurve: UsqueMotion.standard,
+          switchOutCurve: UsqueMotion.exit,
+          transitionBuilder: (child, animation) => SizeTransition(
+            sizeFactor: animation,
+            alignment: AlignmentDirectional.topStart,
+            child: child,
+          ),
+          child: showBar
+              ? SaveChangesBar(
+                  key: const ValueKey('proxy-save-bar'),
+                  strings: strings,
+                  dirty: _dirty,
+                  saving: _saving,
+                  saved: _saved,
+                  statusLabel: statusLabel,
+                  onReconnect: onReconnect,
+                  error: _saveError,
+                  validationError: _validationError,
+                  contentWidth: 880,
+                  matchPageGutter: true,
+                  onSave: _save,
+                )
+              : const SizedBox(width: double.infinity),
         ),
       ],
     );
@@ -576,12 +483,7 @@ class _ProxyScreenState extends State<ProxyScreen> {
 
   bool get _invalidDnsMode {
     final profile = widget.controller.activeProfile;
-    // A listener draft can outlive an exit change on another surface. Only an
-    // edited DNS choice overrides the confirmed mode at the settings boundary.
-    final mode = _dnsMode == _baseline[_fields.length]
-        ? profile.proxy.dnsMode
-        : _dnsMode;
-    return mode == ProxyDnsMode.edgeResolved &&
+    return profile.proxy.dnsMode == ProxyDnsMode.edgeResolved &&
         profile.dataPlane != DataPlaneMode.l4Proxy &&
         !(profile.chainExit?.enabled == true && profile.chainSource.isProxy);
   }
@@ -683,6 +585,7 @@ class _AuthPanelState extends State<_AuthPanel> {
               decoration: InputDecoration(
                 labelText: strings.get('proxy_username'),
                 errorText: _authError,
+                errorMaxLines: 6,
               ),
             );
             final password = TextField(
@@ -697,6 +600,7 @@ class _AuthPanelState extends State<_AuthPanel> {
               decoration: InputDecoration(
                 labelText: strings.get('proxy_password'),
                 helperText: strings.get('proxy_password_hint'),
+                helperMaxLines: 6,
               ),
             );
             if (constraints.maxWidth < 640) {
@@ -735,7 +639,8 @@ class _AuthPanelState extends State<_AuthPanel> {
         ],
         Align(
           alignment: AlignmentDirectional.centerEnd,
-          child: FilledButton(
+          // Tonal, so it never competes with the page's Apply changes bar.
+          child: FilledButton.tonal(
             key: const ValueKey<String>('proxy-auth-apply'),
             onPressed: !widget.enabled || _saving || widget.controller.busy
                 ? null

@@ -1,5 +1,7 @@
 /// Arabic UI catalog.
 const Map<String, String> kArCatalog = <String, String>{
+  'dns_doh_url': 'عنوان DoH',
+  'dns_invalid_doh_url': 'أدخل عنوان HTTPS صالحًا لـ DNS',
   'warp_dns_type': 'DNS ‏WARP',
   'warp_dns_bootstrap_optional': 'اختياري',
   'warp_dns_plain': 'DNS عادي',
@@ -48,8 +50,7 @@ const Map<String, String> kArCatalog = <String, String>{
   'profiles': 'الحسابات',
   'profiles_subtitle': 'بدّل حسابات WARP وأدرها.',
   'proxy': 'الوكيل',
-  'proxy_subtitle':
-      'اضبط عناوين الوكلاء وإعدادات DNS المشتركة بين جميع الحسابات.',
+  'proxy_subtitle': 'اضبط عناوين الاستماع والمصادقة المشتركة للوكيل.',
   'settings': 'الإعدادات',
   'settings_subtitle': 'إعدادات الاتصال والوكيل والتطبيق.',
   'diagnostics': 'التشخيص',
@@ -177,7 +178,7 @@ const Map<String, String> kArCatalog = <String, String>{
   'proxy_dns_system': 'DNS النظام',
   'dns_leak_warning': 'قد يكشف DNS المحلي الأسماء المطلوبة',
   'dns_leak_warning_body':
-      'لا يُحلّ DNS المخصص وDNS النظام عبر النفق، لذا قد ترى شبكتك الحالية النطاقات التي تزورها. استخدم «عن بُعد عبر النفق» ما لم تقبل ذلك.',
+      'قد يكشف DNS المحلي وDNS النظام النطاقات المطلوبة لشبكتك الحالية.',
   'system_proxy': 'تهيئة وكيل النظام',
   'output_disabled_in_profile': 'معطَّل في الإعدادات',
   'auto_connect': 'الاتصال بالحساب الحالي تلقائيًا عند البدء',
@@ -200,11 +201,9 @@ const Map<String, String> kArCatalog = <String, String>{
   'proxy_password_set': 'كلمة المرور معيَّنة. أدخل كلمة جديدة لاستبدالها.',
   'proxy_auth_clear': 'إزالة الحماية بكلمة مرور',
   'general': 'عام',
-  'system_integration': 'التكامل مع النظام',
   'start_on_boot': 'تشغيل Usque عند تسجيل الدخول',
   'close_to_tray': 'إغلاق النافذة إلى علبة النظام',
   'add_quick_settings_tile': 'إضافة بلاطة الإعدادات السريعة',
-  'appearance': 'المظهر',
   'theme': 'السمة',
   'theme_system': 'النظام',
   'theme_light': 'فاتح',
@@ -263,13 +262,13 @@ const Map<String, String> kArCatalog = <String, String>{
   'advanced_subtitle': 'نقاط النهاية، وDNS، وMTU، والتوجيه، وKill Switch.',
   'advanced_warning':
       'قد تمنع نقاط النهاية أو SNI أو DNS أو MTU غير الصحيحة النفق من الاتصال.',
-  'ip_dns': 'IP وDNS',
   'routing_protection': 'التوجيه والحماية',
   'transport': 'النقل',
   'automatic': 'تلقائي',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'اختيار نقطة النهاية',
+  'endpoint_section': 'نقطة النهاية',
   'endpoint_automatic': 'تلقائي',
   'endpoint_custom': 'مخصص',
   'endpoint_automatic_help':
@@ -347,7 +346,7 @@ const Map<String, String> kArCatalog = <String, String>{
       'تحقق من مشكلات الاتصال وصدّر السجلات وأدِر البيانات المحلية.',
   'engine_status': 'معلومات الاتصال',
   'version': 'الإصدار',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'السجلات المحلية',
   'export_diagnostics': 'تصدير حزمة التشخيص',
   'diagnostics_saved': 'تم حفظ حزمة التشخيص في',
@@ -389,7 +388,7 @@ const Map<String, String> kArCatalog = <String, String>{
   'profile_required': 'أبقِ حسابًا واحدًا على الأقل.',
   'socks_capabilities': 'TCP وUDP',
   'http_capabilities': 'CONNECT وإعادة التوجيه العادية',
-  'geo_direct': 'إعدادات تجاوز {tunnel}',
+  'geo_direct': 'إعدادات التجاوز',
   'bypass_custom': 'وجهات تجاوز مخصصة',
   'bypass_countries': 'البلدان / المناطق',
   'bypass_targets_hint':
@@ -399,7 +398,7 @@ const Map<String, String> kArCatalog = <String, String>{
   'bypass_line_error': 'السطر {line}: {reason}',
   'bypass_summary': '{countries} مناطق · {targets} وجهات مخصصة',
   'geo_direct_help':
-      'الحركة المطابقة لهذه القواعد تتجاوز VPN. قد يرى مزوّد DNS للشبكة الحالية أسماء النطاقات المطلوبة. تُوجّه التطبيقات التي تستخدم DNS مشفّرًا حسب عنوان IP فقط.',
+      'تتجاوز الحركة المطابقة لهذه البلدان أو المناطق مسار VPN/TUN في Usque والوكيلين المحليين HTTP وSOCKS5. قد يرى مزوّد DNS للشبكة الحالية أسماء النطاقات المطلوبة. تُوجّه التطبيقات التي تستخدم DNS مشفّرًا حسب عنوان IP فقط.',
   'geo_update_all': 'تحديث بيانات الجغرافيا',
   'geo_last_updated': 'آخر تحديث ناجح: {current}',
   'geo_never_updated': 'لم تُحدَّث بعد',
@@ -637,4 +636,20 @@ const Map<String, String> kArCatalog = <String, String>{
   'dns_duplicate_address': 'احذف عناوين IP المكررة.',
   'dns_address_not_allowed':
       'لا يمكن استخدام أحد العناوين للاتصال بخادم DNS. استخدم عناوين الخادم التي يوفرها مزود DNS.',
+  "routing_rules": "قواعد التوجيه المخصصة",
+  "routing_add": "إضافة قاعدة",
+  "routing_batch": "لصق القواعد",
+  "routing_action": "الإجراء",
+  "routing_target": "نطاق أو IP أو CIDR",
+  "routing_priority":
+      "للأكثر تحديدًا الأولوية. تتقدم القواعد المخصصة على Ads والدول؛ يبقى حظر IP ساريًا.",
+  "routing_conflict": "إجراءات مختلفة للهدف نفسه. عدّل هذه القواعد.",
+  "routing_overlap": "تتقدم القاعدة الأكثر تحديدًا على القاعدة الأوسع.",
+  "routing_duplicate": "تُدمج القواعد المكررة عند الحفظ.",
+  "routing_ads": "Ads · الإعلانات والتتبع",
+  "routing_ads_ready": "بيانات Ads جاهزة.",
+  "routing_ads_unavailable":
+      "بيانات Ads غير متاحة. تظل الاتصالات والقواعد المخصصة متاحة.",
+  "routing_pending": "تُطبق القواعد المنزلة بعد إعادة الاتصال.",
+  'routing_current': "الاتصال الحالي",
 };

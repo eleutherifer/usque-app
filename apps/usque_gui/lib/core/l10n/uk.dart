@@ -1,5 +1,7 @@
 /// Ukrainian UI catalog.
 const Map<String, String> kUkCatalog = <String, String>{
+  'dns_doh_url': 'URL DoH',
+  'dns_invalid_doh_url': 'Введіть коректну HTTPS-адресу DNS',
   'warp_dns_type': 'DNS WARP',
   'warp_dns_bootstrap_optional': 'Необов’язково',
   'warp_dns_plain': 'Звичайний DNS',
@@ -50,7 +52,7 @@ const Map<String, String> kUkCatalog = <String, String>{
   'profiles_subtitle': 'Перемикайте облікові записи WARP і керуйте ними.',
   'proxy': 'Проксі',
   'proxy_subtitle':
-      'Налаштуйте адреси проксі та DNS, спільні для всіх облікових записів.',
+      'Налаштуйте спільні адреси прослуховування та автентифікацію проксі.',
   'settings': 'Налаштування',
   'settings_subtitle': 'Налаштування зʼєднання, проксі та програми.',
   'diagnostics': 'Діагностика',
@@ -181,7 +183,7 @@ const Map<String, String> kUkCatalog = <String, String>{
   'proxy_dns_system': 'Системний DNS',
   'dns_leak_warning': 'Локальний DNS може розкривати запитувані імена',
   'dns_leak_warning_body':
-      'Власний і системний DNS розпізнаються не через тунель, тому поточна мережа може бачити домени, які ви відвідуєте. Використовуйте «Віддалено через тунель», якщо це для вас неприйнятно.',
+      'Локальний і системний DNS можуть розкривати запитані домени поточній мережі.',
   'system_proxy': 'Налаштувати системний проксі',
   'output_disabled_in_profile': 'Вимкнено в Налаштуваннях',
   'auto_connect':
@@ -206,11 +208,9 @@ const Map<String, String> kUkCatalog = <String, String>{
   'proxy_password_set': 'Пароль установлено. Введіть новий, щоб замінити його.',
   'proxy_auth_clear': 'Вимкнути захист паролем',
   'general': 'Загальні',
-  'system_integration': 'Інтеграція із системою',
   'start_on_boot': 'Запускати Usque під час входу',
   'close_to_tray': 'Закривати вікно в область сповіщень',
   'add_quick_settings_tile': 'Додати плитку швидких налаштувань',
-  'appearance': 'Оформлення',
   'theme': 'Тема',
   'theme_system': 'Системна',
   'theme_light': 'Світла',
@@ -270,13 +270,13 @@ const Map<String, String> kUkCatalog = <String, String>{
   'advanced_subtitle': 'Кінцеві точки, DNS, MTU, маршрутизація та Kill Switch.',
   'advanced_warning':
       'Неправильні кінцеві точки, SNI, DNS або MTU можуть завадити зʼєднанню тунелю.',
-  'ip_dns': 'IP і DNS',
   'routing_protection': 'Маршрутизація та захист',
   'transport': 'Транспорт',
   'automatic': 'Авто',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Вибір кінцевої точки',
+  'endpoint_section': 'Кінцева точка',
   'endpoint_automatic': 'Автоматично',
   'endpoint_custom': 'Власна',
   'endpoint_automatic_help':
@@ -354,7 +354,7 @@ const Map<String, String> kUkCatalog = <String, String>{
       'Перевірте проблеми зі з’єднанням, експортуйте журнали та керуйте локальними даними.',
   'engine_status': 'Відомості про з’єднання',
   'version': 'Версія',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Локальні журнали',
   'export_diagnostics': 'Експортувати діагностичний пакет',
   'diagnostics_saved': 'Діагностичний пакет збережено до',
@@ -396,7 +396,7 @@ const Map<String, String> kUkCatalog = <String, String>{
   'profile_required': 'Залиште принаймні один обліковий запис.',
   'socks_capabilities': 'TCP і UDP',
   'http_capabilities': 'CONNECT і звичайне пересилання',
-  'geo_direct': 'Налаштування обходу {tunnel}',
+  'geo_direct': 'Налаштування обходу',
   'bypass_custom': 'Власні цілі обходу',
   'bypass_countries': 'Країни / регіони',
   'bypass_targets_hint':
@@ -406,7 +406,7 @@ const Map<String, String> kUkCatalog = <String, String>{
   'bypass_line_error': 'Рядок {line}: {reason}',
   'bypass_summary': 'Регіонів: {countries} · Власних цілей: {targets}',
   'geo_direct_help':
-      'Трафік, що відповідає цим правилам, оминає VPN. Постачальник DNS поточної мережі може бачити запитувані домени. Для програм із зашифрованим DNS маршрутизація визначається лише за IP-адресою.',
+      'Трафік, що відповідає цим країнам чи регіонам, оминає VPN/TUN Usque та локальні HTTP- і SOCKS5-проксі. Постачальник DNS поточної мережі може бачити запитувані домени. Для програм із зашифрованим DNS маршрутизація визначається лише за IP-адресою.',
   'geo_update_all': 'Оновити геодані',
   'geo_last_updated': 'Останнє успішне оновлення: {current}',
   'geo_never_updated': 'Ще не оновлювалось',
@@ -659,4 +659,21 @@ const Map<String, String> kUkCatalog = <String, String>{
   'dns_duplicate_address': 'Видаліть повторювані IP-адреси.',
   'dns_address_not_allowed':
       'Одну з адрес не можна використати для підключення до DNS-сервера. Вкажіть IP-адреси від вашого DNS-провайдера.',
+  "routing_rules": "Власні правила маршрутизації",
+  "routing_add": "Додати правило",
+  "routing_batch": "Вставити правила",
+  "routing_action": "Дія",
+  "routing_target": "Домен, IP або CIDR",
+  "routing_priority":
+      "Точніші правила мають пріоритет. Власні правила важливіші за Ads і країни; заборона за IP залишається чинною.",
+  "routing_conflict": "Для однієї цілі задано різні дії. Виправте правила.",
+  "routing_overlap": "Точніше правило перекриває загальніше.",
+  "routing_duplicate": "Дублікати буде об’єднано під час збереження.",
+  "routing_ads": "Ads · реклама та відстеження",
+  "routing_ads_ready": "Дані Ads доступні.",
+  "routing_ads_unavailable":
+      "Дані Ads недоступні. Підключення та власні правила продовжують працювати.",
+  "routing_pending":
+      "Завантажені правила застосуються після повторного підключення.",
+  'routing_current': "Поточне підключення",
 };

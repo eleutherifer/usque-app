@@ -1,5 +1,7 @@
 /// Dutch UI catalog.
 const Map<String, String> kNlCatalog = <String, String>{
+  'dns_doh_url': 'DoH-URL',
+  'dns_invalid_doh_url': 'Voer een geldige HTTPS-DNS-URL in',
   'warp_dns_type': 'WARP-DNS',
   'warp_dns_bootstrap_optional': 'Optioneel',
   'warp_dns_plain': 'Gewone DNS',
@@ -50,7 +52,7 @@ const Map<String, String> kNlCatalog = <String, String>{
   'profiles': 'Accounts',
   'profiles_subtitle': 'Wissel en beheer WARP-accounts.',
   'proxy': 'Proxy',
-  'proxy_subtitle': 'Stel proxy-adressen en DNS in voor alle accounts.',
+  'proxy_subtitle': 'Stel gedeelde proxy-luisteradressen en authenticatie in.',
   'settings': 'Instellingen',
   'settings_subtitle': 'Verbindings-, proxy- en applicatie-instellingen.',
   'diagnostics': 'Diagnostiek',
@@ -183,7 +185,7 @@ const Map<String, String> kNlCatalog = <String, String>{
   'proxy_dns_system': 'Systeem-DNS',
   'dns_leak_warning': 'Lokale DNS kan opgevraagde namen prijsgeven',
   'dns_leak_warning_body':
-      'Aangepaste en systeem-DNS worden niet via de tunnel omgezet, dus uw huidige netwerk kan zien welke domeinen u bezoekt. Gebruik “Op afstand via de tunnel”, tenzij u dit accepteert.',
+      'Lokale en systeem-DNS kunnen aangevraagde domeinen aan je huidige netwerk onthullen.',
   'system_proxy': 'Systeemproxy configureren',
   'output_disabled_in_profile': 'Uitgeschakeld in Instellingen',
   'auto_connect': 'Het huidige account bij het starten automatisch verbinden',
@@ -208,11 +210,9 @@ const Map<String, String> kNlCatalog = <String, String>{
       'Wachtwoord is ingesteld. Voer een nieuw wachtwoord in om het te vervangen.',
   'proxy_auth_clear': 'Wachtwoordbeveiliging verwijderen',
   'general': 'Algemeen',
-  'system_integration': 'Systeemintegratie',
   'start_on_boot': 'Usque starten wanneer u zich aanmeldt',
   'close_to_tray': 'Het venster naar het systeemvak sluiten',
   'add_quick_settings_tile': 'Tegel Snelle instellingen toevoegen',
-  'appearance': 'Uiterlijk',
   'theme': 'Thema',
   'theme_system': 'Systeem',
   'theme_light': 'Licht',
@@ -273,13 +273,13 @@ const Map<String, String> kNlCatalog = <String, String>{
   'advanced_subtitle': 'Eindpunten, DNS, MTU, routering en Kill Switch.',
   'advanced_warning':
       'Onjuiste eindpunten, SNI, DNS of MTU kunnen verhinderen dat de tunnel verbinding maakt.',
-  'ip_dns': 'IP en DNS',
   'routing_protection': 'Routering en bescherming',
   'transport': 'Transport',
   'automatic': 'Automatisch',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Endpointselectie',
+  'endpoint_section': 'Eindpunt',
   'endpoint_automatic': 'Automatisch',
   'endpoint_custom': 'Aangepast',
   'endpoint_automatic_help':
@@ -356,7 +356,7 @@ const Map<String, String> kNlCatalog = <String, String>{
       'Controleer verbindingsproblemen, exporteer logboeken en beheer lokale gegevens.',
   'engine_status': 'Verbindingsinformatie',
   'version': 'Versie',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Lokale logboeken',
   'export_diagnostics': 'Diagnostisch pakket exporteren',
   'diagnostics_saved': 'Diagnostisch pakket opgeslagen in',
@@ -398,7 +398,7 @@ const Map<String, String> kNlCatalog = <String, String>{
   'profile_required': 'Behoud ten minste één account.',
   'socks_capabilities': 'TCP en UDP',
   'http_capabilities': 'CONNECT en gewone doorsturing',
-  'geo_direct': '{tunnel}-omzeiling instellen',
+  'geo_direct': 'Omzeilingsinstellingen',
   'bypass_custom': 'Eigen omzeilingsdoelen',
   'bypass_countries': 'Landen / regio’s',
   'bypass_targets_hint':
@@ -408,7 +408,7 @@ const Map<String, String> kNlCatalog = <String, String>{
   'bypass_line_error': 'Regel {line}: {reason}',
   'bypass_summary': '{countries} regio’s · {targets} eigen doelen',
   'geo_direct_help':
-      'Verkeer voor deze landen of regio’s gaat buiten de VPN om. De DNS-aanbieder van je huidige netwerk kan de opgevraagde domeinen zien. Apps met versleutelde DNS worden alleen op IP-adres ingedeeld.',
+      'Verkeer voor deze landen of regio’s omzeilt Usque VPN/TUN en de lokale HTTP- en SOCKS5-proxy’s. De DNS-aanbieder van je huidige netwerk kan de opgevraagde domeinen zien. Apps met versleutelde DNS worden alleen op IP-adres ingedeeld.',
   'geo_update_all': 'Geografische gegevens bijwerken',
   'geo_last_updated': 'Laatste geslaagde update: {current}',
   'geo_never_updated': 'Nog niet bijgewerkt',
@@ -661,4 +661,21 @@ const Map<String, String> kNlCatalog = <String, String>{
   'dns_duplicate_address': 'Verwijder dubbele IP-adressen.',
   'dns_address_not_allowed':
       'Een adres kan niet worden gebruikt voor een DNS-serververbinding. Gebruik de server-IP’s van je DNS-provider.',
+  "routing_rules": "Aangepaste routeringsregels",
+  "routing_add": "Regel toevoegen",
+  "routing_batch": "Regels plakken",
+  "routing_action": "Actie",
+  "routing_target": "Domein, IP of CIDR",
+  "routing_priority":
+      "Specifiekere regels gaan voor. Eigen regels gaan boven Ads en landen; IP-blokkering blijft gelden.",
+  "routing_conflict":
+      "Verschillende acties voor hetzelfde doel. Pas deze regels aan.",
+  "routing_overlap": "De specifiekere regel gaat voor de bredere regel.",
+  "routing_duplicate": "Dubbele regels worden bij opslaan samengevoegd.",
+  "routing_ads": "Ads · advertenties en tracking",
+  "routing_ads_ready": "Ads-gegevens zijn beschikbaar.",
+  "routing_ads_unavailable":
+      "Ads-gegevens ontbreken. Verbindingen en eigen regels blijven beschikbaar.",
+  "routing_pending": "Gedownloade regels gelden na opnieuw verbinden.",
+  'routing_current': "Huidige verbinding",
 };

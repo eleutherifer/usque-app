@@ -1,5 +1,7 @@
 /// Turkish UI catalog.
 const Map<String, String> kTrCatalog = <String, String>{
+  'dns_doh_url': 'DoH URL’si',
+  'dns_invalid_doh_url': 'Geçerli bir HTTPS DNS URL’si girin',
   'warp_dns_type': 'WARP DNS',
   'warp_dns_bootstrap_optional': 'İsteğe bağlı',
   'warp_dns_plain': 'Normal DNS',
@@ -52,7 +54,7 @@ const Map<String, String> kTrCatalog = <String, String>{
       'WARP hesapları arasında geçiş yapın ve bunları yönetin.',
   'proxy': 'Proxy',
   'proxy_subtitle':
-      'Tüm hesapların kullandığı proxy adreslerini ve DNS ayarlarını belirleyin.',
+      'Paylaşılan proxy dinleme adreslerini ve kimlik doğrulamasını yapılandırın.',
   'settings': 'Ayarlar',
   'settings_subtitle': 'Bağlantı, proxy ve uygulama ayarları.',
   'diagnostics': 'Tanılama',
@@ -183,7 +185,7 @@ const Map<String, String> kTrCatalog = <String, String>{
   'proxy_dns_system': 'Sistem DNS',
   'dns_leak_warning': 'Yerel DNS, istenen adları açığa çıkarabilir',
   'dns_leak_warning_body':
-      'Özel ve sistem DNS’si tünel üzerinden çözümlenmez; bu nedenle mevcut ağınız ziyaret ettiğiniz alan adlarını görebilir. Bunu kabul etmiyorsanız “Tünel üzerinden uzak DNS çözümlemesi” seçeneğini kullanın.',
+      'Yerel ve sistem DNS’i, istenen alan adlarını mevcut ağınıza gösterebilir.',
   'system_proxy': 'Sistem proxy’sini yapılandır',
   'output_disabled_in_profile': 'Ayarlarda devre dışı',
   'auto_connect': 'Başlangıçta geçerli hesaba otomatik bağlan',
@@ -208,11 +210,9 @@ const Map<String, String> kTrCatalog = <String, String>{
       'Parola ayarlandı. Değiştirmek için yeni bir parola girin.',
   'proxy_auth_clear': 'Parola korumasını kaldır',
   'general': 'Genel',
-  'system_integration': 'Sistem entegrasyonu',
   'start_on_boot': 'Oturum açtığınızda Usque’yi başlat',
   'close_to_tray': 'Pencereyi sistem tepsisine kapat',
   'add_quick_settings_tile': 'Hızlı Ayarlar kutucuğu ekle',
-  'appearance': 'Görünüm',
   'theme': 'Tema',
   'theme_system': 'Sistem',
   'theme_light': 'Açık',
@@ -272,13 +272,13 @@ const Map<String, String> kTrCatalog = <String, String>{
   'advanced_subtitle': 'Uç noktalar, DNS, MTU, yönlendirme ve Kill Switch.',
   'advanced_warning':
       'Yanlış uç noktalar, SNI, DNS veya MTU tünelin bağlanmasını engelleyebilir.',
-  'ip_dns': 'IP ve DNS',
   'routing_protection': 'Yönlendirme ve koruma',
   'transport': 'Aktarım',
   'automatic': 'Otomatik',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Uç nokta seçimi',
+  'endpoint_section': 'Uç nokta',
   'endpoint_automatic': 'Otomatik',
   'endpoint_custom': 'Özel',
   'endpoint_automatic_help':
@@ -356,7 +356,7 @@ const Map<String, String> kTrCatalog = <String, String>{
       'Bağlantı sorunlarını kontrol edin, günlükleri dışa aktarın ve yerel verileri yönetin.',
   'engine_status': 'Bağlantı bilgileri',
   'version': 'Sürüm',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Yerel günlükler',
   'export_diagnostics': 'Tanılama paketini dışa aktar',
   'diagnostics_saved': 'Tanılama paketi şuraya kaydedildi',
@@ -398,7 +398,7 @@ const Map<String, String> kTrCatalog = <String, String>{
   'profile_required': 'En az bir hesap bulundurun.',
   'socks_capabilities': 'TCP ve UDP',
   'http_capabilities': 'CONNECT ve olağan iletme',
-  'geo_direct': '{tunnel} atlama ayarları',
+  'geo_direct': 'Atlama ayarları',
   'bypass_custom': 'Özel atlama hedefleri',
   'bypass_countries': 'Ülkeler / bölgeler',
   'bypass_targets_hint':
@@ -408,7 +408,7 @@ const Map<String, String> kTrCatalog = <String, String>{
   'bypass_line_error': 'Satır {line}: {reason}',
   'bypass_summary': '{countries} bölge · {targets} özel hedef',
   'geo_direct_help':
-      'Bu kurallarla eşleşen trafik VPN’i kullanmaz. Mevcut ağın DNS sağlayıcısı sorgulanan alan adlarını görebilir. Şifreli DNS kullanan uygulamalar için yalnızca IP adresine göre yönlendirme yapılır.',
+      'Bu ülke veya bölgelerle eşleşen trafik Usque VPN/TUN ile yerel HTTP ve SOCKS5 vekil sunucularını kullanmaz. Mevcut ağın DNS sağlayıcısı sorgulanan alan adlarını görebilir. Şifreli DNS kullanan uygulamalar için yalnızca IP adresine göre yönlendirme yapılır.',
   'geo_update_all': 'Coğrafi verileri güncelle',
   'geo_last_updated': 'Son başarılı güncelleme: {current}',
   'geo_never_updated': 'Henüz güncellenmedi',
@@ -656,4 +656,21 @@ const Map<String, String> kTrCatalog = <String, String>{
   'dns_duplicate_address': 'Yinelenen IP adreslerini kaldırın.',
   'dns_address_not_allowed':
       'Bir adres DNS sunucusuna bağlanmak için kullanılamıyor. DNS sağlayıcınızın verdiği sunucu IP’lerini kullanın.',
+  "routing_rules": "Özel yönlendirme kuralları",
+  "routing_add": "Kural ekle",
+  "routing_batch": "Kuralları yapıştır",
+  "routing_action": "İşlem",
+  "routing_target": "Alan adı, IP veya CIDR",
+  "routing_priority":
+      "Daha özel kurallar önceliklidir. Özel kurallar Ads ve ülkeleri geçersiz kılar; IP engeli uygulanmaya devam eder.",
+  "routing_conflict":
+      "Aynı hedef için farklı işlemler var. Bu kuralları düzenleyin.",
+  "routing_overlap": "Daha özel kural, daha geniş kuralın önüne geçer.",
+  "routing_duplicate": "Yinelenen kurallar kaydedilirken birleştirilir.",
+  "routing_ads": "Ads · reklam ve izleme",
+  "routing_ads_ready": "Ads verileri hazır.",
+  "routing_ads_unavailable":
+      "Ads verileri kullanılamıyor. Bağlantılar ve özel kurallar çalışmaya devam eder.",
+  "routing_pending": "İndirilen kurallar yeniden bağlanınca uygulanır.",
+  'routing_current': "Geçerli bağlantı",
 };

@@ -1,5 +1,7 @@
 /// German UI catalog.
 const Map<String, String> kDeCatalog = <String, String>{
+  'dns_doh_url': 'DoH-URL',
+  'dns_invalid_doh_url': 'Geben Sie eine gültige HTTPS-DNS-URL ein',
   'warp_dns_type': 'WARP-DNS',
   'warp_dns_bootstrap_optional': 'Optional',
   'warp_dns_plain': 'Normales DNS',
@@ -51,7 +53,8 @@ const Map<String, String> kDeCatalog = <String, String>{
   'profiles': 'Konten',
   'profiles_subtitle': 'WARP-Konten wechseln und verwalten.',
   'proxy': 'Proxy',
-  'proxy_subtitle': 'Proxy-Adressen und DNS für alle Konten festlegen.',
+  'proxy_subtitle':
+      'Gemeinsame Proxy-Lauschadressen und Authentifizierung konfigurieren.',
   'settings': 'Einstellungen',
   'settings_subtitle': 'Verbindungs-, Proxy- und Anwendungseinstellungen.',
   'diagnostics': 'Diagnose',
@@ -185,7 +188,7 @@ const Map<String, String> kDeCatalog = <String, String>{
   'proxy_dns_system': 'System-DNS',
   'dns_leak_warning': 'Lokales DNS kann angeforderte Namen preisgeben',
   'dns_leak_warning_body':
-      'Eigenes DNS und System-DNS werden nicht über den Tunnel aufgelöst, daher kann Ihr aktuelles Netzwerk die besuchten Domains sehen. Verwenden Sie „Remote über den Tunnel“, sofern Sie das nicht in Kauf nehmen.',
+      'Lokales und System-DNS können angefragte Domains im aktuellen Netzwerk offenlegen.',
   'system_proxy': 'Systemproxy konfigurieren',
   'output_disabled_in_profile': 'In Einstellungen deaktiviert',
   'auto_connect': 'Aktuelles Konto beim Start automatisch verbinden',
@@ -210,11 +213,9 @@ const Map<String, String> kDeCatalog = <String, String>{
       'Passwort ist gesetzt. Geben Sie ein neues ein, um es zu ersetzen.',
   'proxy_auth_clear': 'Passwortschutz entfernen',
   'general': 'Allgemein',
-  'system_integration': 'Systemintegration',
   'start_on_boot': 'Usque beim Anmelden starten',
   'close_to_tray': 'Fenster in den Infobereich schließen',
   'add_quick_settings_tile': 'Kachel für Schnelleinstellungen hinzufügen',
-  'appearance': 'Erscheinungsbild',
   'theme': 'Design',
   'theme_system': 'System',
   'theme_light': 'Hell',
@@ -275,13 +276,13 @@ const Map<String, String> kDeCatalog = <String, String>{
   'advanced_subtitle': 'Endpunkte, DNS, MTU, Routing und Kill Switch.',
   'advanced_warning':
       'Falsche Endpunkte, SNI, DNS oder MTU können verhindern, dass eine Tunnelverbindung hergestellt wird.',
-  'ip_dns': 'IP & DNS',
   'routing_protection': 'Routing & Schutz',
   'transport': 'Transport',
   'automatic': 'Auto',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Endpunktauswahl',
+  'endpoint_section': 'Endpunkt',
   'endpoint_automatic': 'Automatisch',
   'endpoint_custom': 'Benutzerdefiniert',
   'endpoint_automatic_help':
@@ -360,7 +361,7 @@ const Map<String, String> kDeCatalog = <String, String>{
       'Verbindungsprobleme prüfen, Protokolle exportieren und lokale Daten verwalten.',
   'engine_status': 'Verbindungsinformationen',
   'version': 'Version',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Lokale Protokolle',
   'export_diagnostics': 'Diagnosepaket exportieren',
   'diagnostics_saved': 'Diagnosepaket gespeichert unter',
@@ -402,7 +403,7 @@ const Map<String, String> kDeCatalog = <String, String>{
   'profile_required': 'Behalten Sie mindestens ein Konto.',
   'socks_capabilities': 'TCP und UDP',
   'http_capabilities': 'CONNECT und gewöhnliche Weiterleitung',
-  'geo_direct': '{tunnel}-Umgehung',
+  'geo_direct': 'Umleitungseinstellungen',
   'bypass_custom': 'Eigene Umgehungsziele',
   'bypass_countries': 'Länder / Regionen',
   'bypass_targets_hint':
@@ -413,7 +414,7 @@ const Map<String, String> kDeCatalog = <String, String>{
   'bypass_line_error': 'Zeile {line}: {reason}',
   'bypass_summary': '{countries} Regionen · {targets} eigene Ziele',
   'geo_direct_help':
-      'Passender Datenverkehr umgeht das VPN. Der DNS-Anbieter des aktuellen Netzwerks kann abgefragte Domains sehen. Apps mit verschlüsseltem DNS werden nur anhand der IP-Adresse zugeordnet.',
+      'Passender Datenverkehr umgeht Usque-VPN/TUN sowie die lokalen HTTP- und SOCKS5-Proxys. Der DNS-Anbieter des aktuellen Netzwerks kann abgefragte Domains sehen. Apps mit verschlüsseltem DNS werden nur anhand der IP-Adresse zugeordnet.',
   'geo_update_all': 'Geodaten aktualisieren',
   'geo_last_updated': 'Letzte erfolgreiche Aktualisierung: {current}',
   'geo_never_updated': 'Noch nicht aktualisiert',
@@ -669,4 +670,21 @@ const Map<String, String> kDeCatalog = <String, String>{
   'dns_duplicate_address': 'Entferne doppelte IP-Adressen.',
   'dns_address_not_allowed':
       'Eine Adresse eignet sich nicht für eine DNS-Serververbindung. Verwende die Server-IP-Adressen deines DNS-Anbieters.',
+  "routing_rules": "Eigene Routingregeln",
+  "routing_add": "Regel hinzufügen",
+  "routing_batch": "Regeln einfügen",
+  "routing_action": "Aktion",
+  "routing_target": "Domain, IP oder CIDR",
+  "routing_priority":
+      "Genauere Regeln haben Vorrang. Eigene Regeln übersteuern Ads und Länder; IP-Sperren gelten weiterhin.",
+  "routing_conflict":
+      "Unterschiedliche Aktionen für dasselbe Ziel. Regeln bitte ändern.",
+  "routing_overlap": "Die genauere Regel übersteuert die allgemeinere.",
+  "routing_duplicate": "Doppelte Regeln werden beim Speichern zusammengeführt.",
+  "routing_ads": "Ads · Werbung und Tracking",
+  "routing_ads_ready": "Ads-Daten sind verfügbar.",
+  "routing_ads_unavailable":
+      "Ads-Daten nicht verfügbar. Verbindungen und eigene Regeln bleiben verfügbar.",
+  "routing_pending": "Heruntergeladene Regeln gelten nach erneutem Verbinden.",
+  'routing_current': "Aktuelle Verbindung",
 };

@@ -1,5 +1,7 @@
 /// French UI catalog.
 const Map<String, String> kFrCatalog = <String, String>{
+  'dns_doh_url': 'URL DoH',
+  'dns_invalid_doh_url': 'Saisissez une URL HTTPS DNS valide',
   'warp_dns_type': 'DNS WARP',
   'warp_dns_bootstrap_optional': 'Facultatif',
   'warp_dns_plain': 'DNS classique',
@@ -53,7 +55,7 @@ const Map<String, String> kFrCatalog = <String, String>{
   'profiles_subtitle': 'Changez et gérez les comptes WARP.',
   'proxy': 'Proxy',
   'proxy_subtitle':
-      'Configurez les adresses des proxys et le DNS communs à tous les comptes.',
+      'Configurez les adresses d’écoute et l’authentification partagées du proxy.',
   'settings': 'Paramètres',
   'settings_subtitle': 'Paramètres de connexion, de proxy et de l’application.',
   'diagnostics': 'Diagnostics',
@@ -188,7 +190,7 @@ const Map<String, String> kFrCatalog = <String, String>{
   'proxy_dns_system': 'DNS système',
   'dns_leak_warning': 'Le DNS local peut révéler les noms demandés',
   'dns_leak_warning_body':
-      'Le DNS personnalisé et le DNS système ne passent pas par le tunnel : votre réseau actuel peut donc voir les domaines que vous consultez. Utilisez « Distant via le tunnel », sauf si vous l’acceptez.',
+      'Le DNS local et système peut révéler les domaines demandés au réseau actuel.',
   'system_proxy': 'Configurer le proxy système',
   'output_disabled_in_profile': 'Désactivé dans Paramètres',
   'auto_connect': 'Connecter automatiquement le compte actuel au démarrage',
@@ -213,11 +215,9 @@ const Map<String, String> kFrCatalog = <String, String>{
       'Le mot de passe est défini. Saisissez-en un nouveau pour le remplacer.',
   'proxy_auth_clear': 'Supprimer la protection par mot de passe',
   'general': 'Général',
-  'system_integration': 'Intégration système',
   'start_on_boot': 'Démarrer Usque à l’ouverture de session',
   'close_to_tray': 'Fermer la fenêtre dans la zone de notification',
   'add_quick_settings_tile': 'Ajouter une tuile Paramètres rapides',
-  'appearance': 'Apparence',
   'theme': 'Thème',
   'theme_system': 'Système',
   'theme_light': 'Clair',
@@ -280,13 +280,13 @@ const Map<String, String> kFrCatalog = <String, String>{
       'Points de terminaison, DNS, MTU, routage et Kill Switch.',
   'advanced_warning':
       'Des points de terminaison, SNI, DNS ou MTU incorrects peuvent empêcher le tunnel de se connecter.',
-  'ip_dns': 'IP et DNS',
   'routing_protection': 'Routage et protection',
   'transport': 'Transport',
   'automatic': 'Auto',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Sélection du point de terminaison',
+  'endpoint_section': 'Point de terminaison',
   'endpoint_automatic': 'Automatique',
   'endpoint_custom': 'Personnalisée',
   'endpoint_automatic_help':
@@ -365,7 +365,7 @@ const Map<String, String> kFrCatalog = <String, String>{
       'Vérifiez les problèmes de connexion, exportez les journaux et gérez les données locales.',
   'engine_status': 'Informations de connexion',
   'version': 'Version',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Journaux locaux',
   'export_diagnostics': 'Exporter l’archive de diagnostics',
   'diagnostics_saved': 'Archive de diagnostics enregistrée dans',
@@ -408,7 +408,7 @@ const Map<String, String> kFrCatalog = <String, String>{
   'profile_required': 'Conservez au moins un compte.',
   'socks_capabilities': 'TCP et UDP',
   'http_capabilities': 'CONNECT et transfert ordinaire',
-  'geo_direct': 'Paramètres de contournement {tunnel}',
+  'geo_direct': 'Paramètres de contournement',
   'bypass_custom': 'Destinations personnalisées',
   'bypass_countries': 'Pays / régions',
   'bypass_targets_hint':
@@ -420,7 +420,7 @@ const Map<String, String> kFrCatalog = <String, String>{
   'bypass_summary':
       '{countries} régions · {targets} destinations personnalisées',
   'geo_direct_help':
-      'Le trafic correspondant à ces pays ou régions ne passe pas par le VPN. Le fournisseur DNS du réseau actuel peut voir les domaines demandés. Les applications utilisant un DNS chiffré sont réparties selon l’adresse IP uniquement.',
+      'Le trafic correspondant à ces pays ou régions contourne le VPN/TUN Usque ainsi que les proxys locaux HTTP et SOCKS5. Le fournisseur DNS du réseau actuel peut voir les domaines demandés. Les applications utilisant un DNS chiffré sont réparties selon l’adresse IP uniquement.',
   'geo_update_all': 'Mettre à jour les données géographiques',
   'geo_last_updated': 'Dernière mise à jour réussie : {current}',
   'geo_never_updated': 'Pas encore mis à jour',
@@ -674,4 +674,21 @@ const Map<String, String> kFrCatalog = <String, String>{
   'dns_duplicate_address': 'Supprimez les adresses IP en double.',
   'dns_address_not_allowed':
       'Une adresse ne permet pas de joindre un serveur DNS. Utilisez les IP de serveur fournies par votre fournisseur DNS.',
+  "routing_rules": "Règles de routage personnalisées",
+  "routing_add": "Ajouter une règle",
+  "routing_batch": "Coller des règles",
+  "routing_action": "Action",
+  "routing_target": "Domaine, IP ou CIDR",
+  "routing_priority":
+      "La règle la plus précise prime. Les règles personnalisées priment sur Ads et les pays ; le refus par IP reste actif.",
+  "routing_conflict":
+      "Actions différentes pour la même cible. Modifiez ces règles.",
+  "routing_overlap": "La règle la plus précise prime sur la règle plus large.",
+  "routing_duplicate": "Les doublons seront fusionnés à l’enregistrement.",
+  "routing_ads": "Ads · publicités et suivi",
+  "routing_ads_ready": "Les données Ads sont disponibles.",
+  "routing_ads_unavailable":
+      "Données Ads indisponibles. Les connexions et règles personnalisées restent disponibles.",
+  "routing_pending": "Les règles téléchargées s’appliquent après reconnexion.",
+  'routing_current': "Connexion actuelle",
 };

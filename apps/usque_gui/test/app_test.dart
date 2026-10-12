@@ -941,14 +941,14 @@ void main() {
     final downloader = RecordingUpdateDownloader(engine);
     final controller = AppController(engine, updateDownloader: downloader);
     await controller.initialize();
-    const path = 'test-update-cache/usque-v0.3.1-android-arm64-v8a.apk';
+    const path = 'test-update-cache/usque-v0.3.2-android-arm64-v8a.apk';
     controller.updateResult = const UpdateCheckResult(
       available: true,
-      version: 'v0.3.1',
+      version: 'v0.3.2',
       package: UpdatePackage(
-        name: 'usque-v0.3.1-android-arm64-v8a.apk',
+        name: 'usque-v0.3.2-android-arm64-v8a.apk',
         downloadUrl:
-            'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.1/usque-v0.3.1-android-arm64-v8a.apk',
+            'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.2/usque-v0.3.2-android-arm64-v8a.apk',
         size: 1024,
         sha256:
             'a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5',
@@ -1536,6 +1536,11 @@ void main() {
           ),
         );
         expect(localized.catalogId, catalog.key);
+        // Routing is shared by TUN and local proxies, so its heading is platform independent.
+        expect(
+          localized.get('geo_direct', platform: TargetPlatform.windows),
+          localized.get('geo_direct', platform: TargetPlatform.android),
+        );
         expect(localized.tunnelOutputLabel(TargetPlatform.android), 'VPN');
         for (final platform in [
           TargetPlatform.windows,
@@ -1546,7 +1551,6 @@ void main() {
             'outputs',
             'channel_only',
             'channel_only_warning',
-            'geo_direct',
           ]) {
             final text = localized.get(key, platform: platform);
             expect(
@@ -2396,83 +2400,58 @@ void main() {
     expect(settings.exposesLan, isTrue);
   });
 
-  testWidgets(
-    'custom proxy DNS reveals Cloudflare address fields and saves valid edits',
-    (tester) async {
-      SharedPreferences.setMockInitialValues(<String, Object>{});
-      final engine = FakeEngineClient();
-      final controller = AppController(engine);
-      await controller.initialize();
-      controller.updateProfile(
-        controller.activeProfile.copyWith(
-          dnsIpv4: '8.8.8.8',
-          dnsIpv6: '2001:4860:4860::8888',
+  testWidgets('default proxy page omits DNS controls and preserves WARP DNS', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final engine = FakeEngineClient();
+    final controller = AppController(engine);
+    await controller.initialize();
+    controller.updateProfile(
+      controller.activeProfile.copyWith(
+        dnsIpv4: '8.8.8.8',
+        dnsIpv6: '2001:4860:4860::8888',
+      ),
+    );
+    await controller.flushProfileWrites();
+    await controller.setLocale(LocalePreference.simplifiedChinese);
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: UsqueTheme.light(),
+        home: ListenableBuilder(
+          listenable: controller,
+          builder: (context, _) => ProxyScreen(controller: controller),
         ),
-      );
-      await controller.flushProfileWrites();
-      await controller.setLocale(LocalePreference.simplifiedChinese);
-      addTearDown(controller.dispose);
-      addTearDown(() => tester.view.resetPhysicalSize());
-      addTearDown(() => tester.view.resetDevicePixelRatio());
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(1200, 900);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: UsqueTheme.light(),
-          home: ListenableBuilder(
-            listenable: controller,
-            builder: (context, _) => ProxyScreen(controller: controller),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(
-        find.byKey(const ValueKey<String>('proxy-dns-ipv4')),
-        findsNothing,
-      );
-      expect(
-        find.byKey(const ValueKey<String>('proxy-dns-ipv6')),
-        findsNothing,
-      );
-
-      final dnsMode = find.byKey(const ValueKey<String>('proxy-dns-mode'));
-      await tester.ensureVisible(dnsMode);
-      await tester.pumpAndSettle();
-      await tester.tap(dnsMode);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('自定义 DNS 服务器').last);
-      await tester.pumpAndSettle();
-
-      final ipv4 = find.byKey(const ValueKey<String>('proxy-dns-ipv4'));
-      final ipv6 = find.byKey(const ValueKey<String>('proxy-dns-ipv6'));
-      expect(ipv4, findsOneWidget);
-      expect(ipv6, findsOneWidget);
-      expect(tester.widget<TextFormField>(ipv4).controller?.text, '1.1.1.1');
-      expect(
-        tester.widget<TextFormField>(ipv6).controller?.text,
-        '2606:4700:4700::1111',
-      );
-
-      await tester.enterText(ipv4, '9.9.9.9');
-      await tester.pump();
-      // Draft changes do not alter live DNS until explicitly applied.
-      expect(controller.activeProfile.proxy.dnsMode, ProxyDnsMode.remote);
-      await tester.tap(find.widgetWithText(FilledButton, '应用修改'));
-      await tester.pumpAndSettle();
-      await controller.flushProfileWrites();
-
-      expect(
-        controller.activeProfile.proxy.dnsMode,
-        ProxyDnsMode.localConfigured,
-      );
-      expect(controller.activeProfile.proxy.dnsIpv4, '9.9.9.9');
-      expect(controller.activeProfile.dnsIpv4, '8.8.8.8');
-      expect(engine.storedProfiles.single.proxy.dnsIpv4, '9.9.9.9');
-    },
-  );
-
+      ),
+    );
+    await tester.pumpAndSettle();
+    for (final key in [
+      'proxy-dns-mode',
+      'proxy-dns-ipv4',
+      'proxy-dns-ipv6',
+      'proxy-dns-override',
+      'proxy-dns-restore',
+    ]) {
+      expect(find.byKey(ValueKey(key)), findsNothing);
+    }
+    final port = find
+        .byWidgetPredicate(
+          (widget) =>
+              widget is TextField &&
+              widget.decoration?.labelText == controller.strings.get('port'),
+        )
+        .first;
+    await tester.ensureVisible(port);
+    await tester.enterText(port, '9090');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, '应用修改'));
+    await tester.pumpAndSettle();
+    expect(controller.activeProfile.proxy.socksPort, 9090);
+    expect(controller.activeProfile.proxy.dnsMode, ProxyDnsMode.remote);
+    expect(controller.activeProfile.dnsIpv4, '8.8.8.8');
+    expect(controller.activeProfile.dnsIpv6, '2001:4860:4860::8888');
+  });
   test('proxy profile JSON stores username and never password bytes', () {
     final profile = UsqueProfile.defaultProfile().copyWith(
       proxy: const ProxySettings(authUsername: 'lan-user'),
@@ -2871,14 +2850,16 @@ void main() {
       ),
       findsNothing,
     );
-    final endpointFields = tester
-        .widgetList<TextField>(find.byType(TextField))
-        .take(4)
-        .toList(growable: false);
-    expect(endpointFields[0].readOnly, isTrue);
-    expect(endpointFields[1].readOnly, isTrue);
-    expect(endpointFields[2].readOnly, isFalse);
-    expect(endpointFields[3].readOnly, isFalse);
+    TextField endpointField(String label) => tester.widget<TextField>(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is TextField && widget.decoration?.labelText == label,
+      ),
+    );
+    expect(endpointField('Endpoint IPv4').readOnly, isTrue);
+    expect(endpointField('Endpoint IPv6').readOnly, isTrue);
+    expect(endpointField('Port').readOnly, isFalse);
+    expect(endpointField('SNI').readOnly, isFalse);
     await tester.enterText(find.widgetWithText(TextFormField, 'Port'), '8443');
     await tester.enterText(
       find.widgetWithText(TextFormField, 'SNI'),
@@ -3988,13 +3969,19 @@ void main() {
         tester.getSemantics(themePicker).rect.height,
         greaterThanOrEqualTo(48),
       );
-      expect(find.text('System integration'), findsOneWidget);
+      // Application rows sit directly under the group label.
+      expect(find.text('System integration'), findsNothing);
+      expect(find.text('Updates'), findsNothing);
       expect(find.text('Start Usque when you sign in'), findsOneWidget);
-      expect(find.text('Add Quick Settings Tile'), findsOneWidget);
-      expect(find.text('Open Always-on VPN settings'), findsOneWidget);
-      expect(find.text('Per-app proxy'), findsOneWidget);
+      expect(find.text('Check for updates'), findsOneWidget);
+      for (final row in [
+        'Add Quick Settings Tile',
+        'Open Always-on VPN settings',
+        'Per-app proxy',
+      ]) {
+        expect(find.widgetWithText(LinkRow, row), findsOneWidget, reason: row);
+      }
       expect(find.text('All apps use the VPN'), findsOneWidget);
-      expect(find.text('Updates'), findsOneWidget);
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
@@ -4039,13 +4026,13 @@ void main() {
         addTearDown(controller.dispose);
         controller.updateResult = const UpdateCheckResult(
           available: true,
-          version: 'v0.3.1',
+          version: 'v0.3.2',
           releaseUrl:
-              'https://github.com/GeorgeXie2333/usque-app/releases/tag/v0.3.1',
+              'https://github.com/GeorgeXie2333/usque-app/releases/tag/v0.3.2',
           package: UpdatePackage(
-            name: 'usque-v0.3.1-windows-x64-v2.msi',
+            name: 'usque-v0.3.2-windows-x64-v2.msi',
             downloadUrl:
-                'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.1/usque-v0.3.1-windows-x64-v2.msi',
+                'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.2/usque-v0.3.2-windows-x64-v2.msi',
             size: 20 * 1024 * 1024,
             sha256:
                 'a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5',
@@ -4063,7 +4050,7 @@ void main() {
         );
 
         await tester.pumpWidget(app());
-        expect(find.text('v0.3.1  •  x64-v2  •  20.0 MiB'), findsOneWidget);
+        expect(find.text('v0.3.2  •  x64-v2  •  20.0 MiB'), findsOneWidget);
         expect(find.byType(LinearProgressIndicator), findsOneWidget);
         expect(find.text('5.0 MiB / 20.0 MiB'), findsOneWidget);
         expect(find.text('Cancel'), findsOneWidget);
@@ -4109,8 +4096,12 @@ void main() {
               home: SettingsScreen(controller: controller),
             ),
           );
-          await tester.ensureVisible(find.text('Updates'));
+          await tester.ensureVisible(find.text('Restart and update'));
           await tester.pump();
+          expect(
+            find.byKey(const ValueKey('settings-app-version')),
+            findsOneWidget,
+          );
           expect(tester.takeException(), isNull);
         }
 
@@ -4144,7 +4135,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final directCountries = find.text('VPN bypass settings');
+      final directCountries = find.text('Bypass settings');
       expect(directCountries, findsOneWidget);
       await tester.ensureVisible(directCountries);
       await tester.pumpAndSettle();
@@ -4169,7 +4160,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AdvancedSettingsScreen), findsOneWidget);
-      expect(find.text('VPN bypass settings'), findsNothing);
+      expect(find.text('Bypass settings'), findsNothing);
     },
   );
 

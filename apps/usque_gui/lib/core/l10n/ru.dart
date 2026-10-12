@@ -1,5 +1,7 @@
 /// Russian UI catalog.
 const Map<String, String> kRuCatalog = <String, String>{
+  'dns_doh_url': 'URL DoH',
+  'dns_invalid_doh_url': 'Введите корректный HTTPS URL для DNS',
   'warp_dns_type': 'DNS WARP',
   'warp_dns_bootstrap_optional': 'Необязательно',
   'warp_dns_plain': 'Обычный DNS',
@@ -49,7 +51,8 @@ const Map<String, String> kRuCatalog = <String, String>{
   'profiles': 'Аккаунты',
   'profiles_subtitle': 'Переключение и управление аккаунтами WARP.',
   'proxy': 'Прокси',
-  'proxy_subtitle': 'Настройте адреса прокси и DNS, общие для всех аккаунтов.',
+  'proxy_subtitle':
+      'Настройте общие адреса прослушивания и аутентификацию прокси.',
   'settings': 'Настройки',
   'settings_subtitle': 'Настройки подключения, прокси и приложения.',
   'diagnostics': 'Диагностика',
@@ -180,7 +183,7 @@ const Map<String, String> kRuCatalog = <String, String>{
   'proxy_dns_system': 'Системный DNS',
   'dns_leak_warning': 'Локальный DNS может раскрывать запрашиваемые имена',
   'dns_leak_warning_body':
-      'Пользовательский и системный DNS разрешаются не через туннель, поэтому текущая сеть может видеть посещаемые вами домены. Используйте «Удалённо через туннель», если это для вас неприемлемо.',
+      'Локальный и системный DNS могут раскрывать запрошенные домены текущей сети.',
   'system_proxy': 'Настроить системный прокси',
   'output_disabled_in_profile': 'Отключено в Настройках',
   'auto_connect': 'Автоматически подключать текущий аккаунт при запуске',
@@ -204,11 +207,9 @@ const Map<String, String> kRuCatalog = <String, String>{
   'proxy_password_set': 'Пароль задан. Введите новый, чтобы заменить его.',
   'proxy_auth_clear': 'Отключить защиту паролем',
   'general': 'Основные',
-  'system_integration': 'Системная интеграция',
   'start_on_boot': 'Запускать Usque при входе в систему',
   'close_to_tray': 'Закрывать окно в область уведомлений',
   'add_quick_settings_tile': 'Добавить плитку быстрых настроек',
-  'appearance': 'Оформление',
   'theme': 'Тема',
   'theme_system': 'Системная',
   'theme_light': 'Светлая',
@@ -269,13 +270,13 @@ const Map<String, String> kRuCatalog = <String, String>{
   'advanced_subtitle': 'Конечные точки, DNS, MTU, маршрутизация и Kill Switch.',
   'advanced_warning':
       'Неверные конечные точки, SNI, DNS или MTU могут помешать подключению туннеля.',
-  'ip_dns': 'IP и DNS',
   'routing_protection': 'Маршрутизация и защита',
   'transport': 'Транспорт',
   'automatic': 'Авто',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Выбор конечной точки',
+  'endpoint_section': 'Конечная точка',
   'endpoint_automatic': 'Автоматически',
   'endpoint_custom': 'Вручную',
   'endpoint_automatic_help':
@@ -353,7 +354,7 @@ const Map<String, String> kRuCatalog = <String, String>{
       'Проверяйте проблемы подключения, экспортируйте журналы и управляйте локальными данными.',
   'engine_status': 'Сведения о подключении',
   'version': 'Версия',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Локальные журналы',
   'export_diagnostics': 'Экспортировать диагностический пакет',
   'diagnostics_saved': 'Диагностический пакет сохранён в',
@@ -395,7 +396,7 @@ const Map<String, String> kRuCatalog = <String, String>{
   'profile_required': 'Оставьте хотя бы один аккаунт.',
   'socks_capabilities': 'TCP и UDP',
   'http_capabilities': 'CONNECT и обычная пересылка',
-  'geo_direct': 'Настройки обхода {tunnel}',
+  'geo_direct': 'Настройки обхода',
   'bypass_custom': 'Свои цели обхода',
   'bypass_countries': 'Страны / регионы',
   'bypass_targets_hint':
@@ -405,7 +406,7 @@ const Map<String, String> kRuCatalog = <String, String>{
   'bypass_line_error': 'Строка {line}: {reason}',
   'bypass_summary': 'Регионов: {countries} · Своих целей: {targets}',
   'geo_direct_help':
-      'Трафик для этих стран и регионов идёт в обход VPN. DNS-провайдер текущей сети может видеть запрашиваемые домены. Приложения с шифрованным DNS распределяются только по IP-адресу.',
+      'Трафик для этих стран и регионов обходит VPN/TUN Usque, а также локальные HTTP- и SOCKS5-прокси. DNS-провайдер текущей сети может видеть запрашиваемые домены. Приложения с шифрованным DNS распределяются только по IP-адресу.',
   'geo_update_all': 'Обновить геоданные',
   'geo_last_updated': 'Последнее успешное обновление: {current}',
   'geo_never_updated': 'Ещё не обновлялось',
@@ -655,4 +656,21 @@ const Map<String, String> kRuCatalog = <String, String>{
   'dns_duplicate_address': 'Удалите повторяющиеся IP-адреса.',
   'dns_address_not_allowed':
       'Один из адресов нельзя использовать для подключения к DNS-серверу. Укажите IP-адреса сервера вашего DNS-провайдера.',
+  "routing_rules": "Пользовательские правила маршрутизации",
+  "routing_add": "Добавить правило",
+  "routing_batch": "Вставить правила",
+  "routing_action": "Действие",
+  "routing_target": "Домен, IP или CIDR",
+  "routing_priority":
+      "Более точные правила имеют приоритет. Свои правила важнее Ads и стран; запрет по IP сохраняется.",
+  "routing_conflict":
+      "Для одной цели заданы разные действия. Исправьте правила.",
+  "routing_overlap": "Более точное правило перекрывает более общее.",
+  "routing_duplicate": "Дубликаты будут объединены при сохранении.",
+  "routing_ads": "Ads · реклама и отслеживание",
+  "routing_ads_ready": "Данные Ads доступны.",
+  "routing_ads_unavailable":
+      "Данные Ads недоступны. Подключение и свои правила продолжают работать.",
+  "routing_pending": "Загруженные правила применятся после переподключения.",
+  'routing_current': "Текущее подключение",
 };

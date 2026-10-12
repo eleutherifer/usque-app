@@ -20,6 +20,7 @@ For setup and practical tutorials, start with the Wiki: [English](https://github
 | --- | --- |
 | [Installation and removal](INSTALLATION.md) | Package verification, upgrades, uninstall, recovery, and version applicability / 校验、升级、卸载、恢复与适用版本 |
 | [Network Doctor](network-doctor.md) | Run checks, read results, and export a local report / 运行检查、理解结果与导出诊断 |
+| [Routing and Ads](ROUTING.md) | Configure DIRECT, REJECT, PROXY, exceptions and Ads / 配置分流动作、例外与广告拦截 |
 | [Direct DNS](encrypted-direct-dns.md) | Choose System, DoH or DoT and fill in resolver settings / 选择直连 DNS 模式与填写服务器配置 |
 | [WARP® exit DNS](WARP_DNS.md) | Configure Plain DNS, DoH or DoT inside the WARP tunnel / 配置 WARP 隧道内普通 DNS、DoH、DoT |
 | [WARP via WireGuard](WARP_WIREGUARD.md) | Generate/import WARP configurations and edit endpoints / 生成、导入 WARP 配置与编辑端点 |
@@ -37,11 +38,12 @@ For setup and practical tutorials, start with the Wiki: [English](https://github
 | [Contributing](../CONTRIBUTING.md) | Toolchain setup and change-scoped checks / 工具链准备与检查矩阵 |
 | [Development-machine safety](../CONTRIBUTING.md#development-machines) | Workstation limits, isolation, and evidence requirements / 开发机安全边界与验证要求 |
 | [Implementation progress](IMPLEMENTATION.md) | Source-tree milestones, not proof of a test run / 源码实现进度，不等同于测试通过 |
+| [Routing validation record](ROUTING_VALIDATION.md) | Workstation commands, results and unavailable isolated checks / 分流功能开发机验证与未运行的隔离检查 |
 | [GUI development](../apps/usque_gui/README.md) | Editing workflows and native UI conventions / 界面交互与布局约定 |
 | [Linux and WSL development](LINUX_DEVELOPMENT.md) | Native tools, debug UI preview, hot reload and checks / Linux 工具、模拟界面预览、热重载与检查 |
 | [Country flags](COUNTRY_FLAGS.md) | Bundled assets, attribution and update checks / 内置旗帜资源、来源与更新检查 |
 | [Release process](RELEASE.md) | Candidate preparation, approval, signing, and publication / 候选包、审批、签名与发布 |
-| [v0.3.0 readiness review](RELEASE_V0.3.0_READINESS.md) | Reviewed source, documentation checks, version synchronization and remaining release requirements / 审查源码、文档检查、版本同步与发布待办 |
+| [v0.3.1 readiness review](RELEASE_V0.3.1_READINESS.md) | Documentation checks, planned version synchronization, schema-24 upgrade limits and remaining release requirements / 文档检查、版本同步计划、schema 24 升级限制与发布待办 |
 | [Flutter release symbols](FLUTTER_SYMBOLS.md) | Separate and archive matching Dart symbols; restore stack traces / 分离、归档 Dart 符号与还原堆栈 |
 | [Code signing policy](CODE_SIGNING.md) | Official identities, key handling, and rotation / 官方签名身份、密钥管理与轮换 |
 | [GitHub governance](GITHUB_GOVERNANCE.md) | Repository checks, permissions, and maintainer rules / 仓库检查、权限与维护规则 |
@@ -91,6 +93,7 @@ Common terms in these references:
 | Record | Scope / 范围 |
 | --- | --- |
 | [Implementation baseline](implementation-baseline.md) | PR-00 source, toolchain, and unavailable-lab baseline / PR-00 基线 |
+| [v0.3.0 readiness review](RELEASE_V0.3.0_READINESS.md) | Historical preparation review with its original source, checks and unavailable evidence / 保留当时源码、检查与缺失证据的历史发布准备审查 |
 | [MASQUE performance candidates](MASQUE_PERFORMANCE_VALIDATION.md) | Staged source candidates, checks, and unmeasured device results / 分阶段候选、检查与待测设备结果 |
 | [Network-quality acceptance](network-quality-acceptance.md) | PR-01–PR-12 implementation and test matrix, with later correction notice / 阶段验收及后续更正 |
 | [PMTU review and fixes](pmtu-path-fixes.md) | Candidate-specific defects, corrections, and regression results / 特定候选版本的修复记录 |

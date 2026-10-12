@@ -1,5 +1,7 @@
 /// Thai UI catalog.
 const Map<String, String> kThCatalog = <String, String>{
+  'dns_doh_url': 'URL ของ DoH',
+  'dns_invalid_doh_url': 'ป้อน URL HTTPS ของ DNS ที่ถูกต้อง',
   'warp_dns_type': 'DNS ของ WARP',
   'warp_dns_bootstrap_optional': 'ไม่บังคับ',
   'warp_dns_plain': 'DNS ปกติ',
@@ -49,7 +51,8 @@ const Map<String, String> kThCatalog = <String, String>{
   'profiles': 'บัญชี',
   'profiles_subtitle': 'สลับและจัดการบัญชี WARP',
   'proxy': 'พร็อกซี',
-  'proxy_subtitle': 'ตั้งค่าที่อยู่พร็อกซีและ DNS ที่ใช้ร่วมกันทุกบัญชี',
+  'proxy_subtitle':
+      'ตั้งค่าที่อยู่รับฟังและการยืนยันตัวตนของพร็อกซีที่ใช้ร่วมกัน',
   'settings': 'การตั้งค่า',
   'settings_subtitle': 'การตั้งค่าการเชื่อมต่อ พร็อกซี และแอป',
   'diagnostics': 'การวินิจฉัย',
@@ -178,7 +181,7 @@ const Map<String, String> kThCatalog = <String, String>{
   'proxy_dns_system': 'DNS ของระบบ',
   'dns_leak_warning': 'DNS ในเครื่องอาจเปิดเผยชื่อที่ร้องขอ',
   'dns_leak_warning_body':
-      'DNS ที่กำหนดเองและ DNS ของระบบไม่ได้แปลงผ่านอุโมงค์ เครือข่ายปัจจุบันจึงอาจเห็นโดเมนที่คุณเข้าชม ให้ใช้ “ระยะไกลผ่านอุโมงค์” เว้นแต่คุณยอมรับข้อนี้ได้',
+      'DNS ในเครื่องและของระบบอาจเปิดเผยโดเมนที่ร้องขอต่อเครือข่ายปัจจุบัน',
   'system_proxy': 'ตั้งค่าพร็อกซีของระบบ',
   'output_disabled_in_profile': 'ปิดไว้ในการตั้งค่า',
   'auto_connect': 'เชื่อมต่อบัญชีปัจจุบันโดยอัตโนมัติเมื่อเริ่มต้น',
@@ -201,11 +204,9 @@ const Map<String, String> kThCatalog = <String, String>{
   'proxy_password_set': 'ตั้งรหัสผ่านแล้ว กรอกรหัสใหม่เพื่อแทนที่',
   'proxy_auth_clear': 'ยกเลิกการป้องกันด้วยรหัสผ่าน',
   'general': 'ทั่วไป',
-  'system_integration': 'การผสานกับระบบ',
   'start_on_boot': 'เริ่ม Usque เมื่อลงชื่อเข้าใช้',
   'close_to_tray': 'ปิดหน้าต่างไปที่ถาดระบบ',
   'add_quick_settings_tile': 'เพิ่มไทล์การตั้งค่าด่วน',
-  'appearance': 'รูปลักษณ์',
   'theme': 'ธีม',
   'theme_system': 'ตามระบบ',
   'theme_light': 'สว่าง',
@@ -265,13 +266,13 @@ const Map<String, String> kThCatalog = <String, String>{
   'advanced_subtitle': 'ปลายทาง, DNS, MTU, การกำหนดเส้นทาง และ Kill Switch',
   'advanced_warning':
       'ปลายทาง, SNI, DNS หรือ MTU ที่ไม่ถูกต้องอาจทำให้เชื่อมต่ออุโมงค์ไม่ได้',
-  'ip_dns': 'IP และ DNS',
   'routing_protection': 'การกำหนดเส้นทางและการป้องกัน',
   'transport': 'ทรานสปอร์ต',
   'automatic': 'อัตโนมัติ',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'การเลือกปลายทาง',
+  'endpoint_section': 'ปลายทาง',
   'endpoint_automatic': 'อัตโนมัติ',
   'endpoint_custom': 'กำหนดเอง',
   'endpoint_automatic_help':
@@ -348,7 +349,7 @@ const Map<String, String> kThCatalog = <String, String>{
       'ตรวจสอบปัญหาการเชื่อมต่อ ส่งออกบันทึก และจัดการข้อมูลในเครื่อง',
   'engine_status': 'ข้อมูลการเชื่อมต่อ',
   'version': 'เวอร์ชัน',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'บันทึกในเครื่อง',
   'export_diagnostics': 'ส่งออกชุดการวินิจฉัย',
   'diagnostics_saved': 'บันทึกชุดการวินิจฉัยไปที่',
@@ -390,7 +391,7 @@ const Map<String, String> kThCatalog = <String, String>{
   'profile_required': 'คงบัญชีไว้อย่างน้อยหนึ่งรายการ',
   'socks_capabilities': 'TCP และ UDP',
   'http_capabilities': 'CONNECT และการส่งต่อทั่วไป',
-  'geo_direct': 'การตั้งค่าข้าม {tunnel}',
+  'geo_direct': 'การตั้งค่าข้ามเส้นทาง',
   'bypass_custom': 'ปลายทางข้ามที่กำหนดเอง',
   'bypass_countries': 'ประเทศ / ภูมิภาค',
   'bypass_targets_hint':
@@ -400,7 +401,7 @@ const Map<String, String> kThCatalog = <String, String>{
   'bypass_line_error': 'บรรทัด {line}: {reason}',
   'bypass_summary': '{countries} ภูมิภาค · {targets} ปลายทางที่กำหนดเอง',
   'geo_direct_help':
-      'ข้อมูลที่ตรงกับกฎเหล่านี้จะไม่ผ่าน VPN ผู้ให้บริการ DNS ของเครือข่ายปัจจุบันอาจเห็นชื่อโดเมนที่สอบถาม แอปที่ใช้ DNS แบบเข้ารหัสจะกำหนดเส้นทางตามที่อยู่ IP เท่านั้น',
+      'ทราฟฟิกที่ตรงกับประเทศหรือภูมิภาคเหล่านี้จะไม่ผ่าน VPN/TUN ของ Usque และพร็อกซี HTTP กับ SOCKS5 ในเครื่อง ผู้ให้บริการ DNS ของเครือข่ายปัจจุบันอาจเห็นชื่อโดเมนที่สอบถาม แอปที่ใช้ DNS แบบเข้ารหัสจะกำหนดเส้นทางตามที่อยู่ IP เท่านั้น',
   'geo_update_all': 'อัปเดตข้อมูลภูมิศาสตร์',
   'geo_last_updated': 'อัปเดตสำเร็จล่าสุด: {current}',
   'geo_never_updated': 'ยังไม่ได้อัปเดต',
@@ -639,4 +640,21 @@ const Map<String, String> kThCatalog = <String, String>{
   'dns_duplicate_address': 'โปรดลบที่อยู่ IP ที่ซ้ำกัน',
   'dns_address_not_allowed':
       'มีที่อยู่ที่ใช้เชื่อมต่อเซิร์ฟเวอร์ DNS ไม่ได้ โปรดใช้ IP เซิร์ฟเวอร์ที่ผู้ให้บริการ DNS ระบุ',
+  "routing_rules": "กฎการกำหนดเส้นทางที่กำหนดเอง",
+  "routing_add": "เพิ่มกฎ",
+  "routing_batch": "วางหลายกฎ",
+  "routing_action": "การดำเนินการ",
+  "routing_target": "โดเมน, IP หรือ CIDR",
+  "routing_priority":
+      "กฎที่เจาะจงกว่ามีลำดับสูงกว่า กฎกำหนดเองมีผลเหนือ Ads และประเทศ แต่ยังคงปฏิเสธ IP ที่ถูกบล็อก",
+  "routing_conflict":
+      "มีการดำเนินการต่างกันสำหรับเป้าหมายเดียวกัน โปรดแก้ไขกฎเหล่านี้",
+  "routing_overlap": "กฎที่เจาะจงกว่ามีผลเหนือกฎที่ครอบคลุมกว้างกว่า",
+  "routing_duplicate": "กฎซ้ำจะถูกรวมเมื่อบันทึก",
+  "routing_ads": "Ads · โฆษณาและการติดตาม",
+  "routing_ads_ready": "ข้อมูล Ads พร้อมใช้งาน",
+  "routing_ads_unavailable":
+      "ข้อมูล Ads ไม่พร้อมใช้งาน การเชื่อมต่อและกฎกำหนดเองยังใช้งานได้",
+  "routing_pending": "กฎที่ดาวน์โหลดจะมีผลหลังเชื่อมต่อใหม่",
+  'routing_current': "การเชื่อมต่อปัจจุบัน",
 };

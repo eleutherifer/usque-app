@@ -1,5 +1,7 @@
 /// Indonesian UI catalog.
 const Map<String, String> kIdCatalog = <String, String>{
+  'dns_doh_url': 'URL DoH',
+  'dns_invalid_doh_url': 'Masukkan URL HTTPS DNS yang valid',
   'warp_dns_type': 'DNS WARP',
   'warp_dns_bootstrap_optional': 'Opsional',
   'warp_dns_plain': 'DNS biasa',
@@ -49,8 +51,7 @@ const Map<String, String> kIdCatalog = <String, String>{
   'profiles': 'Akun',
   'profiles_subtitle': 'Beralih dan kelola akun WARP.',
   'proxy': 'Proksi',
-  'proxy_subtitle':
-      'Atur alamat proksi dan DNS yang digunakan bersama oleh semua akun.',
+  'proxy_subtitle': 'Atur alamat pendengar dan autentikasi proksi bersama.',
   'settings': 'Pengaturan',
   'settings_subtitle': 'Pengaturan koneksi, proksi, dan aplikasi.',
   'diagnostics': 'Diagnostik',
@@ -181,7 +182,7 @@ const Map<String, String> kIdCatalog = <String, String>{
   'proxy_dns_system': 'DNS sistem',
   'dns_leak_warning': 'DNS lokal dapat mengungkapkan nama yang diminta',
   'dns_leak_warning_body':
-      'DNS kustom dan sistem tidak diselesaikan melalui terowongan, sehingga jaringan Anda saat ini dapat melihat domain yang Anda kunjungi. Gunakan “Jarak jauh melalui terowongan” kecuali Anda menerimanya.',
+      'DNS lokal dan sistem dapat mengungkap domain yang diminta ke jaringan saat ini.',
   'system_proxy': 'Konfigurasikan proksi sistem',
   'output_disabled_in_profile': 'Dinonaktifkan di Pengaturan',
   'auto_connect': 'Sambungkan akun saat ini secara otomatis saat mulai',
@@ -205,11 +206,9 @@ const Map<String, String> kIdCatalog = <String, String>{
       'Kata sandi sudah diatur. Masukkan yang baru untuk menggantinya.',
   'proxy_auth_clear': 'Hapus perlindungan kata sandi',
   'general': 'Umum',
-  'system_integration': 'Integrasi sistem',
   'start_on_boot': 'Jalankan Usque saat Anda masuk',
   'close_to_tray': 'Tutup jendela ke baki sistem',
   'add_quick_settings_tile': 'Tambahkan ubin Setelan Cepat',
-  'appearance': 'Tampilan',
   'theme': 'Tema',
   'theme_system': 'Sistem',
   'theme_light': 'Terang',
@@ -269,13 +268,13 @@ const Map<String, String> kIdCatalog = <String, String>{
   'advanced_subtitle': 'Endpoint, DNS, MTU, perutean, dan Kill Switch.',
   'advanced_warning':
       'Endpoint, SNI, DNS, atau MTU yang salah dapat mencegah terowongan tersambung.',
-  'ip_dns': 'IP & DNS',
   'routing_protection': 'Perutean & perlindungan',
   'transport': 'Transport',
   'automatic': 'Otomatis',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Pemilihan endpoint',
+  'endpoint_section': 'Endpoint',
   'endpoint_automatic': 'Otomatis',
   'endpoint_custom': 'Kustom',
   'endpoint_automatic_help':
@@ -353,7 +352,7 @@ const Map<String, String> kIdCatalog = <String, String>{
       'Periksa masalah koneksi, ekspor log, dan kelola data lokal.',
   'engine_status': 'Informasi koneksi',
   'version': 'Versi',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Log lokal',
   'export_diagnostics': 'Ekspor bundel diagnostik',
   'diagnostics_saved': 'Bundel diagnostik disimpan ke',
@@ -395,7 +394,7 @@ const Map<String, String> kIdCatalog = <String, String>{
   'profile_required': 'Pertahankan setidaknya satu akun.',
   'socks_capabilities': 'TCP dan UDP',
   'http_capabilities': 'CONNECT dan penerusan biasa',
-  'geo_direct': 'Pengaturan bypass {tunnel}',
+  'geo_direct': 'Pengaturan bypass',
   'bypass_custom': 'Target bypass khusus',
   'bypass_countries': 'Negara / wilayah',
   'bypass_targets_hint':
@@ -405,7 +404,7 @@ const Map<String, String> kIdCatalog = <String, String>{
   'bypass_line_error': 'Baris {line}: {reason}',
   'bypass_summary': '{countries} wilayah · {targets} target khusus',
   'geo_direct_help':
-      'Lalu lintas yang cocok dengan negara atau wilayah ini tidak melalui VPN. Penyedia DNS jaringan saat ini mungkin melihat domain yang diminta. Aplikasi dengan DNS terenkripsi dicocokkan berdasarkan IP saja.',
+      'Lalu lintas yang cocok dengan negara atau wilayah ini melewati VPN/TUN Usque serta proksi lokal HTTP dan SOCKS5. Penyedia DNS jaringan saat ini mungkin melihat domain yang diminta. Aplikasi dengan DNS terenkripsi dicocokkan berdasarkan IP saja.',
   'geo_update_all': 'Perbarui data geo',
   'geo_last_updated': 'Pembaruan berhasil terakhir: {current}',
   'geo_never_updated': 'Belum diperbarui',
@@ -650,4 +649,23 @@ const Map<String, String> kIdCatalog = <String, String>{
   'dns_duplicate_address': 'Hapus alamat IP yang duplikat.',
   'dns_address_not_allowed':
       'Salah satu alamat tidak bisa digunakan untuk terhubung ke server DNS. Gunakan IP server dari penyedia DNS Anda.',
+  "routing_rules": "Aturan perutean khusus",
+  "routing_add": "Tambah aturan",
+  "routing_batch": "Tempel aturan",
+  "routing_action": "Tindakan",
+  "routing_target": "Domain, IP, atau CIDR",
+  "routing_priority":
+      "Aturan lebih spesifik didahulukan. Aturan khusus mengesampingkan Ads dan negara; penolakan IP tetap berlaku.",
+  "routing_conflict":
+      "Tindakan berbeda untuk tujuan yang sama. Ubah aturan ini.",
+  "routing_overlap":
+      "Aturan lebih spesifik mengesampingkan aturan yang lebih luas.",
+  "routing_duplicate": "Aturan duplikat digabungkan saat disimpan.",
+  "routing_ads": "Ads · iklan dan pelacakan",
+  "routing_ads_ready": "Data Ads tersedia.",
+  "routing_ads_unavailable":
+      "Data Ads tidak tersedia. Koneksi dan aturan khusus tetap tersedia.",
+  "routing_pending":
+      "Aturan yang diunduh diterapkan setelah tersambung kembali.",
+  'routing_current': "Koneksi saat ini",
 };

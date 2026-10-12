@@ -1,5 +1,7 @@
 /// Spanish UI catalog.
 const Map<String, String> kEsCatalog = <String, String>{
+  'dns_doh_url': 'URL de DoH',
+  'dns_invalid_doh_url': 'Introduce una URL HTTPS de DNS válida',
   'warp_dns_type': 'DNS de WARP',
   'warp_dns_bootstrap_optional': 'Opcional',
   'warp_dns_plain': 'DNS normal',
@@ -52,7 +54,7 @@ const Map<String, String> kEsCatalog = <String, String>{
   'profiles_subtitle': 'Cambiar y administrar las cuentas WARP.',
   'proxy': 'Proxy',
   'proxy_subtitle':
-      'Configura las direcciones de proxy y DNS compartidas por todas las cuentas.',
+      'Configura las direcciones de escucha y la autenticación del proxy compartidas.',
   'settings': 'Ajustes',
   'settings_subtitle': 'Ajustes de conexión, proxy y aplicación.',
   'diagnostics': 'Diagnóstico',
@@ -186,7 +188,7 @@ const Map<String, String> kEsCatalog = <String, String>{
   'proxy_dns_system': 'DNS del sistema',
   'dns_leak_warning': 'El DNS local puede revelar los nombres solicitados',
   'dns_leak_warning_body':
-      'El DNS personalizado y el del sistema no se resuelven a través del túnel, por lo que su red actual puede ver los dominios que visita. Use “Remoto a través del túnel” salvo que lo acepte.',
+      'El DNS local y del sistema puede revelar los dominios solicitados a tu red actual.',
   'system_proxy': 'Configurar el proxy del sistema',
   'output_disabled_in_profile': 'Desactivado en Ajustes',
   'auto_connect': 'Conectar la cuenta actual automáticamente al iniciar',
@@ -211,11 +213,9 @@ const Map<String, String> kEsCatalog = <String, String>{
       'La contraseña está establecida. Introduzca una nueva para reemplazarla.',
   'proxy_auth_clear': 'Quitar protección por contraseña',
   'general': 'General',
-  'system_integration': 'Integración con el sistema',
   'start_on_boot': 'Iniciar Usque al iniciar sesión',
   'close_to_tray': 'Cerrar la ventana a la bandeja del sistema',
   'add_quick_settings_tile': 'Añadir mosaico a Ajustes rápidos',
-  'appearance': 'Apariencia',
   'theme': 'Tema',
   'theme_system': 'Sistema',
   'theme_light': 'Claro',
@@ -276,13 +276,13 @@ const Map<String, String> kEsCatalog = <String, String>{
   'advanced_subtitle': 'Extremos, DNS, MTU, enrutamiento y Kill Switch.',
   'advanced_warning':
       'Unos extremos, SNI, DNS o MTU incorrectos pueden impedir que el túnel se conecte.',
-  'ip_dns': 'IP y DNS',
   'routing_protection': 'Enrutamiento y protección',
   'transport': 'Transporte',
   'automatic': 'Auto',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Selección de extremo',
+  'endpoint_section': 'Extremo',
   'endpoint_automatic': 'Automática',
   'endpoint_custom': 'Personalizada',
   'endpoint_automatic_help':
@@ -360,7 +360,7 @@ const Map<String, String> kEsCatalog = <String, String>{
       'Revisa problemas de conexión, exporta registros y administra los datos locales.',
   'engine_status': 'Información de conexión',
   'version': 'Versión',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Registros locales',
   'export_diagnostics': 'Exportar paquete de diagnóstico',
   'diagnostics_saved': 'Paquete de diagnóstico guardado en',
@@ -402,7 +402,7 @@ const Map<String, String> kEsCatalog = <String, String>{
   'profile_required': 'Conserve al menos una cuenta.',
   'socks_capabilities': 'TCP y UDP',
   'http_capabilities': 'CONNECT y reenvío ordinario',
-  'geo_direct': 'Ajustes de omisión de {tunnel}',
+  'geo_direct': 'Ajustes de omisión',
   'bypass_custom': 'Destinos personalizados',
   'bypass_countries': 'Países / regiones',
   'bypass_targets_hint':
@@ -412,7 +412,7 @@ const Map<String, String> kEsCatalog = <String, String>{
   'bypass_line_error': 'Línea {line}: {reason}',
   'bypass_summary': '{countries} regiones · {targets} destinos personalizados',
   'geo_direct_help':
-      'El tráfico que coincida con estos países o regiones no pasa por la VPN. El proveedor DNS de tu red puede ver los dominios consultados. Las aplicaciones con DNS cifrado se clasifican solo por IP.',
+      'El tráfico que coincida con estos países o regiones omite la VPN/TUN de Usque y los proxies locales HTTP y SOCKS5. El proveedor DNS de tu red puede ver los dominios consultados. Las aplicaciones con DNS cifrado se clasifican solo por IP.',
   'geo_update_all': 'Actualizar datos geográficos',
   'geo_last_updated': 'Última actualización correcta: {current}',
   'geo_never_updated': 'Aún no actualizado',
@@ -670,4 +670,21 @@ const Map<String, String> kEsCatalog = <String, String>{
   'dns_duplicate_address': 'Elimina las direcciones IP duplicadas.',
   'dns_address_not_allowed':
       'Una dirección no sirve para conectar con un servidor DNS. Usa las IP del servidor facilitadas por tu proveedor DNS.',
+  "routing_rules": "Reglas de enrutamiento personalizadas",
+  "routing_add": "Añadir regla",
+  "routing_batch": "Pegar reglas",
+  "routing_action": "Acción",
+  "routing_target": "Dominio, IP o CIDR",
+  "routing_priority":
+      "Gana la regla más específica. Las reglas propias prevalecen sobre Ads y países; el bloqueo IP sigue vigente.",
+  "routing_conflict":
+      "Acciones distintas para el mismo destino. Modifica estas reglas.",
+  "routing_overlap": "La regla más específica prevalece sobre la más amplia.",
+  "routing_duplicate": "Los duplicados se combinarán al guardar.",
+  "routing_ads": "Ads · anuncios y rastreo",
+  "routing_ads_ready": "Los datos de Ads están disponibles.",
+  "routing_ads_unavailable":
+      "Ads no está disponible. Las conexiones y reglas propias siguen disponibles.",
+  "routing_pending": "Las reglas descargadas se aplican al volver a conectar.",
+  'routing_current': "Conexión actual",
 };

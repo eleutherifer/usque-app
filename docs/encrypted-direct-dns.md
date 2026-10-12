@@ -9,31 +9,34 @@ intercept an application's own encrypted DNS, or decrypt unrelated traffic.
 | Mode in the app | Where matching queries go | What you need to configure |
 | --- | --- | --- |
 | Current network DNS (System, the default) | The DNS servers on your current network, outside the VPN. Those servers can see the queried names. | No custom resolver fields. |
-| DNS over HTTPS (DoH) | The encrypted resolver you choose, over HTTPS. | TLS server name, HTTPS path, port and bootstrap IP addresses. |
+| DNS over HTTPS (DoH) | The encrypted resolver you choose, over HTTPS. | Complete HTTPS URL and bootstrap IP addresses. |
 | DNS over TLS (DoT) | The encrypted resolver you choose, over TLS. | TLS server name, port and bootstrap IP addresses. |
 
 The chosen DoH/DoT provider can see the names it resolves. Encryption protects
 the connection to that provider; it does not make queries anonymous to it.
-Usque has no provider presets or embedded resolver addresses.
+New encrypted DNS drafts prefill Cloudflare: DoH uses
+`https://cloudflare-dns.com/dns-query`, and DoT uses `one.one.one.one:853`.
+Both prefill `1.1.1.1`, `1.0.0.1`, `2606:4700:4700::1111` and
+`2606:4700:4700::1001`. Existing saved values are preserved. These are editable
+drafts and do not change the System default until you select and apply a mode.
 
 ## Configure direct DNS
 
-1. In **Settings → TUN bypass settings** on Windows or **Settings → VPN bypass settings** on Android, select the countries and download
+1. In **Settings → Bypass settings**, select the countries and download
    their GeoIP rules and the global GeoSite catalog, then save the selection.
-   Alternatively, enter custom domains under **Custom bypass targets**; these
-   do not need geographic downloads. If no country or custom domain rule matches,
-   these DNS settings are not used.
+   Alternatively, add domains with the **DIRECT** action under **Custom routing
+   rules**; these do not need geographic downloads. If no country rule or DIRECT
+   domain rule matches, these DNS settings are not used.
 2. Open **Settings → Advanced network settings → Direct DNS**.
-3. Choose System, DoH or DoT. For an encrypted resolver, enter the values from
-   your DNS provider using the field guide below.
+3. Choose System, DoH or DoT. Keep the Cloudflare defaults for a new encrypted
+   draft, or enter your provider's values using the field guide below.
 4. Select **Apply changes**. Editing or resetting fields alone does not apply
    them. Read the save result and pending-state message; reconnect manually if
    the change is saved for the next connection.
 5. Check **Network quality → Direct DNS** while connected. To test reachability,
    run a confirmed [Deep diagnostic](network-doctor.md).
 
-In Simplified Chinese, the bypass page is **设置 → 绕过虚拟网卡分流设置** on Windows
-or **设置 → 绕过VPN分流设置** on Android. Direct DNS is under
+In Simplified Chinese, the bypass page is **设置 → 分流设置**. Direct DNS is under
 **设置 → 高级网络设置 → 直连 DNS**. The System option is currently labelled
 **当前网络的 DNS**.
 
@@ -41,15 +44,21 @@ or **设置 → 绕过VPN分流设置** on Android. Direct DNS is under
 
 | Field | What to enter | Format example |
 | --- | --- | --- |
-| DNS server name | The provider's certificate name, without `https://`, a port or a path. Do not enter an IP here. | `resolver.example` |
-| HTTPS path (DoH only) | The provider's path beginning with one slash, without a query string or fragment. | `/dns-query` |
-| Port (0 uses the default) | `443` for default DoH or `853` for default DoT. Use a different port only when specified by the provider. | `443` |
-| DNS server IP addresses | One to eight distinct IP addresses for that resolver, preferably one per line. Usque connects to these addresses without first using system DNS to find the server. | `192.0.2.53` and `2001:db8::53` |
+| DoH URL | Complete HTTPS URL with the provider's DNS name and path. An optional custom port belongs in the URL. No credentials, query string or fragment. | `https://cloudflare-dns.com/dns-query` |
+| DNS server name (DoT) | The provider's certificate name, without a scheme, port or path. Do not enter an IP here. | `one.one.one.one` |
+| Port (DoT; 0 uses the default) | `853`, or a custom port specified by the provider. | `853` |
+| DNS server IP addresses | One to eight distinct IP addresses for that resolver, preferably one per line. Usque connects to these addresses without first using system DNS to find the server. | `1.1.1.1` and `2606:4700:4700::1111` |
 
-These are documentation-only examples, not a working resolver. Replace the
-example name and IPs with your provider's real values. DoT has no HTTPS path.
-The TLS certificate must match the name even though the connection uses a
-numeric IP address.
+The Cloudflare endpoints above are working defaults; use the provider's actual
+IP addresses if you choose another resolver. Direct DNS still requires 1–8
+bootstrap IPs. DoT has no HTTPS path. The TLS certificate must match the name
+even though the connection uses a numeric IP address.
+
+Saved DoH name, port and path fields automatically display as one URL, without
+rewriting the stored configuration. Custom ports, paths and bootstrap IPs are
+preserved. Switching modes retains separate drafts. Resetting Advanced settings
+clears these drafts; selecting an encrypted mode afterward prefills Cloudflare.
+All changes still require **Apply changes**.
 
 ## If it does not work
 
@@ -67,7 +76,7 @@ numeric IP address.
 Other remote VPN queries use the final exit's DNS: WARP® without a chain, or the
 active chain exit (custom OpenVPN or WireGuard, WARP via WireGuard, or VPN
 Gate). Ordinary WARP supports configurable Plain DNS, DoH and DoT; see
-[WARP exit DNS](WARP_DNS.md). Explicit local DNS and proxy DNS settings keep their own scope.
+[WARP exit DNS](WARP_DNS.md).
 See the [direct DNS threat model](direct-dns-threat-model.md) for platform
 protection and diagnostic limits.
 
@@ -80,6 +89,9 @@ validation, protocol handling and resource ownership.
 ### Configuration and trust
 
 `DirectDnsSettings` is validated in core before opening a connection. TLS
+server name, port and path remain the persisted and IPC representation; the
+editor splits the HTTPS URL into these fields without decoding its path.
+An omitted URL port uses `443`; an omitted path uses `/dns-query`. TLS
 server names are IDNA-normalized DNS names, at most 253 characters/ASCII bytes
 after normalization, and validated with rustls `ServerName`. URL syntax,
 wildcards, empty labels, control characters and whitespace are rejected rather
@@ -231,33 +243,16 @@ performance results.
 
 ## Custom bypass targets / 自定义绕过目标
 
-In **Settings → TUN bypass settings** on Windows or **Settings → VPN bypass settings** on Android, enter one CIDR, IPv4/IPv6 address or
-bare domain per line, then select **Apply changes**. Existing bypass CIDRs from
-Advanced settings appear here automatically. Address rules and domains each
-allow up to 256 entries. An IP becomes a /32 or /128 host rule; network addresses
-are normalized and duplicates removed. Domains include themselves and every
-subdomain, using label boundaries: `example.com` matches `a.example.com`, not
-`notexample.com`. Case, a final dot, and IDNA names are normalized. URLs, ports,
-paths, wildcards and regular expressions are rejected. Invalid lines prevent
-saving the entire draft; a failed apply retains the draft for correction.
+Custom targets now use the [routing rule editor](ROUTING.md): select DIRECT,
+REJECT or PROXY for each domain, IP or CIDR. More-specific domains and longer
+prefixes win. Legacy targets migrate to DIRECT in schema 24; custom CIDRs no
+longer create OS-level bypass routes. Direct hostname resolution still uses the
+Direct DNS settings described above. Rejecting a hostname prevents its DNS
+query; explicit IP rejection is checked before opening a data socket.
 
-Windows and Android share these settings across accounts and use them for VPN,
-HTTP and SOCKS5 frontends, including traffic otherwise sent through a chain.
-Custom rules work without selecting a country. Address literals use address
-rules; hostnames use domain rules. VPN DNS observations associate matching names
-with addresses only within the existing bounded TTL/generation cache. Conflicting
-names sharing an address fall back to explicit IP/CIDR or GeoIP matching.
-Applications using their own encrypted DNS cannot be matched by hidden names;
-IP/CIDR matching remains available. Changing rules follows the existing reconnect
-and pending-settings workflow. An older Engine shows targets read-only.
-
-在 Windows 的 **设置 → 绕过虚拟网卡分流设置** 或 Android 的 **设置 → 绕过VPN分流设置**
-的 **自定义绕过目标** 中，每行填写一个 CIDR、IPv4/IPv6 地址或域名，点击
-**应用修改**。原高级设置里的 CIDR 会自动显示在这里。
-域名匹配自身及全部子域名；不接受 URL、端口、路径、通配符或正则表达式。
-错误行会阻止整份草稿保存。自定义规则无需下载国家规则即可工作，设置跨账号共享，
-适用于 Windows、Android 的 VPN 和 HTTP/SOCKS5 入口。直连域名使用当前的直连 DNS
-设置；应用自行使用加密 DNS 时只能按地址分流。请查看应用结果，必要时重新连接。
+在 **设置 → 分流设置** 中为目标选择 DIRECT、REJECT 或 PROXY，点击 **应用修改**。
+旧绕过目标自动迁移为 DIRECT；更具体的域名和更长的网段前缀优先。Ads 开关、冲突提示、
+重连生效及可见性边界见[分流规则与 Ads](ROUTING.md)。直连域名继续使用本页的直连 DNS 设置。
 
 ---
 

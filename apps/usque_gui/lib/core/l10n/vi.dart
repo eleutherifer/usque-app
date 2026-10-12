@@ -1,5 +1,7 @@
 /// Vietnamese UI catalog.
 const Map<String, String> kViCatalog = <String, String>{
+  'dns_doh_url': 'URL DoH',
+  'dns_invalid_doh_url': 'Nhập URL HTTPS DNS hợp lệ',
   'warp_dns_type': 'DNS WARP',
   'warp_dns_bootstrap_optional': 'Không bắt buộc',
   'warp_dns_plain': 'DNS thường',
@@ -49,7 +51,7 @@ const Map<String, String> kViCatalog = <String, String>{
   'profiles': 'Tài khoản',
   'profiles_subtitle': 'Chuyển đổi và quản lý tài khoản WARP.',
   'proxy': 'Proxy',
-  'proxy_subtitle': 'Đặt địa chỉ proxy và DNS dùng chung cho mọi tài khoản.',
+  'proxy_subtitle': 'Thiết lập địa chỉ lắng nghe và xác thực proxy dùng chung.',
   'settings': 'Cài đặt',
   'settings_subtitle': 'Cài đặt kết nối, proxy và ứng dụng.',
   'diagnostics': 'Chẩn đoán',
@@ -180,7 +182,7 @@ const Map<String, String> kViCatalog = <String, String>{
   'proxy_dns_system': 'DNS hệ thống',
   'dns_leak_warning': 'DNS cục bộ có thể lộ tên đã yêu cầu',
   'dns_leak_warning_body':
-      'DNS tùy chỉnh và DNS hệ thống không phân giải qua đường hầm, nên mạng hiện tại có thể thấy các tên miền bạn truy cập. Hãy dùng “Từ xa qua đường hầm” trừ khi bạn chấp nhận điều này.',
+      'DNS cục bộ và hệ thống có thể tiết lộ các miền được yêu cầu cho mạng hiện tại.',
   'system_proxy': 'Cấu hình proxy hệ thống',
   'output_disabled_in_profile': 'Đã tắt trong Cài đặt',
   'auto_connect': 'Tự kết nối tài khoản hiện tại khi khởi động',
@@ -203,11 +205,9 @@ const Map<String, String> kViCatalog = <String, String>{
   'proxy_password_set': 'Đã đặt mật khẩu. Nhập mật khẩu mới để thay thế.',
   'proxy_auth_clear': 'Bỏ bảo vệ bằng mật khẩu',
   'general': 'Chung',
-  'system_integration': 'Tích hợp hệ thống',
   'start_on_boot': 'Khởi chạy Usque khi bạn đăng nhập',
   'close_to_tray': 'Đóng cửa sổ về khay hệ thống',
   'add_quick_settings_tile': 'Thêm ô Cài đặt nhanh',
-  'appearance': 'Giao diện',
   'theme': 'Chủ đề',
   'theme_system': 'Hệ thống',
   'theme_light': 'Sáng',
@@ -266,13 +266,13 @@ const Map<String, String> kViCatalog = <String, String>{
   'advanced_subtitle': 'Endpoint, DNS, MTU, định tuyến và Kill Switch.',
   'advanced_warning':
       'Endpoint, SNI, DNS hoặc MTU sai có thể khiến đường hầm không kết nối được.',
-  'ip_dns': 'IP & DNS',
   'routing_protection': 'Định tuyến & bảo vệ',
   'transport': 'Truyền tải',
   'automatic': 'Tự động',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Chọn điểm cuối',
+  'endpoint_section': 'Điểm cuối',
   'endpoint_automatic': 'Tự động',
   'endpoint_custom': 'Tùy chỉnh',
   'endpoint_automatic_help':
@@ -350,7 +350,7 @@ const Map<String, String> kViCatalog = <String, String>{
       'Kiểm tra sự cố kết nối, xuất nhật ký và quản lý dữ liệu cục bộ.',
   'engine_status': 'Thông tin kết nối',
   'version': 'Phiên bản',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Nhật ký cục bộ',
   'export_diagnostics': 'Xuất gói chẩn đoán',
   'diagnostics_saved': 'Đã lưu gói chẩn đoán vào',
@@ -392,7 +392,7 @@ const Map<String, String> kViCatalog = <String, String>{
   'profile_required': 'Giữ ít nhất một tài khoản.',
   'socks_capabilities': 'TCP và UDP',
   'http_capabilities': 'CONNECT và chuyển tiếp thông thường',
-  'geo_direct': 'Cài đặt bỏ qua {tunnel}',
+  'geo_direct': 'Cài đặt bỏ qua',
   'bypass_custom': 'Đích bỏ qua tùy chỉnh',
   'bypass_countries': 'Quốc gia / khu vực',
   'bypass_targets_hint':
@@ -402,7 +402,7 @@ const Map<String, String> kViCatalog = <String, String>{
   'bypass_line_error': 'Dòng {line}: {reason}',
   'bypass_summary': '{countries} khu vực · {targets} đích tùy chỉnh',
   'geo_direct_help':
-      'Lưu lượng khớp các quy tắc này sẽ không qua VPN. Nhà cung cấp DNS của mạng hiện tại có thể thấy các tên miền được truy vấn. Ứng dụng dùng DNS mã hóa chỉ được định tuyến theo địa chỉ IP.',
+      'Lưu lượng khớp các quốc gia hoặc khu vực này bỏ qua VPN/TUN của Usque và proxy cục bộ HTTP cùng SOCKS5. Nhà cung cấp DNS của mạng hiện tại có thể thấy các tên miền được truy vấn. Ứng dụng dùng DNS mã hóa chỉ được định tuyến theo địa chỉ IP.',
   'geo_update_all': 'Cập nhật dữ liệu địa lý',
   'geo_last_updated': 'Lần cập nhật thành công gần nhất: {current}',
   'geo_never_updated': 'Chưa cập nhật',
@@ -648,4 +648,21 @@ const Map<String, String> kViCatalog = <String, String>{
   'dns_duplicate_address': 'Hãy xóa các địa chỉ IP trùng lặp.',
   'dns_address_not_allowed':
       'Có địa chỉ không dùng được để kết nối máy chủ DNS. Hãy dùng IP máy chủ do nhà cung cấp DNS cung cấp.',
+  "routing_rules": "Quy tắc định tuyến tùy chỉnh",
+  "routing_add": "Thêm quy tắc",
+  "routing_batch": "Dán nhiều quy tắc",
+  "routing_action": "Hành động",
+  "routing_target": "Tên miền, IP hoặc CIDR",
+  "routing_priority":
+      "Quy tắc cụ thể hơn được ưu tiên. Quy tắc tùy chỉnh ghi đè Ads và quốc gia; chặn IP vẫn có hiệu lực.",
+  "routing_conflict":
+      "Cùng một đích có hành động khác nhau. Hãy sửa các quy tắc.",
+  "routing_overlap": "Quy tắc cụ thể hơn ghi đè quy tắc rộng hơn.",
+  "routing_duplicate": "Quy tắc trùng lặp sẽ được gộp khi lưu.",
+  "routing_ads": "Ads · quảng cáo và theo dõi",
+  "routing_ads_ready": "Dữ liệu Ads đã sẵn sàng.",
+  "routing_ads_unavailable":
+      "Dữ liệu Ads không khả dụng. Kết nối và quy tắc tùy chỉnh vẫn hoạt động.",
+  "routing_pending": "Quy tắc đã tải áp dụng sau khi kết nối lại.",
+  'routing_current': "Kết nối hiện tại",
 };

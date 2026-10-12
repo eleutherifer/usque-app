@@ -1,5 +1,7 @@
 /// English UI catalog.
 const Map<String, String> kEnCatalog = <String, String>{
+  'dns_doh_url': 'DoH URL',
+  'dns_invalid_doh_url': 'Enter a valid HTTPS DNS URL',
   'warp_dns_type': 'WARP DNS',
   'warp_dns_bootstrap_optional': 'Optional',
   'warp_dns_plain': 'Plain DNS',
@@ -49,7 +51,7 @@ const Map<String, String> kEnCatalog = <String, String>{
   'profiles': 'Accounts',
   'profiles_subtitle': 'Switch and manage WARP accounts.',
   'proxy': 'Proxy',
-  'proxy_subtitle': 'Set proxy addresses and DNS for all accounts.',
+  'proxy_subtitle': 'Configure shared proxy listeners and authentication.',
   'settings': 'Settings',
   'settings_subtitle': 'Connection, proxy and application settings.',
   'diagnostics': 'Diagnostics',
@@ -178,7 +180,7 @@ const Map<String, String> kEnCatalog = <String, String>{
   'proxy_dns_system': 'System DNS',
   'dns_leak_warning': 'Local DNS may reveal requested names',
   'dns_leak_warning_body':
-      'Custom and system DNS do not resolve through the tunnel, so your current network may see the domains you visit. Use “Remote through tunnel” unless you accept this.',
+      'Local and system DNS may reveal requested domains to your current network.',
   'system_proxy': 'Configure system proxy',
   'output_disabled_in_profile': 'Disabled in Settings',
   'auto_connect': 'Connect the current account automatically on start',
@@ -201,11 +203,9 @@ const Map<String, String> kEnCatalog = <String, String>{
   'proxy_password_set': 'Password is set. Enter a new one to replace it.',
   'proxy_auth_clear': 'Remove password protection',
   'general': 'General',
-  'system_integration': 'System integration',
   'start_on_boot': 'Start Usque when you sign in',
   'close_to_tray': 'Close the window to the system tray',
   'add_quick_settings_tile': 'Add Quick Settings Tile',
-  'appearance': 'Appearance',
   'theme': 'Theme',
   'theme_system': 'System',
   'theme_light': 'Light',
@@ -266,13 +266,13 @@ const Map<String, String> kEnCatalog = <String, String>{
   'advanced_subtitle': 'Endpoints, DNS, MTU, routing, and Kill Switch.',
   'advanced_warning':
       'Incorrect endpoints, SNI, DNS, or MTU can prevent the tunnel from connecting.',
-  'ip_dns': 'IP & DNS',
   'routing_protection': 'Routing & protection',
   'transport': 'Transport',
   'automatic': 'Auto',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Endpoint selection',
+  'endpoint_section': 'Endpoint',
   'endpoint_automatic': 'Automatic',
   'endpoint_custom': 'Custom',
   'endpoint_automatic_help':
@@ -349,7 +349,7 @@ const Map<String, String> kEnCatalog = <String, String>{
       'Check connection problems, export logs and manage local data.',
   'engine_status': 'Connection information',
   'version': 'Version',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Local logs',
   'export_diagnostics': 'Export diagnostic bundle',
   'diagnostics_saved': 'Diagnostic bundle saved to',
@@ -391,7 +391,7 @@ const Map<String, String> kEnCatalog = <String, String>{
   'profile_required': 'Keep at least one account.',
   'socks_capabilities': 'TCP and UDP',
   'http_capabilities': 'CONNECT and ordinary forwarding',
-  'geo_direct': '{tunnel} bypass settings',
+  'geo_direct': 'Bypass settings',
   'bypass_custom': 'Custom bypass targets',
   'bypass_countries': 'Countries / regions',
   'bypass_targets_hint':
@@ -401,7 +401,7 @@ const Map<String, String> kEnCatalog = <String, String>{
   'bypass_line_error': 'Line {line}: {reason}',
   'bypass_summary': '{countries} regions · {targets} custom targets',
   'geo_direct_help':
-      'Traffic matching these countries or regions connects without the VPN. DNS providers on your current network may see the requested domains. Apps using encrypted DNS are matched by IP address only.',
+      'Traffic matching these countries or regions bypasses Usque VPN/TUN and the local HTTP and SOCKS5 proxies. DNS providers on your current network may see the requested domains. Apps using encrypted DNS are matched by IP address only.',
   'geo_update_all': 'Update geographic data',
   'geo_last_updated': 'Last successful update: {current}',
   'geo_never_updated': 'Not updated yet',
@@ -647,4 +647,21 @@ const Map<String, String> kEnCatalog = <String, String>{
   'dns_duplicate_address': 'Remove repeated IP addresses.',
   'dns_address_not_allowed':
       'One of these addresses cannot be used to connect to a DNS server. Use the server IPs supplied by your DNS provider.',
+  "routing_rules": "Custom routing rules",
+  "routing_add": "Add rule",
+  "routing_batch": "Paste rules",
+  "routing_action": "Action",
+  "routing_target": "Domain, IP or CIDR",
+  "routing_priority":
+      "More specific rules win. Custom rules override Ads and countries; IP rejection still applies.",
+  "routing_conflict":
+      "Different actions for the same target. Edit these rules.",
+  "routing_overlap": "The more specific rule overrides the broader rule.",
+  "routing_duplicate": "Duplicate rules will be merged.",
+  "routing_ads": "Ads · advertising and tracking",
+  "routing_ads_ready": "Ads data is ready.",
+  "routing_ads_unavailable":
+      "Ads unavailable. Connections and custom rules remain available.",
+  "routing_pending": "Downloaded rules apply after reconnecting.",
+  'routing_current': "Current connection",
 };

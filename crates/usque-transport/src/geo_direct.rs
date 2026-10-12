@@ -27,6 +27,17 @@ const MAX_DIRECT_ADDRESSES: usize = 16;
 pub enum GeoRoute {
     Tunnel,
     Direct,
+    Reject,
+}
+
+impl From<usque_core::RoutingAction> for GeoRoute {
+    fn from(action: usque_core::RoutingAction) -> Self {
+        match action {
+            usque_core::RoutingAction::Direct => Self::Direct,
+            usque_core::RoutingAction::Reject => Self::Reject,
+            usque_core::RoutingAction::Proxy => Self::Tunnel,
+        }
+    }
 }
 
 /// Read-only Geo matching interface used by [`GeoDirectPolicy`].
@@ -60,8 +71,13 @@ impl GeoDirectClassifier for GeoClassifier {
 pub struct GeoDirectPolicy {
     classifier: Option<Arc<dyn GeoDirectClassifier>>,
     countries: Vec<CountryCode>,
+    allow_lan: bool,
     networks: Vec<usque_core::config::IpNet>,
     domains: Vec<String>,
+    routing: usque_core::RoutingSettings,
+    routing_networks: Vec<(usque_core::config::IpNet, usque_core::RoutingAction)>,
+    routing_domains: Vec<(String, usque_core::RoutingAction)>,
+    ads: Option<Arc<usque_geo::AdsRules>>,
 }
 
 impl Default for GeoDirectPolicy {
@@ -76,8 +92,13 @@ impl GeoDirectPolicy {
         Self {
             classifier: None,
             countries: Vec::new(),
+            allow_lan: false,
             networks: Vec::new(),
             domains: Vec::new(),
+            routing: Default::default(),
+            routing_networks: Vec::new(),
+            routing_domains: Vec::new(),
+            ads: None,
         }
     }
 
@@ -126,8 +147,13 @@ impl GeoDirectPolicy {
         Self {
             classifier: Some(classifier),
             countries: countries.into_iter().collect(),
+            allow_lan: false,
             networks: Vec::new(),
             domains: Vec::new(),
+            routing: Default::default(),
+            routing_networks: Vec::new(),
+            routing_domains: Vec::new(),
+            ads: None,
         }
     }
 
@@ -136,9 +162,93 @@ impl GeoDirectPolicy {
         mut self,
         profile: &usque_core::Profile,
     ) -> Result<Self, usque_core::ConfigError> {
+        self.allow_lan = profile.allow_lan;
         self.domains = usque_core::config::normalize_bypass_domains(&profile.bypass_domains)?;
         self.networks = profile.split_exclusions.clone();
+        self.routing = profile.routing.normalized()?;
+        self.routing_networks.clear();
+        self.routing_domains.clear();
+        for rule in &self.routing.rules {
+            match rule.kind {
+                usque_core::RoutingMatch::Cidr => self.routing_networks.push((
+                    rule.target
+                        .parse()
+                        .map_err(|_| usque_core::ConfigError::InvalidRoutingRule(rule.id))?,
+                    rule.action,
+                )),
+                usque_core::RoutingMatch::Domain => self
+                    .routing_domains
+                    .push((rule.target.clone(), rule.action)),
+            }
+        }
+        self.routing_networks
+            .sort_by_key(|(net, _)| std::cmp::Reverse(net.prefix_len()));
+        self.routing_domains
+            .sort_by_key(|(domain, _)| std::cmp::Reverse(domain.len()));
         Ok(self)
+    }
+
+    pub fn with_ads(mut self, cache_dir: &Path) -> Self {
+        if self.routing.ads_enabled {
+            self.ads = usque_geo::AdsRules::load(cache_dir).ok().map(Arc::new);
+        }
+        self
+    }
+
+    pub fn ads_revision(&self) -> Option<&str> {
+        self.ads.as_ref().map(|ads| ads.revision())
+    }
+    pub fn needs_direct_dns(&self) -> bool {
+        !self.countries.is_empty() || !self.domains.is_empty() || self.routing.has_direct_domains()
+    }
+    pub fn has_direct_routes(&self) -> bool {
+        self.allow_lan
+            || !self.countries.is_empty()
+            || !self.networks.is_empty()
+            || !self.domains.is_empty()
+            || self.routing.has_direct_rules()
+    }
+    pub(crate) fn has_ip_rules(&self) -> bool {
+        self.allow_lan || !self.routing_networks.is_empty()
+    }
+    pub(crate) fn custom_host(&self, host: &str) -> Option<GeoRoute> {
+        let host = usque_core::config::canonical_bypass_domain(host)?;
+        self.routing_domains
+            .iter()
+            .find(|(domain, _)| {
+                host == *domain
+                    || host
+                        .strip_suffix(domain.as_str())
+                        .is_some_and(|prefix| prefix.ends_with('.'))
+            })
+            .map(|(_, action)| (*action).into())
+    }
+    pub(crate) fn custom_ip(&self, ip: IpAddr) -> Option<GeoRoute> {
+        let ip = ip.to_canonical();
+        self.routing_networks
+            .iter()
+            .find(|(net, _)| net.contains(&ip))
+            .map(|(_, action)| (*action).into())
+    }
+    pub(crate) fn rejects_ip(&self, ip: IpAddr) -> bool {
+        self.custom_ip(ip) == Some(GeoRoute::Reject)
+    }
+    pub(crate) fn resolved_route(&self, host: &str, ip: IpAddr) -> GeoRoute {
+        if self.rejects_ip(ip) {
+            return GeoRoute::Reject;
+        }
+        if let Some(route) = self.custom_host(host) {
+            return route;
+        }
+        if let Some(route) = self.custom_ip(ip) {
+            return route;
+        }
+        let route = self.route_host(host);
+        if route != GeoRoute::Reject && self.is_lan_direct(ip) {
+            GeoRoute::Direct
+        } else {
+            route
+        }
     }
 
     /// Returns the configured country codes in their caller-provided order.
@@ -146,15 +256,26 @@ impl GeoDirectPolicy {
         &self.countries
     }
 
-    /// Returns whether this policy can select a direct route.
+    /// Returns whether LAN bypass, application routing or Ads was configured.
     pub fn is_enabled(&self) -> bool {
-        (self.classifier.is_some() && !self.countries.is_empty())
+        self.allow_lan
+            || (self.classifier.is_some() && !self.countries.is_empty())
             || !self.networks.is_empty()
             || !self.domains.is_empty()
+            || !self.routing.rules.is_empty()
+            || self.routing.ads_enabled
     }
 
     /// Selects a route for a hostname using custom suffixes and GeoSite.
     pub fn route_host(&self, host: &str) -> GeoRoute {
+        let canonical = usque_core::config::canonical_bypass_domain(host);
+        let host = canonical.as_deref().unwrap_or(host);
+        if let Some(route) = self.custom_host(host) {
+            return route;
+        }
+        if self.ads.as_ref().is_some_and(|ads| ads.contains(host)) {
+            return GeoRoute::Reject;
+        }
         if !self.domains.is_empty()
             && let Some(host) = usque_core::config::canonical_bypass_domain(host)
             && self.domains.iter().any(|domain| {
@@ -183,9 +304,13 @@ impl GeoDirectPolicy {
         }
     }
 
-    /// Selects a route for an IP literal using explicit networks and GeoIP.
+    /// Selects a route using explicit rules, LAN bypass, then networks and GeoIP.
     pub fn route_ip(&self, ip: IpAddr) -> GeoRoute {
-        if self.networks.iter().any(|network| network.contains(&ip)) {
+        let ip = ip.to_canonical();
+        if let Some(route) = self.custom_ip(ip) {
+            return route;
+        }
+        if self.is_lan_direct(ip) || self.networks.iter().any(|network| network.contains(&ip)) {
             return GeoRoute::Direct;
         }
         let Some(classifier) = &self.classifier else {
@@ -203,6 +328,10 @@ impl GeoDirectPolicy {
         } else {
             GeoRoute::Tunnel
         }
+    }
+
+    fn is_lan_direct(&self, ip: IpAddr) -> bool {
+        self.allow_lan && usque_core::config::is_lan_bypass_address(ip)
     }
 }
 
@@ -342,10 +471,12 @@ enum DirectFallback<T> {
     Direct(TcpStream, DirectEgressLease),
     Fallback(T),
     EncryptedDnsFailed,
+    Rejected,
 }
 
 enum DirectConnectFailure {
     Dns,
+    Rejected,
     Connect(Vec<IpAddr>),
 }
 
@@ -363,10 +494,14 @@ where
     F: FnOnce(Option<Vec<IpAddr>>) -> Fut,
     Fut: Future<Output = Result<T, E>>,
 {
+    if target.route(policy) == GeoRoute::Reject {
+        return Ok(DirectFallback::Rejected);
+    }
     let mut resolved = None;
     if target.route(policy) == GeoRoute::Direct {
-        match connect_direct(protector, target, port).await {
+        match connect_direct(protector, target, port, policy).await {
             Ok((stream, lease)) => return Ok(DirectFallback::Direct(stream, lease)),
+            Err(DirectConnectFailure::Rejected) => return Ok(DirectFallback::Rejected),
             Err(DirectConnectFailure::Dns) if protector.direct_dns_resolver().is_some() => {
                 return Ok(DirectFallback::EncryptedDnsFailed);
             }
@@ -386,19 +521,101 @@ where
     fallback(resolved).await.map(DirectFallback::Fallback)
 }
 
+/// System direct-DNS failure retains the old tunnel-resolution fallback, but
+/// every returned address is still checked. Encrypted DNS failures are terminal.
+pub(crate) async fn resolve_routing_host(
+    policy: &GeoDirectPolicy,
+    protector: &dyn SocketProtector,
+    resolver: &crate::dns::Resolver,
+    host: &str,
+    port: u16,
+) -> Result<(Vec<IpAddr>, bool), String> {
+    let direct = policy.route_host(host) == GeoRoute::Direct;
+    if direct {
+        match crate::split_dns::resolve_direct_routed(protector, host, port, policy).await {
+            Ok(addresses) => {
+                return Ok((
+                    addresses.into_iter().map(|address| address.ip()).collect(),
+                    false,
+                ));
+            }
+            Err(error)
+                if error == "routing_rejected" || protector.direct_dns_resolver().is_some() =>
+            {
+                return Err(error);
+            }
+            Err(_) => {}
+        }
+    }
+    resolver
+        .resolve_for_policy(host)
+        .await
+        .map(|addresses| (addresses, direct))
+        .map_err(|error| error.to_string())
+}
+
 pub(crate) async fn connect_routed<E, F, Fut>(
     policy: &GeoDirectPolicy,
     protector: &dyn SocketProtector,
     counters: Arc<TrafficCounters>,
-    destination: (GeoTarget<'_>, u16),
-    encrypted_dns_failure: impl FnOnce() -> E,
+    destination: (GeoTarget<'_>, u16, Option<&crate::dns::Resolver>),
+    failures: (impl FnOnce() -> E, impl Fn() -> E),
     tunnel: F,
 ) -> Result<RoutedTcpStream, E>
 where
     F: FnOnce(Option<Vec<IpAddr>>) -> Fut,
     Fut: Future<Output = Result<TunnelTcpStream, E>>,
 {
-    let (target, port) = destination;
+    let (target, port, resolver) = destination;
+    let (encrypted_dns_failure, rejected) = failures;
+    if target.route(policy) == GeoRoute::Reject {
+        return Err(rejected());
+    }
+    if policy.has_ip_rules()
+        && let GeoTarget::Host(host) = target
+    {
+        let Some(resolver) = resolver else {
+            return Err(rejected());
+        };
+        let (addresses, tunnel_only) =
+            match resolve_routing_host(policy, protector, resolver, host, port).await {
+                Ok(result) => result,
+                Err(error) if error.contains("routing_rejected") => return Err(rejected()),
+                Err(_) => return Err(encrypted_dns_failure()),
+            };
+        let mut allowed = Vec::new();
+        for ip in addresses
+            .into_iter()
+            .filter(|ip| !policy.rejects_ip(*ip))
+            .take(MAX_DIRECT_ADDRESSES)
+        {
+            let route = if tunnel_only {
+                GeoRoute::Tunnel
+            } else {
+                policy.resolved_route(host, ip)
+            };
+            match route {
+                GeoRoute::Reject => continue,
+                GeoRoute::Direct => {
+                    if let Ok((stream, lease)) =
+                        connect_direct_ip(protector, SocketAddr::new(ip, port)).await
+                    {
+                        return Ok(RoutedTcpStream::Direct {
+                            stream,
+                            counters,
+                            _lease: lease,
+                        });
+                    }
+                }
+                GeoRoute::Tunnel => {}
+            }
+            allowed.push(ip);
+        }
+        if allowed.is_empty() {
+            return Err(rejected());
+        }
+        return tunnel(Some(allowed)).await.map(RoutedTcpStream::Tunnel);
+    }
     connect_with_geo_fallback(policy, protector, target, port, tunnel)
         .await
         .and_then(|stream| match stream {
@@ -409,6 +626,7 @@ where
             }),
             DirectFallback::Fallback(stream) => Ok(RoutedTcpStream::Tunnel(stream)),
             DirectFallback::EncryptedDnsFailed => Err(encrypted_dns_failure()),
+            DirectFallback::Rejected => Err(rejected()),
         })
 }
 
@@ -416,12 +634,20 @@ async fn connect_direct(
     protector: &dyn SocketProtector,
     target: GeoTarget<'_>,
     port: u16,
+    policy: &GeoDirectPolicy,
 ) -> Result<(TcpStream, DirectEgressLease), DirectConnectFailure> {
     let addresses = match target {
-        GeoTarget::Host(host) => protector
-            .resolve_direct(host, port)
-            .await
-            .map_err(|_| DirectConnectFailure::Dns)?,
+        GeoTarget::Host(host) => {
+            crate::split_dns::resolve_direct_routed(protector, host, port, policy)
+                .await
+                .map_err(|error| {
+                    if error == "routing_rejected" {
+                        DirectConnectFailure::Rejected
+                    } else {
+                        DirectConnectFailure::Dns
+                    }
+                })?
+        }
         GeoTarget::Ip(ip) => vec![SocketAddr::new(ip, port)],
     };
     let addresses = addresses
@@ -512,6 +738,74 @@ pub(crate) async fn bind_direct_udp(
 }
 
 #[cfg(test)]
+pub(crate) fn lan_test_policy(allow_lan: bool) -> GeoDirectPolicy {
+    GeoDirectPolicy::disabled()
+        .with_custom_rules(&usque_core::Profile {
+            allow_lan,
+            ..Default::default()
+        })
+        .unwrap()
+}
+
+/// Records physical attempts but refuses them before any network I/O.
+#[cfg(test)]
+#[derive(Default)]
+pub(crate) struct LanProbeProtector {
+    pub(crate) attempts: std::sync::Mutex<Vec<(SocketAddr, DirectProtocol)>>,
+}
+
+#[cfg(test)]
+#[async_trait::async_trait]
+impl SocketProtector for LanProbeProtector {
+    fn protect(&self, _socket: crate::socket::SocketHandle) -> Result<(), String> {
+        Ok(())
+    }
+
+    fn resolve(&self, _host: &str, _port: u16) -> Result<Vec<SocketAddr>, String> {
+        Err("test forbids physical DNS".into())
+    }
+
+    async fn protect_for_target(
+        &self,
+        _socket: crate::socket::SocketHandle,
+        remote: SocketAddr,
+        protocol: DirectProtocol,
+    ) -> Result<DirectEgressLease, String> {
+        self.attempts.lock().unwrap().push((remote, protocol));
+        Err("test direct protection rejection".into())
+    }
+}
+
+#[cfg(test)]
+pub(crate) fn routing_test_policy(
+    entries: &[(&str, usque_core::RoutingAction)],
+) -> GeoDirectPolicy {
+    let profile = usque_core::Profile {
+        allow_lan: false,
+        routing: usque_core::RoutingSettings {
+            rules: entries
+                .iter()
+                .map(|(target, action)| usque_core::RoutingRule {
+                    id: uuid::Uuid::new_v4(),
+                    kind: if target.contains('/') || target.parse::<IpAddr>().is_ok() {
+                        usque_core::RoutingMatch::Cidr
+                    } else {
+                        usque_core::RoutingMatch::Domain
+                    },
+                    target: (*target).into(),
+                    action: *action,
+                })
+                .collect(),
+            ads_enabled: false,
+        },
+        ..Default::default()
+    };
+    GeoDirectPolicy::disabled()
+        .with_custom_rules(&profile)
+        .unwrap()
+}
+
+#[cfg(test)]
 mod tests {
     use std::net::{IpAddr, Ipv4Addr, SocketAddr};
     use std::sync::Arc;
@@ -520,7 +814,7 @@ mod tests {
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
     use super::{
-        CountryCode, GeoDirectClassifier, GeoDirectPolicy, GeoRoute, GeoTarget,
+        CountryCode, DirectFallback, GeoDirectClassifier, GeoDirectPolicy, GeoRoute, GeoTarget,
         connect_with_geo_fallback,
     };
     use crate::socket::{SocketHandle, SocketProtector};
@@ -574,6 +868,284 @@ mod tests {
     }
 
     #[test]
+    fn allow_lan_matches_only_private_and_link_local_ranges_in_both_families() {
+        for allow_lan in [false, true] {
+            let policy = super::lan_test_policy(allow_lan);
+            assert_eq!(policy.is_enabled(), allow_lan);
+            assert_eq!(policy.has_direct_routes(), allow_lan);
+            assert_eq!(policy.has_ip_rules(), allow_lan);
+            assert!(!policy.needs_direct_dns());
+            for ip in [
+                "10.0.0.0",
+                "10.255.255.255",
+                "172.16.0.0",
+                "172.31.255.255",
+                "192.168.0.0",
+                "192.168.255.255",
+                "169.254.0.0",
+                "169.254.255.255",
+                "fc00::",
+                "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+                "fe80::",
+                "febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+                "::ffff:192.168.1.10",
+            ] {
+                let expected = if allow_lan {
+                    GeoRoute::Direct
+                } else {
+                    GeoRoute::Tunnel
+                };
+                assert_eq!(policy.route_ip(ip.parse().unwrap()), expected, "{ip}");
+                assert_eq!(
+                    policy.resolved_route("nas.example", ip.parse().unwrap()),
+                    expected,
+                    "{ip}"
+                );
+            }
+            for ip in [
+                "9.255.255.255",
+                "11.0.0.0",
+                "172.15.255.255",
+                "172.32.0.0",
+                "192.167.255.255",
+                "192.169.0.0",
+                "169.253.255.255",
+                "169.255.0.0",
+                "100.64.0.1",
+                "127.0.0.1",
+                "0.0.0.0",
+                "224.0.0.1",
+                "fbff::1",
+                "fe00::1",
+                "fe7f::1",
+                "fec0::1",
+                "2001:db8::1",
+                "::1",
+                "ff02::1",
+                "::ffff:1.1.1.1",
+            ] {
+                assert_eq!(
+                    policy.route_ip(ip.parse().unwrap()),
+                    GeoRoute::Tunnel,
+                    "{ip}"
+                );
+                assert_eq!(
+                    policy.resolved_route("public.example", ip.parse().unwrap()),
+                    GeoRoute::Tunnel,
+                    "{ip}"
+                );
+            }
+            assert_eq!(policy.route_host("nas.example"), GeoRoute::Tunnel);
+        }
+    }
+
+    #[test]
+    fn allow_lan_preserves_explicit_domain_and_address_rules() {
+        use usque_core::RoutingAction::{Proxy, Reject};
+        let mut policy = super::routing_test_policy(&[
+            ("192.168.1.0/24", Reject),
+            ("192.168.1.7", Proxy),
+            ("fd00::/8", Proxy),
+            ("proxy.example", Proxy),
+            ("blocked.example", Reject),
+        ]);
+        policy.allow_lan = true;
+        for (ip, expected) in [
+            ("192.168.1.8", GeoRoute::Reject),
+            ("::ffff:192.168.1.8", GeoRoute::Reject),
+            ("192.168.1.7", GeoRoute::Tunnel),
+            ("fd00::1", GeoRoute::Tunnel),
+        ] {
+            assert_eq!(policy.route_ip(ip.parse().unwrap()), expected);
+            assert_eq!(
+                policy.resolved_route("nas.example", ip.parse().unwrap()),
+                expected
+            );
+        }
+        assert_eq!(
+            policy.resolved_route("proxy.example", "10.0.0.2".parse().unwrap()),
+            GeoRoute::Tunnel
+        );
+        assert_eq!(
+            policy.resolved_route("blocked.example", "10.0.0.2".parse().unwrap()),
+            GeoRoute::Reject
+        );
+        assert_eq!(
+            policy.resolved_route("proxy.example", "192.168.1.8".parse().unwrap()),
+            GeoRoute::Reject
+        );
+    }
+
+    #[tokio::test]
+    async fn allow_lan_checks_tunnel_dns_answers_without_physical_resolution() {
+        use tokio_util::task::AbortOnDropHandle;
+        use ts_netstack_smoltcp::CreateSocket;
+        use ts_netstack_smoltcp::netcore::{HasChannel, NetstackControl};
+
+        let (client, server) = ts_netstack_smoltcp::piped_pair(Default::default());
+        let client_channel = client.command_channel();
+        let server_channel = server.command_channel();
+        let _client_task = AbortOnDropHandle::new(client.spawn_tokio());
+        let _server_task = AbortOnDropHandle::new(server.spawn_tokio());
+        let client_ip: Ipv4Addr = "192.0.2.1".parse().unwrap();
+        let dns_ip: IpAddr = "203.0.113.53".parse().unwrap();
+        client_channel.set_ips([client_ip.into()]).await.unwrap();
+        server_channel.set_ips([dns_ip]).await.unwrap();
+        let dns = server_channel
+            .udp_bind(SocketAddr::new(dns_ip, 53))
+            .await
+            .unwrap();
+        let _dns_task = AbortOnDropHandle::new(tokio::spawn(async move {
+            for _ in 0..2 {
+                let (from, query) = dns.recv_from_bytes().await.unwrap();
+                let value = match &query[query.len() - 4..query.len() - 2] {
+                    [0, 1] => "10.0.0.2".parse::<Ipv4Addr>().unwrap().octets().to_vec(),
+                    [0, 28] => "fd00::2"
+                        .parse::<std::net::Ipv6Addr>()
+                        .unwrap()
+                        .octets()
+                        .to_vec(),
+                    _ => panic!("unexpected DNS type"),
+                };
+                let mut reply = query.to_vec();
+                reply[2..4].copy_from_slice(&[0x81, 0x80]);
+                reply[6..8].copy_from_slice(&1_u16.to_be_bytes());
+                reply.extend_from_slice(&[0xc0, 0x0c]);
+                reply.extend_from_slice(&query[query.len() - 4..]);
+                reply.extend_from_slice(&60_u32.to_be_bytes());
+                reply.extend_from_slice(&(value.len() as u16).to_be_bytes());
+                reply.extend(value);
+                dns.send_to(from, &reply).await.unwrap();
+            }
+        }));
+        let policy = Arc::new(super::lan_test_policy(true));
+        let protector = Arc::new(super::LanProbeProtector::default());
+        let resolver = crate::dns::Resolver::new(
+            client_channel,
+            client_ip,
+            std::net::Ipv6Addr::UNSPECIFIED,
+            vec![dns_ip],
+            usque_core::ProxyDnsMode::Remote,
+            protector.clone(),
+        )
+        .with_routing(policy.clone());
+        let expected: Vec<IpAddr> = vec!["10.0.0.2".parse().unwrap(), "fd00::2".parse().unwrap()];
+        let checked = expected.clone();
+        let result = tokio::time::timeout(
+            std::time::Duration::from_secs(2),
+            super::connect_routed(
+                &policy,
+                protector.as_ref(),
+                Arc::default(),
+                (GeoTarget::Host("nas.example"), 8080, Some(&resolver)),
+                (|| "dns_failed", || "rejected"),
+                |addresses| async move {
+                    assert_eq!(addresses, Some(checked));
+                    Err("protected_fallback")
+                },
+            ),
+        )
+        .await
+        .unwrap();
+        assert!(matches!(result, Err("protected_fallback")));
+        assert_eq!(
+            *protector.attempts.lock().unwrap(),
+            expected
+                .into_iter()
+                .map(|ip| (
+                    SocketAddr::new(ip, 8080),
+                    crate::socket::DirectProtocol::Tcp
+                ))
+                .collect::<Vec<_>>()
+        );
+    }
+
+    #[tokio::test]
+    async fn rejected_resolved_addresses_cannot_open_a_direct_socket_or_fall_back() {
+        use ts_netstack_smoltcp::netcore::HasChannel;
+        let (stack, _pipe) = crate::netstack::bounded_piped(Default::default());
+        let resolver = crate::dns::Resolver::new(
+            stack.command_channel(),
+            Ipv4Addr::UNSPECIFIED,
+            std::net::Ipv6Addr::UNSPECIFIED,
+            vec![],
+            usque_core::ProxyDnsMode::Remote,
+            Arc::new(crate::socket::NoopSocketProtector),
+        );
+        let policy = super::routing_test_policy(&[
+            ("direct.test", usque_core::RoutingAction::Direct),
+            ("192.0.2.0/24", usque_core::RoutingAction::Reject),
+        ]);
+        for address in ["192.0.2.17:443", "[::ffff:192.0.2.17]:443"] {
+            let protector = FakeProtector {
+                resolved: address.parse().unwrap(),
+                reject_protect: true,
+                protect_calls: AtomicUsize::new(0),
+                resolve_calls: AtomicUsize::new(0),
+            };
+            let fallback = AtomicBool::new(false);
+            let result = super::connect_routed(
+                &policy,
+                &protector,
+                Arc::default(),
+                (GeoTarget::Host("direct.test"), 443, Some(&resolver)),
+                (|| "dns_failed", || "rejected"),
+                |_| async {
+                    fallback.store(true, Ordering::SeqCst);
+                    Err("fallback")
+                },
+            )
+            .await;
+            assert!(matches!(result, Err("rejected")));
+            assert!(!fallback.load(Ordering::SeqCst));
+            assert_eq!(protector.protect_calls.load(Ordering::SeqCst), 0);
+            assert_eq!(protector.resolve_calls.load(Ordering::SeqCst), 1);
+        }
+    }
+
+    #[tokio::test]
+    async fn rejected_targets_never_resolve_or_enter_fallback() {
+        use usque_core::RoutingAction::{Direct, Proxy, Reject};
+        let policy = super::routing_test_policy(&[
+            ("example.test", Direct),
+            ("ads.example.test", Reject),
+            ("proxy.example.test", Proxy),
+            ("192.0.2.0/24", Reject),
+            ("192.0.2.7", Direct),
+        ]);
+        for target in [
+            GeoTarget::Host("ads.example.test"),
+            GeoTarget::Ip("192.0.2.8".parse().unwrap()),
+        ] {
+            let result = connect_with_geo_fallback(
+                &policy,
+                &crate::socket::NoopSocketProtector,
+                target,
+                443,
+                |_| async { Err::<(), ()>(()) },
+            )
+            .await
+            .unwrap();
+            assert!(matches!(result, DirectFallback::Rejected));
+        }
+        assert_eq!(
+            policy.resolved_route("example.test", "192.0.2.8".parse().unwrap()),
+            GeoRoute::Reject
+        );
+        assert_eq!(
+            policy.resolved_route("proxy.example.test", "192.0.2.7".parse().unwrap()),
+            GeoRoute::Tunnel
+        );
+        assert_eq!(
+            policy.route_ip("192.0.2.7".parse().unwrap()),
+            GeoRoute::Direct
+        );
+        let reject_only = super::routing_test_policy(&[("ads.test", Reject)]);
+        assert!(!reject_only.needs_direct_dns());
+        assert!(!reject_only.has_direct_routes());
+    }
+
+    #[test]
     fn custom_targets_work_without_geo_and_match_label_and_network_boundaries() {
         let profile = usque_core::Profile {
             bypass_domains: vec!["Example.COM.".into(), "bücher.example".into()],
@@ -611,7 +1183,10 @@ mod tests {
             assert_eq!(policy.route_ip(ip.parse().unwrap()), GeoRoute::Tunnel);
         }
         let removed = GeoDirectPolicy::disabled()
-            .with_custom_rules(&usque_core::Profile::default())
+            .with_custom_rules(&usque_core::Profile {
+                allow_lan: false,
+                ..Default::default()
+            })
             .unwrap();
         assert!(!removed.is_enabled());
         assert_eq!(removed.route_host("example.com"), GeoRoute::Tunnel);

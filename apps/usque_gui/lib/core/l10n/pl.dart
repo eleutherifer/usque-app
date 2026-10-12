@@ -1,5 +1,7 @@
 /// Polish UI catalog.
 const Map<String, String> kPlCatalog = <String, String>{
+  'dns_doh_url': 'Adres URL DoH',
+  'dns_invalid_doh_url': 'Wpisz prawidłowy adres URL HTTPS DNS',
   'warp_dns_type': 'DNS WARP',
   'warp_dns_bootstrap_optional': 'Opcjonalnie',
   'warp_dns_plain': 'Zwykły DNS',
@@ -49,7 +51,8 @@ const Map<String, String> kPlCatalog = <String, String>{
   'profiles': 'Konta',
   'profiles_subtitle': 'Przełączanie i zarządzanie kontami WARP.',
   'proxy': 'Proxy',
-  'proxy_subtitle': 'Ustaw adresy proxy i DNS wspólne dla wszystkich kont.',
+  'proxy_subtitle':
+      'Skonfiguruj wspólne adresy nasłuchiwania i uwierzytelnianie proxy.',
   'settings': 'Ustawienia',
   'settings_subtitle': 'Ustawienia połączenia, proxy i aplikacji.',
   'diagnostics': 'Diagnostyka',
@@ -182,7 +185,7 @@ const Map<String, String> kPlCatalog = <String, String>{
   'proxy_dns_system': 'Systemowy DNS',
   'dns_leak_warning': 'Lokalny DNS może ujawnić żądane nazwy',
   'dns_leak_warning_body':
-      'Niestandardowy i systemowy DNS nie rozwiązują nazw przez tunel, więc bieżąca sieć może widzieć odwiedzane przez Ciebie domeny. Używaj „Zdalnie przez tunel”, chyba że to akceptujesz.',
+      'Lokalny i systemowy DNS mogą ujawniać żądane domeny bieżącej sieci.',
   'system_proxy': 'Konfiguruj systemowe proxy',
   'output_disabled_in_profile': 'Wyłączone w Ustawieniach',
   'auto_connect': 'Łącz automatycznie bieżące konto przy uruchomieniu',
@@ -206,11 +209,9 @@ const Map<String, String> kPlCatalog = <String, String>{
   'proxy_password_set': 'Hasło jest ustawione. Wpisz nowe, aby je zastąpić.',
   'proxy_auth_clear': 'Usuń ochronę hasłem',
   'general': 'Ogólne',
-  'system_integration': 'Integracja z systemem',
   'start_on_boot': 'Uruchamiaj Usque przy logowaniu',
   'close_to_tray': 'Zamykaj okno do zasobnika systemowego',
   'add_quick_settings_tile': 'Dodaj kafelek Szybkich ustawień',
-  'appearance': 'Wygląd',
   'theme': 'Motyw',
   'theme_system': 'Systemowy',
   'theme_light': 'Jasny',
@@ -272,13 +273,13 @@ const Map<String, String> kPlCatalog = <String, String>{
   'advanced_subtitle': 'Punkty końcowe, DNS, MTU, trasowanie i Kill Switch.',
   'advanced_warning':
       'Nieprawidłowe punkty końcowe, SNI, DNS lub MTU mogą uniemożliwić połączenie tunelu.',
-  'ip_dns': 'IP i DNS',
   'routing_protection': 'Trasowanie i ochrona',
   'transport': 'Transport',
   'automatic': 'Auto',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Wybór punktu końcowego',
+  'endpoint_section': 'Punkt końcowy',
   'endpoint_automatic': 'Automatyczny',
   'endpoint_custom': 'Własny',
   'endpoint_automatic_help':
@@ -356,7 +357,7 @@ const Map<String, String> kPlCatalog = <String, String>{
       'Sprawdzaj problemy z połączeniem, eksportuj dzienniki i zarządzaj danymi lokalnymi.',
   'engine_status': 'Informacje o połączeniu',
   'version': 'Wersja',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Dzienniki lokalne',
   'export_diagnostics': 'Eksportuj pakiet diagnostyczny',
   'diagnostics_saved': 'Pakiet diagnostyczny zapisano w',
@@ -399,7 +400,7 @@ const Map<String, String> kPlCatalog = <String, String>{
   'profile_required': 'Zachowaj co najmniej jedno konto.',
   'socks_capabilities': 'TCP i UDP',
   'http_capabilities': 'CONNECT i zwykłe przekazywanie',
-  'geo_direct': 'Ustawienia omijania {tunnel}',
+  'geo_direct': 'Ustawienia omijania',
   'bypass_custom': 'Własne cele omijania',
   'bypass_countries': 'Kraje / regiony',
   'bypass_targets_hint':
@@ -409,7 +410,7 @@ const Map<String, String> kPlCatalog = <String, String>{
   'bypass_line_error': 'Wiersz {line}: {reason}',
   'bypass_summary': 'Regiony: {countries} · Własne cele: {targets}',
   'geo_direct_help':
-      'Ruch pasujący do tych krajów lub regionów omija VPN. Dostawca DNS bieżącej sieci może widzieć żądane domeny. Aplikacje z szyfrowanym DNS są dopasowywane wyłącznie według IP.',
+      'Ruch pasujący do tych krajów lub regionów omija VPN/TUN Usque oraz lokalne proxy HTTP i SOCKS5. Dostawca DNS bieżącej sieci może widzieć żądane domeny. Aplikacje z szyfrowanym DNS są dopasowywane wyłącznie według IP.',
   'geo_update_all': 'Aktualizuj dane geo',
   'geo_last_updated': 'Ostatnia udana aktualizacja: {current}',
   'geo_never_updated': 'Jeszcze nie zaktualizowano',
@@ -662,4 +663,20 @@ const Map<String, String> kPlCatalog = <String, String>{
   'dns_duplicate_address': 'Usuń powtarzające się adresy IP.',
   'dns_address_not_allowed':
       'Jednego z adresów nie można użyć do połączenia z serwerem DNS. Użyj adresów IP podanych przez dostawcę DNS.',
+  "routing_rules": "Własne reguły routingu",
+  "routing_add": "Dodaj regułę",
+  "routing_batch": "Wklej reguły",
+  "routing_action": "Działanie",
+  "routing_target": "Domena, IP lub CIDR",
+  "routing_priority":
+      "Dokładniejsza reguła ma pierwszeństwo. Własne reguły zastępują Ads i kraje; blokada IP nadal obowiązuje.",
+  "routing_conflict": "Różne działania dla tego samego celu. Popraw te reguły.",
+  "routing_overlap": "Dokładniejsza reguła zastępuje szerszą.",
+  "routing_duplicate": "Duplikaty zostaną połączone przy zapisie.",
+  "routing_ads": "Ads · reklamy i śledzenie",
+  "routing_ads_ready": "Dane Ads są dostępne.",
+  "routing_ads_unavailable":
+      "Dane Ads są niedostępne. Połączenia i własne reguły nadal działają.",
+  "routing_pending": "Pobrane reguły obowiązują po ponownym połączeniu.",
+  'routing_current': "Bieżące połączenie",
 };

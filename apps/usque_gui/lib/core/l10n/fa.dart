@@ -1,5 +1,7 @@
 /// Persian UI catalog.
 const Map<String, String> kFaCatalog = <String, String>{
+  'dns_doh_url': 'نشانی DoH',
+  'dns_invalid_doh_url': 'نشانی HTTPS معتبر برای DNS وارد کنید',
   'warp_dns_type': 'DNS ‏WARP',
   'warp_dns_bootstrap_optional': 'اختیاری',
   'warp_dns_plain': 'DNS معمولی',
@@ -50,8 +52,7 @@ const Map<String, String> kFaCatalog = <String, String>{
   'profiles': 'حساب‌ها',
   'profiles_subtitle': 'حساب‌های WARP را عوض و مدیریت کنید.',
   'proxy': 'پروکسی',
-  'proxy_subtitle':
-      'نشانی پروکسی‌ها و DNS مشترک میان همهٔ حساب‌ها را تنظیم کنید.',
+  'proxy_subtitle': 'نشانی‌های شنود و احراز هویت مشترک پروکسی را تنظیم کنید.',
   'settings': 'تنظیمات',
   'settings_subtitle': 'تنظیمات اتصال، پروکسی و برنامه.',
   'diagnostics': 'عیب‌یابی',
@@ -180,7 +181,7 @@ const Map<String, String> kFaCatalog = <String, String>{
   'proxy_dns_system': 'DNS سیستم',
   'dns_leak_warning': 'DNS محلی ممکن است نام‌های درخواستی را فاش کند',
   'dns_leak_warning_body':
-      'DNS سفارشی و DNS سیستم از طریق تونل حل نمی‌شوند، بنابراین شبکهٔ فعلی شما ممکن است دامنه‌هایی را که بازدید می‌کنید ببیند. مگر اینکه این را بپذیرید، گزینهٔ «از راه دور از طریق تونل» را به کار ببرید.',
+      'DNS محلی و سیستم ممکن است دامنه‌های درخواستی را به شبکهٔ فعلی نشان دهند.',
   'system_proxy': 'پیکربندی پروکسی سیستم',
   'output_disabled_in_profile': 'در تنظیمات غیرفعال شده',
   'auto_connect': 'اتصال خودکار حساب جاری هنگام شروع',
@@ -205,11 +206,9 @@ const Map<String, String> kFaCatalog = <String, String>{
       'رمز عبور تنظیم شده است. برای جایگزینی، رمز جدیدی وارد کنید.',
   'proxy_auth_clear': 'برداشتن محافظت با گذرواژه',
   'general': 'عمومی',
-  'system_integration': 'یکپارچگی سیستم',
   'start_on_boot': 'اجرای Usque هنگام ورود شما',
   'close_to_tray': 'بستن پنجره به سینی سیستم',
   'add_quick_settings_tile': 'افزودن کاشی تنظیمات سریع',
-  'appearance': 'ظاهر',
   'theme': 'پوسته',
   'theme_system': 'سیستم',
   'theme_light': 'روشن',
@@ -269,13 +268,13 @@ const Map<String, String> kFaCatalog = <String, String>{
   'advanced_subtitle': 'نقاط پایانی، DNS، MTU، مسیریابی و Kill Switch.',
   'advanced_warning':
       'نقاط پایانی، SNI، DNS یا MTU نادرست می‌تواند مانع اتصال تونل شود.',
-  'ip_dns': 'IP و DNS',
   'routing_protection': 'مسیریابی و حفاظت',
   'transport': 'انتقال',
   'automatic': 'خودکار',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'انتخاب نقطهٔ پایانی',
+  'endpoint_section': 'نقطهٔ پایانی',
   'endpoint_automatic': 'انتخاب خودکار',
   'endpoint_custom': 'سفارشی',
   'endpoint_automatic_help':
@@ -353,7 +352,7 @@ const Map<String, String> kFaCatalog = <String, String>{
       'مشکلات اتصال را بررسی کنید، گزارش‌ها را خروجی بگیرید و داده‌های محلی را مدیریت کنید.',
   'engine_status': 'اطلاعات اتصال',
   'version': 'نسخه',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'گزارش‌های محلی',
   'export_diagnostics': 'صادر کردن بستهٔ عیب‌یابی',
   'diagnostics_saved': 'بستهٔ عیب‌یابی در این مسیر ذخیره شد:',
@@ -395,7 +394,7 @@ const Map<String, String> kFaCatalog = <String, String>{
   'profile_required': 'حداقل یک حساب نگه دارید.',
   'socks_capabilities': 'TCP و UDP',
   'http_capabilities': 'CONNECT و هدایت معمولی',
-  'geo_direct': 'تنظیمات عبور از {tunnel}',
+  'geo_direct': 'تنظیمات عبور مستقیم',
   'bypass_custom': 'مقصدهای سفارشی',
   'bypass_countries': 'کشورها / مناطق',
   'bypass_targets_hint':
@@ -405,7 +404,7 @@ const Map<String, String> kFaCatalog = <String, String>{
   'bypass_line_error': 'خط {line}: {reason}',
   'bypass_summary': '{countries} منطقه · {targets} مقصد سفارشی',
   'geo_direct_help':
-      'ترافیک مطابق این قوانین از VPN عبور نمی‌کند. ارائه‌دهندهٔ DNS شبکهٔ فعلی ممکن است نام دامنه‌های درخواستی را ببیند. برنامه‌هایی که از DNS رمزگذاری‌شده استفاده می‌کنند فقط بر اساس نشانی IP مسیریابی می‌شوند.',
+      'ترافیک مطابق این کشورها یا مناطق از VPN/TUN یوسک و پروکسی‌های محلی HTTP و SOCKS5 عبور نمی‌کند. ارائه‌دهندهٔ DNS شبکهٔ فعلی ممکن است نام دامنه‌های درخواستی را ببیند. برنامه‌هایی که از DNS رمزگذاری‌شده استفاده می‌کنند فقط بر اساس نشانی IP مسیریابی می‌شوند.',
   'geo_update_all': 'به‌روزرسانی داده‌های جغرافیایی',
   'geo_last_updated': 'آخرین به‌روزرسانی موفق: {current}',
   'geo_never_updated': 'هنوز به‌روزرسانی نشده',
@@ -650,4 +649,21 @@ const Map<String, String> kFaCatalog = <String, String>{
   'dns_duplicate_address': 'نشانی‌های IP تکراری را حذف کنید.',
   'dns_address_not_allowed':
       'یکی از نشانی‌ها برای اتصال به سرور DNS مناسب نیست. از IPهای ارائه‌شده توسط سرویس DNS استفاده کنید.',
+  "routing_rules": "قواعد مسیریابی سفارشی",
+  "routing_add": "افزودن قاعده",
+  "routing_batch": "چسباندن قواعد",
+  "routing_action": "عملکرد",
+  "routing_target": "دامنه، IP یا CIDR",
+  "routing_priority":
+      "قاعده دقیق‌تر اولویت دارد. قواعد سفارشی بر Ads و کشورها مقدم‌اند؛ مسدودسازی IP همچنان اعمال می‌شود.",
+  "routing_conflict":
+      "برای یک مقصد عملکردهای متفاوت تعیین شده است. قواعد را اصلاح کنید.",
+  "routing_overlap": "قاعده دقیق‌تر جایگزین قاعده گسترده‌تر می‌شود.",
+  "routing_duplicate": "قواعد تکراری هنگام ذخیره ادغام می‌شوند.",
+  "routing_ads": "Ads · تبلیغات و ردیابی",
+  "routing_ads_ready": "داده‌های Ads آماده است.",
+  "routing_ads_unavailable":
+      "داده‌های Ads در دسترس نیست. اتصال‌ها و قواعد سفارشی همچنان فعال‌اند.",
+  "routing_pending": "قواعد دانلودشده پس از اتصال مجدد اعمال می‌شوند.",
+  'routing_current': "اتصال فعلی",
 };

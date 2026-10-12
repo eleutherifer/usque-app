@@ -1,5 +1,7 @@
 /// Portuguese (Brazil) UI catalog.
 const Map<String, String> kPtCatalog = <String, String>{
+  'dns_doh_url': 'URL de DoH',
+  'dns_invalid_doh_url': 'Digite uma URL HTTPS de DNS válida',
   'warp_dns_type': 'DNS do WARP',
   'warp_dns_bootstrap_optional': 'Opcional',
   'warp_dns_plain': 'DNS comum',
@@ -51,7 +53,7 @@ const Map<String, String> kPtCatalog = <String, String>{
   'profiles_subtitle': 'Alterne e gerencie contas WARP.',
   'proxy': 'Proxy',
   'proxy_subtitle':
-      'Defina os endereços de proxy e DNS compartilhados por todas as contas.',
+      'Configure os endereços de escuta e a autenticação compartilhados do proxy.',
   'settings': 'Configurações',
   'settings_subtitle': 'Configurações de conexão, proxy e aplicativo.',
   'diagnostics': 'Diagnósticos',
@@ -184,7 +186,7 @@ const Map<String, String> kPtCatalog = <String, String>{
   'proxy_dns_system': 'DNS do sistema',
   'dns_leak_warning': 'O DNS local pode revelar os nomes solicitados',
   'dns_leak_warning_body':
-      'O DNS personalizado e o do sistema não são resolvidos pelo túnel, então sua rede atual pode ver os domínios que você acessa. Use “Remoto pelo túnel”, a menos que aceite isso.',
+      'O DNS local e do sistema pode revelar os domínios solicitados à rede atual.',
   'system_proxy': 'Configurar proxy do sistema',
   'output_disabled_in_profile': 'Desabilitado em Configurações',
   'auto_connect': 'Conectar a conta atual automaticamente ao iniciar',
@@ -208,11 +210,9 @@ const Map<String, String> kPtCatalog = <String, String>{
       'A senha está definida. Insira uma nova para substituí-la.',
   'proxy_auth_clear': 'Remover proteção por senha',
   'general': 'Geral',
-  'system_integration': 'Integração com o sistema',
   'start_on_boot': 'Iniciar o Usque ao entrar no sistema',
   'close_to_tray': 'Fechar a janela para a bandeja do sistema',
   'add_quick_settings_tile': 'Adicionar bloco de Configurações rápidas',
-  'appearance': 'Aparência',
   'theme': 'Tema',
   'theme_system': 'Sistema',
   'theme_light': 'Claro',
@@ -273,13 +273,13 @@ const Map<String, String> kPtCatalog = <String, String>{
   'advanced_subtitle': 'Endpoints, DNS, MTU, roteamento e Kill Switch.',
   'advanced_warning':
       'Endpoints, SNI, DNS ou MTU incorretos podem impedir a conexão do túnel.',
-  'ip_dns': 'IP e DNS',
   'routing_protection': 'Roteamento e proteção',
   'transport': 'Transporte',
   'automatic': 'Automático',
   'http3': 'HTTP/3',
   'http2': 'HTTP/2',
   'endpoint_selection': 'Seleção de endpoint',
+  'endpoint_section': 'Endpoint',
   'endpoint_automatic': 'Automática',
   'endpoint_custom': 'Personalizada',
   'endpoint_automatic_help':
@@ -357,7 +357,7 @@ const Map<String, String> kPtCatalog = <String, String>{
       'Verifique problemas de conexão, exporte registros e gerencie os dados locais.',
   'engine_status': 'Informações da conexão',
   'version': 'Versão',
-  'app_version': 'Usque 0.3.0',
+  'app_version': 'Usque 0.3.1',
   'logs': 'Logs locais',
   'export_diagnostics': 'Exportar pacote de diagnóstico',
   'diagnostics_saved': 'Pacote de diagnóstico salvo em',
@@ -399,7 +399,7 @@ const Map<String, String> kPtCatalog = <String, String>{
   'profile_required': 'Mantenha pelo menos uma conta.',
   'socks_capabilities': 'TCP e UDP',
   'http_capabilities': 'CONNECT e encaminhamento comum',
-  'geo_direct': 'Definições de desvio da {tunnel}',
+  'geo_direct': 'Definições de desvio',
   'bypass_custom': 'Destinos personalizados',
   'bypass_countries': 'Países / regiões',
   'bypass_targets_hint':
@@ -409,7 +409,7 @@ const Map<String, String> kPtCatalog = <String, String>{
   'bypass_line_error': 'Linha {line}: {reason}',
   'bypass_summary': '{countries} regiões · {targets} destinos personalizados',
   'geo_direct_help':
-      'O tráfego correspondente a esses países ou regiões não passa pela VPN. O provedor DNS da rede atual pode ver os domínios consultados. Aplicativos com DNS criptografado são classificados apenas pelo IP.',
+      'O tráfego correspondente a esses países ou regiões ignora a VPN/TUN do Usque e os proxies locais HTTP e SOCKS5. O provedor DNS da rede atual pode ver os domínios consultados. Aplicativos com DNS criptografado são classificados apenas pelo IP.',
   'geo_update_all': 'Atualizar dados geográficos',
   'geo_last_updated': 'Última atualização bem-sucedida: {current}',
   'geo_never_updated': 'Ainda não atualizado',
@@ -661,4 +661,22 @@ const Map<String, String> kPtCatalog = <String, String>{
   'dns_duplicate_address': 'Remova os endereços IP duplicados.',
   'dns_address_not_allowed':
       'Um endereço não pode ser usado para conectar ao servidor DNS. Use os IPs fornecidos pelo seu provedor DNS.',
+  "routing_rules": "Regras de encaminhamento personalizadas",
+  "routing_add": "Adicionar regra",
+  "routing_batch": "Colar regras",
+  "routing_action": "Ação",
+  "routing_target": "Domínio, IP ou CIDR",
+  "routing_priority":
+      "A regra mais específica tem prioridade. Regras próprias prevalecem sobre Ads e países; o bloqueio IP continua válido.",
+  "routing_conflict":
+      "Ações diferentes para o mesmo destino. Edite estas regras.",
+  "routing_overlap":
+      "A regra mais específica prevalece sobre a mais abrangente.",
+  "routing_duplicate": "Duplicatas serão unidas ao salvar.",
+  "routing_ads": "Ads · anúncios e rastreamento",
+  "routing_ads_ready": "Os dados de Ads estão disponíveis.",
+  "routing_ads_unavailable":
+      "Ads indisponível. Conexões e regras próprias continuam disponíveis.",
+  "routing_pending": "As regras baixadas entram em vigor após reconectar.",
+  'routing_current': "Conexão atual",
 };

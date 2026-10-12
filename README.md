@@ -69,7 +69,7 @@ English interface previews rendered from the current source, shown disconnected.
 
 ## Download and install
 
-These docs describe **v0.3.0**, with checked-in application version **0.3.0**. A version declaration is not proof of publication: obtain approved packages from [GitHub Releases](https://github.com/GeorgeXie2333/usque-app/releases). The [release readiness review](docs/RELEASE_V0.3.0_READINESS.md) records its historical source and validation limits. The package set has six installers; two additional Windows MSI files are reserved for in-app updates:
+These development docs prepare **v0.3.1**; application metadata and the release workflow now target **v0.3.1 / 0.3.1+25**. The [v0.3.1 readiness review](docs/RELEASE_V0.3.1_READINESS.md) records checks and remaining requirements. For published packages, use [GitHub Releases](https://github.com/GeorgeXie2333/usque-app/releases) and documentation at the matching tag. The planned package set has six installers, plus two Windows MSI files used only by in-app updates:
 
 | Platform | Minimum OS | Packages |
 | --- | --- | --- |
@@ -83,13 +83,13 @@ Pre-1.0 packages use fixed, project-controlled self-signed certificates. Windows
 
 See [Installation and removal](docs/INSTALLATION.md) for upgrades, uninstall, recovery, and Android developer-verification details, and [Code signing](docs/CODE_SIGNING.md) for official identities. Updates require confirmation before downloading and use the platform installer; there is no unattended installation.
 
-Upgrading migrates local configuration to a schema that v0.2.9 cannot read. Review [configuration compatibility](docs/INSTALLATION.md#configuration-compatibility-when-upgrading) and any required pre-upgrade backup before upgrading; reinstalling an older package does not reverse the migration.
+Upgrading from v0.3.0 migrates configuration from schema 23 to 24, which v0.3.0 and older clients cannot read. Review [configuration compatibility](docs/INSTALLATION.md#configuration-compatibility-when-upgrading) and any required pre-upgrade backup before upgrading; reinstalling an older package does not reverse the migration.
 
 ## First connection
 
 1. Install a [verified official package](docs/INSTALLATION.md#verify-before-installing) and open Usque.
 2. Complete the first-run permissions and terms steps. Android requires VPN consent to finish setup; granting it may disconnect another VPN but does not start a Usque connection. Notifications are optional. Register a Consumer WARP® account, optionally with a WARP License Key. If setup was interrupted, check the saved result before registering again. Usque does not accept new WARP Secret imports.
-3. Open **Proxy → TUN and local proxies** on Windows, or **Proxy → VPN and local proxies** on Android, choose the outputs, then connect from Home. These switches take effect immediately; listener and DNS form edits require **Apply changes**. Proxy-only operation does not use the granted VPN permission to start a VPN.
+3. Open **Proxy → TUN and local proxies** on Windows, or **Proxy → VPN and local proxies** on Android, choose the outputs, then connect from Home. These switches take effect immediately; listener form edits require **Apply changes**. Proxy-only operation does not use the granted VPN permission to start a VPN.
 
 | Connection option | When to use it |
 | --- | --- |
@@ -117,8 +117,8 @@ Network settings are shared by all accounts.
 - Automatic HTTP/3 connections with HTTP/2 fallback. IPv4 and IPv6 connection
   attempts help find a reachable endpoint; supported H3 network changes can
   migrate the connection. See [path behavior](docs/h3-path-infrastructure.md).
-- Full-tunnel VPN, tunneled DNS, Kill Switch, LAN access and [custom CIDR, IP and domain bypass rules](docs/encrypted-direct-dns.md#custom-bypass-targets--自定义绕过目标). Domains include subdomains; custom rules do not need country-rule downloads.
-- Custom [WARP exit DNS](docs/WARP_DNS.md): open **Settings → Advanced network settings → IP & DNS**, choose Plain DNS, DoH or DoT, and select **Apply changes**. Changing DNS reconnects an established session; the final chain exit keeps its own DNS policy.
+- Full-tunnel VPN, tunneled DNS, Kill Switch, LAN access and [DIRECT/REJECT/PROXY routing rules with Ads](docs/ROUTING.md). Custom domains and CIDRs support more-specific exceptions; conflicts are checked before saving.
+- Custom [WARP exit DNS](docs/WARP_DNS.md): open **Settings → Advanced network settings → WARP DNS**, choose Plain DNS, DoH or DoT, and select **Apply changes**. Changing DNS reconnects an established session; the final chain exit keeps its own DNS policy.
 - Optional country-based direct routing. Download the selected countries' GeoIP
   data and the global GeoSite catalog separately. Usque uses domain rules when
   the name is visible, otherwise IP rules; unknown destinations stay in the tunnel.
@@ -164,9 +164,10 @@ are blocked instead of bypassing the tunnel.
 
 ### DNS privacy
 
-Country-based and custom-domain direct rules use **System** DNS by default: matching domain queries
+Country-based and custom-domain direct rules use **Current network DNS** by default: matching domain queries
 go to the DNS servers on your current network, outside the VPN. You can instead
-choose **DoH** or **DoT** and supply an encrypted resolver's name and IP addresses.
+choose **DoH** with a full HTTPS URL or **DoT** with a server name and port.
+New drafts prefill Cloudflare; saved custom settings are preserved.
 That resolver receives the queries; connection failures do not switch them to
 plaintext DNS. See [configuration steps and examples](docs/encrypted-direct-dns.md).
 
@@ -175,7 +176,7 @@ HTTP/SOCKS5 chain DNS defaults to verified Cloudflare® DoH through that proxy;
 custom or non-default inherited DNS retains TCP DNS. With these exits,
 application-selected UDP/53 queries use TCP to that resolver, with no physical DNS fallback. See the
 [chain DNS choices](docs/CHAIN_PROXY.md#http-and-socks5-exits--http-与-socks5-出口).
-Explicit local and proxy DNS settings still apply. Apps that use
+Apps that use
 their own encrypted DNS hide domain names from Usque, so direct routing uses IP
 rules. Rule downloads also respect Android Lockdown and any remaining Windows
 Kill Switch while disconnected.
@@ -203,7 +204,11 @@ released. iOS, store distribution and a public CLI are outside this release's sc
 | SOCKS5 | `127.0.0.1:1080`, `[::1]:1080` |
 | HTTP proxy | `127.0.0.1:8080`, `[::1]:8080` |
 
-Proxy address, port, and DNS edits are drafts until applied. Advanced settings reset loads defaults into the draft; it does not apply them immediately. Zero Trust endpoint addresses start with registered values. In Advanced network settings, choose **Edit Zero Trust endpoints**, read the red fullscreen warning and acknowledge the risks and your authorization before editing IPv4/IPv6; then **Apply changes**. Reset stages the registered addresses; signing in again restores them and removes custom addresses. Home keeps a risk notice visible while the selected account has custom Zero Trust addresses or a running ZT session still uses them; the notice cannot be dismissed.
+Proxy address and port edits are drafts until applied. Proxy DNS uses the current exit by default: configure [WARP DNS](docs/WARP_DNS.md) in Advanced settings or the final DNS in the chain configuration. The Proxy page has no DNS settings; a proxy DNS choice saved by an older version keeps working.
+
+Advanced settings reset loads defaults into the draft; it does not apply them immediately.
+
+Zero Trust endpoint addresses start with registered values. In Advanced network settings, choose **Edit Zero Trust endpoints**, read the red fullscreen warning and acknowledge the risks and your authorization before editing IPv4/IPv6; then **Apply changes**. Reset stages the registered addresses; signing in again restores them and removes custom addresses. Home keeps a risk notice visible while the selected account has custom Zero Trust addresses or a running ZT session still uses them; the notice cannot be dismissed.
 
 In Advanced network settings, Automatic selection races eligible account endpoints; Custom keeps manual addresses. Port and SNI remain editable. See [automatic endpoints](docs/NETWORK_SETTINGS.md#automatic-endpoints--自动选择端点).
 
