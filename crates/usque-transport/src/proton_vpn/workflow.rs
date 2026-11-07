@@ -326,7 +326,7 @@ pub(super) async fn certificate(
     cancel: &CancellationToken,
 ) -> Result<super::crypto::Certificate, Failure> {
     interaction.phase("certificate");
-    let response=client.request(Method::POST,"/vpn/v1/certificate",&Json(json!({"ClientPublicKey":keys.spki_pem(),"ClientPublicKeyMode":"EC","DeviceName":"Usque","Mode":"session","Features":[]})).0,interaction,cancel).await?;
+    let response=client.request(Method::POST,"/vpn/v1/certificate",&Json(json!({"ClientPublicKey":keys.spki_pem(),"ClientPublicKeyMode":"EC","DeviceName":"Usque","Mode":"persistent","Features":[]})).0,interaction,cancel).await?;
     let pem = response
         .get("Certificate")
         .and_then(Value::as_str)
