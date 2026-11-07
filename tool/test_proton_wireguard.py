@@ -111,7 +111,7 @@ class WireguardCryptoTests(unittest.TestCase):
         self.assertEqual(request["ClientPublicKey"], self.keys.public_key_pem)
         self.assertTrue(request["ClientPublicKey"].startswith("-----BEGIN PUBLIC KEY-----"))
         self.assertEqual(request["ClientPublicKeyMode"], "EC")
-        self.assertEqual(request["Mode"], "session")
+        self.assertEqual(request["Mode"], "persistent")
         self.assertEqual(request["Features"], [])
         with self.assertRaises(WireguardError):
             certificate_request(self.keys, "unsafe\nname")
