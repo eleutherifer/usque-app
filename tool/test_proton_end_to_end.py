@@ -87,7 +87,7 @@ class GuestApi:
         )
         self.test_case.assertEqual(payload["ClientPublicKeyMode"], "EC")
         self.test_case.assertEqual(payload["DeviceName"], "Usque PoC")
-        self.test_case.assertEqual(payload["Mode"], "session")
+        self.test_case.assertEqual(payload["Mode"], "persistent")
         self.test_case.assertEqual(payload["Features"], [])
         public_key = serialization.load_pem_public_key(payload["ClientPublicKey"].encode("ascii"))
         self.test_case.assertIsInstance(public_key, Ed25519PublicKey)
