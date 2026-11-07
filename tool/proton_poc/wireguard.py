@@ -101,7 +101,7 @@ def certificate_request(keys: KeyMaterial, device_name: str = "Usque PoC") -> di
         "ClientPublicKey": keys.public_key_pem,
         "ClientPublicKeyMode": "EC",
         "DeviceName": device_name,
-        "Mode": "session",
+        "Mode": "persistent",
         "Features": [],
     }
 
