@@ -1207,7 +1207,7 @@ async fn deferred_certificate_is_requested_once_for_the_saved_key_at_first_conne
     assert_eq!(creds.certificate_chain, cert.certificate_chain);
     assert_eq!(storage.record.lock().unwrap().expires_at, cert.expires_at);
     let bodies = http.bodies.lock().unwrap();
-    assert_eq!(bodies.last().unwrap()["Mode"], "session");
+    assert_eq!(bodies.last().unwrap()["Mode"], "persistent");
     assert_eq!(
         bodies.last().unwrap()["ClientPublicKey"],
         KeyMaterial::from_seed([7; 32]).unwrap().spki_pem()
