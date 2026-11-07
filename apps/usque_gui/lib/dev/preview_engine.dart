@@ -11,6 +11,13 @@ class PreviewEngine
         EngineClient,
         InitialIdentityClient,
         OnboardingPermissionsClient {
+  @override
+  Future<Map<String, Object?>> scenarioCommand(
+    Map<String, Object?> command,
+  ) async {
+    throw const EngineException('SCENARIOS_UNSUPPORTED', 'Scenes unavailable.');
+  }
+
   PreviewEngine({bool identityReady = true}) {
     _profiles = [
       UsqueProfile.defaultProfile().copyWith(
@@ -360,6 +367,8 @@ class PreviewEngine
   Future<void> setStartOnBoot(bool enabled) async => _unavailable();
   @override
   Future<void> setCloseToTray(bool enabled) async => _unavailable();
+  @override
+  Future<void> setHideFromRecents(bool enabled) async => _unavailable();
   @override
   Future<void> requestAddQuickSettingsTile() async => _unavailable();
   @override

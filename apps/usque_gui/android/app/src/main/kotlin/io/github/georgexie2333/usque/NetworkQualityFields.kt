@@ -5,6 +5,7 @@ import org.json.JSONObject
 /** Bounded native/Messenger/Flutter bridge. Unknown keys and raw text never cross it. */
 internal object NetworkQualityFields {
     const val MAX_JSON_BYTES = 16 * 1024
+    const val MAX_CAPABILITIES_JSON_BYTES = 16 * 1024
     private val availability = setOf("unknown", "available", "unsupported", "notReady", "stale")
     private val levels = setOf("unknown", "good", "fair", "poor", "limitedData", "disconnected")
     private val queueKinds =
@@ -106,6 +107,19 @@ internal object NetworkQualityFields {
             "enqueue_count",
             "dequeue_count",
         )
+    private val directGatewayCounters =
+        setOf(
+            "fallback_total",
+            "fallback_unavailable",
+            "fallback_worker_failed",
+            "fallback_flow_capacity",
+            "fallback_setup_failed",
+            "fallback_unsupported_target",
+            "fallback_rewrite_failed",
+            "flow_failures",
+            "return_queue_drop_packets",
+            "return_queue_drop_bytes",
+        )
 
     fun encode(source: JSONObject?): String? {
         source ?: return null
@@ -123,7 +137,14 @@ internal object NetworkQualityFields {
     }
 
     fun capabilities(value: String?): Map<String, Boolean> {
-        val source = if (value != null && value.length <= 1024) runCatching { JSONObject(value) }.getOrNull() else null
+        val source =
+            if (value != null && value.length <= MAX_CAPABILITIES_JSON_BYTES &&
+                value.toByteArray(Charsets.UTF_8).size <= MAX_CAPABILITIES_JSON_BYTES
+            ) {
+                runCatching { JSONObject(value) }.getOrNull()
+            } else {
+                null
+            }
         return listOf(
             "network_quality",
             "encrypted_direct_dns",
@@ -135,12 +156,14 @@ internal object NetworkQualityFields {
             "l4_dns_conversion",
             "vpn_gate_tcp",
             "vpn_gate_pool_favorites",
+            "vpn_gate_epoch_requests",
             "chain_profile_import",
             "chain_openvpn_udp",
             "chain_wireguard",
             "chain_warp_wireguard",
             "chain_proton_vpn",
             "proton_account_warp_fallback",
+            "proton_server_switching",
             "chain_http_proxy",
             "chain_socks5_proxy",
             "chain_proxy_encrypted_dns",
@@ -246,6 +269,7 @@ internal object NetworkQualityFields {
                         mapOf("observation" to observation)
                 },
             "transport_performance" to source.optJSONObject("transport_performance")?.let { performance(it) },
+            "direct_gateway" to source.optJSONObject("direct_gateway")?.let { directGateway(it) },
             "samples" to sampleOutput,
             "sampled_at_unix_ms" to number(source, "sampled_at_unix_ms"),
             "connection_instance_id" to (source.opt("connection_instance_id") as? String)?.takeIf(instanceId::matches),
@@ -304,6 +328,26 @@ internal object NetworkQualityFields {
             number(JSONObject().put("n", array.opt(index)), "n")
         }
     }
+
+    /** Native counters saturate at Long.MAX_VALUE before crossing JNI. Reject
+     * coercions so malformed input cannot become a measured zero or a wrapped count. */
+    private fun directGateway(source: JSONObject): Map<String, Long?> =
+        directGatewayCounters.associateWith { key ->
+            val raw = source.opt(key)
+            val value =
+                if (raw is Long) {
+                    raw
+                } else if (raw is Int) {
+                    raw.toLong()
+                } else if (raw is Short) {
+                    raw.toLong()
+                } else if (raw is Byte) {
+                    raw.toLong()
+                } else {
+                    null
+                }
+            value?.takeIf { it >= 0 }
+        }
 
     private fun backpressure(source: JSONObject): Map<String, Any?> =
         numbers(

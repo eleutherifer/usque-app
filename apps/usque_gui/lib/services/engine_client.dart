@@ -100,6 +100,13 @@ abstract interface class StartupProfileClient {
   Future<ProfileCatalog> readStartupProfiles();
 }
 
+/// Keeps an Android control owner alive for an explicit multi-step operation.
+/// Passive observation never acquires this capability.
+abstract interface class ControlOperationClient {
+  Future<String> beginControlOperation();
+  Future<void> endControlOperation(String ownerToken);
+}
+
 abstract interface class EngineClient {
   Future<NetworkSettingsState> saveNetworkSettings(
     String operationId,
@@ -109,6 +116,8 @@ abstract interface class EngineClient {
   );
 
   Future<NetworkSettingsState> getNetworkSettingsState();
+
+  Future<Map<String, Object?>> scenarioCommand(Map<String, Object?> request);
   bool get supportsSnapshotEvents;
 
   Stream<EngineSnapshotEvent> get snapshotEvents;
@@ -172,6 +181,8 @@ abstract interface class EngineClient {
   Future<void> setStartOnBoot(bool enabled);
 
   Future<void> setCloseToTray(bool enabled);
+
+  Future<void> setHideFromRecents(bool enabled);
 
   Future<void> requestAddQuickSettingsTile();
 
@@ -363,8 +374,30 @@ class MethodChannelEngineClient
         ProtonHumanVerificationClient,
         InitialIdentityClient,
         OnboardingPermissionsClient,
+        ControlOperationClient,
         AdsRulesClient {
   bool _continuousConnection = false;
+
+  @override
+  Future<String> beginControlOperation() async {
+    final value = await _invoke<Map<Object?, Object?>>('beginControlOperation');
+    final token = value?['owner_token'];
+    if (token is! String ||
+        !RegExp(
+          r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+        ).hasMatch(token)) {
+      throw const EngineException(
+        'ENGINE_IPC_UNAVAILABLE',
+        'The Android control owner was not confirmed.',
+      );
+    }
+    return token;
+  }
+
+  @override
+  Future<void> endControlOperation(String ownerToken) =>
+      _invoke<void>('endControlOperation', {'owner_token': ownerToken});
+
   @override
   Future<InitialIdentityState> initializeIdentity(
     UsqueProfile profile, {
@@ -432,6 +465,23 @@ class MethodChannelEngineClient
   ) async =>
       await _invoke<Map<Object?, Object?>>('warpWireguard', request) ??
       const {};
+
+  @override
+  Future<Map<String, Object?>> scenarioCommand(
+    Map<String, Object?> request,
+  ) async {
+    final value = await _invoke<Map<Object?, Object?>>(
+      'scenarioCommand',
+      request,
+    );
+    if (value == null) {
+      throw const EngineException(
+        'SCENARIO_RESULT_UNKNOWN',
+        'The scenario result could not be confirmed.',
+      );
+    }
+    return Map<String, Object?>.from(value);
+  }
 
   @override
   Future<ProtonVpnResult> protonVpn(
@@ -723,6 +773,10 @@ class MethodChannelEngineClient
 
   @override
   Future<void> setCloseToTray(bool enabled) async {}
+
+  @override
+  Future<void> setHideFromRecents(bool enabled) =>
+      _invoke<void>('setHideFromRecents', <String, Object>{'enabled': enabled});
 
   @override
   Future<void> requestAddQuickSettingsTile() =>

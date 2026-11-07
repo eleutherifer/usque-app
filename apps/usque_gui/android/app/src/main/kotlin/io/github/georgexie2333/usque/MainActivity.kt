@@ -16,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.Settings
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
@@ -47,6 +48,8 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     private val identityExecutor = Executors.newSingleThreadExecutor()
+    private val tvInput by lazy { TvInputHost(this) }
+    private val recentsVisibility by lazy { recentsVisibilityController(this) }
     private val protonVerificationWindow by lazy { ProtonVerificationWindow(this) }
 
     // Doctor cannot queue behind registration or account I/O. Only one active
@@ -250,6 +253,7 @@ class MainActivity : FlutterFragmentActivity() {
                     "start_on_boot" to
                         preferences.getBoolean(UsqueVpnService.START_ON_BOOT, false),
                     "close_to_tray" to true,
+                    "hide_from_recents" to recentsVisibility.restore(),
                 )
             }
 
@@ -257,6 +261,14 @@ class MainActivity : FlutterFragmentActivity() {
                 AndroidPolicyStore
                     .startup(this@MainActivity)
                     .edit { putBoolean(UsqueVpnService.START_ON_BOOT, enabled) }
+            }
+
+            override fun setHideFromRecents(enabled: Boolean) {
+                recentsVisibility.setHidden(enabled)
+            }
+
+            override fun restoreRecentsVisibility() {
+                recentsVisibility.restore()
             }
 
             override fun openAlwaysOnVpnSettings() {
@@ -330,6 +342,7 @@ class MainActivity : FlutterFragmentActivity() {
         // super.onCreate; wire control + method handlers first.
         ensureEngineComponents()
         super.onCreate(savedInstanceState)
+        restoreRecentsVisibility()
         configureQuickSettingsTileAvailability()
         AndroidShortcutController.sync(this)
         AndroidMaintenance.cleanupLegacyUpdateState(this)
@@ -364,6 +377,7 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        restoreRecentsVisibility()
         handleIncomingIntent(intent)
     }
 
@@ -434,11 +448,14 @@ class MainActivity : FlutterFragmentActivity() {
             }
     }
 
+    override fun provideRootLayout(context: Context): FrameLayout = tvInput.createRoot(context)
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         // The default Fragment starts Dart before this hook. Register only the
         // tracked preferences implementation, without briefly exposing the
         // upstream background handlers through super.configureFlutterEngine.
         AndroidUiPluginRegistration.registerWith(flutterEngine)
+        tvInput.attach(flutterEngine)
         ensureEngineComponents()
         engineMethodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
         engineMethodChannel?.setMethodCallHandler { call, result ->
@@ -518,12 +535,19 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun onStart() {
         super.onStart()
+        restoreRecentsVisibility()
         ensureEngineComponents()
-        controlClient.bind()
         controlClient.setUiVisible(true)
     }
 
+    private fun restoreRecentsVisibility() {
+        // Never crash launch on a task/storage failure. Flutter's preferences
+        // read retries and exposes the structured error instead.
+        runCatching { recentsVisibility.restore() }
+    }
+
     override fun onStop() {
+        tvInput.stopped()
         protonVerificationWindow.hostStopped()
         if (::controlClient.isInitialized) {
             controlClient.setUiVisible(false)
@@ -532,6 +556,7 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     override fun onDestroy() {
+        tvInput.dispose()
         protonVerificationWindow.hostStopped()
         pendingChainFileResult?.success(null)
         pendingChainFileResult = null

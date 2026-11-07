@@ -61,6 +61,7 @@ class ChainEngine extends GateEngine
     automaticEndpoints: true,
     vpnGateTcp: true,
     vpnGatePoolFavorites: true,
+    vpnGateEpochRequests: true,
     networkSettingsApplication: true,
     chainProfileImport: true,
     chainOpenvpnUdp: true,
@@ -478,7 +479,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Chain proxy'), findsOneWidget);
     expect(find.text('VPN Gate'), findsOneWidget);
-    expect(find.text('Manage'), findsOneWidget);
+    // The whole row opens the chain page; there is no separate action.
+    expect(
+      tester
+          .widget<LinkRow>(
+            find.byKey(const ValueKey('proxy-chain-proxy-entry')),
+          )
+          .onTap,
+      isNotNull,
+    );
     expect(find.text('Manage servers'), findsNothing);
     expect(find.text('Choose an exit reached through WARP.'), findsOneWidget);
   });
@@ -927,8 +936,8 @@ void main() {
       LocalePreference.traditionalChineseTaiwan,
       systemLocale: const Locale('en'),
     );
-    expect(hongKong.chain('address_family'), '位址族');
-    expect(taiwan.chain('address_family'), '位址族');
+    expect(hongKong.chain('address_family'), 'IP 類型');
+    expect(taiwan.chain('address_family'), 'IP 類型');
     expect(hongKong.chain('username'), '用戶名稱');
     expect(taiwan.chain('username'), '使用者名稱');
     expect(hongKong.chain('addresses'), '隧道地址');

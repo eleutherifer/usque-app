@@ -17,6 +17,7 @@ import 'package:usque/core/l10n/network_quality.dart';
 import 'package:usque/core/l10n/network_settings.dart';
 import 'package:usque/core/l10n/onboarding.dart';
 import 'package:usque/core/l10n/proton.dart';
+import 'package:usque/core/l10n/scenarios.dart';
 import 'package:usque/core/l10n/tls_fingerprint.dart';
 import 'package:usque/core/l10n/ui_workflow.dart';
 import 'package:usque/core/l10n/update_check.dart';
@@ -39,6 +40,7 @@ const _tables = {
   'network settings': kNetworkSettingsCatalogs,
   'onboarding': kOnboardingCatalogs,
   'Proton': kProtonCatalogs,
+  'scenarios': kScenarioCatalogs,
   'TLS fingerprint': kTlsFingerprintCatalogs,
   'workflow': kUiWorkflowCatalogs,
   'update': kUpdateCheckCatalogs,
@@ -146,7 +148,7 @@ void main() {
           locale.value['connection_sessions'],
         );
       }
-      expect(_strings('zh_CN').proton('automatic_hint'), '连接时选择最低延迟节点。');
+      expect(_strings('zh_CN').proton('automatic_hint'), '连接时选择延迟最低的服务器。');
       expect(_strings('zh_HK').proton('login'), '登入 Proton');
       expect(_strings('zh_TW').proton('login'), '登入 Proton');
       expect(_strings('zh_HK').proton('account'), 'Proton 帳戶');

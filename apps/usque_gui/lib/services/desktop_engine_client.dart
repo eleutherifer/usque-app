@@ -154,6 +154,20 @@ class DesktopEngineClient
       ));
 
   @override
+  Future<Map<String, Object?>> scenarioCommand(Map<String, Object?> request) =>
+      _serialized(() async {
+        final payload = ControlPayloadWriter()..string(1, jsonEncode(request));
+        final result = (await _request(53, payload.takeBytes())).scenario;
+        if (result == null) {
+          throw const EngineException(
+            'SCENARIO_RESULT_UNKNOWN',
+            'The scenario result could not be confirmed.',
+          );
+        }
+        return result;
+      });
+
+  @override
   Future<Map<Object?, Object?>> warpWireguard(Map<String, Object?> request) =>
       _serialized(() async {
         final payload = ControlPayloadWriter()..string(1, jsonEncode(request));
@@ -268,7 +282,8 @@ class DesktopEngineClient
             ..string(2, request.action)
             ..string(3, request.serverId)
             ..string(4, request.configSha256)
-            ..string(5, request.expectedFavoriteHash))
+            ..string(5, request.expectedFavoriteHash)
+            ..string(6, request.expectedSourceEpoch))
           .takeBytes(),
     );
   });
@@ -612,6 +627,11 @@ class DesktopEngineClient
 
   @override
   Future<void> requestAddQuickSettingsTile() async {}
+
+  @override
+  Future<void> setHideFromRecents(bool enabled) async => throw UnsupportedError(
+    'Recent task visibility is only supported on Android.',
+  );
 
   @override
   Future<PerAppProxySettings> perAppProxy() async =>

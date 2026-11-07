@@ -42,6 +42,16 @@ internal object NativeEngine {
         request: String,
     ): String?
 
+    fun scenarioCommand(
+        path: String,
+        request: String,
+    ): String? = if (libraryLoaded) nativeScenarioCommand(path, request) else null
+
+    private external fun nativeScenarioCommand(
+        path: String,
+        request: String,
+    ): String?
+
     private val libraryLoaded: Boolean =
         try {
             System.loadLibrary("usque_android")
@@ -368,4 +378,5 @@ internal object NativeEngine {
     const val ERROR_TRANSPORT_FAILURE = -7
     const val ERROR_TUN_FAILURE = -8
     const val RECONFIGURE_NOT_RUNNING = -10
+    const val RECONFIGURE_REJECTED = -11
 }

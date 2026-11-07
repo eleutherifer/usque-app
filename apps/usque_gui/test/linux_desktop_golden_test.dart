@@ -31,7 +31,10 @@ import 'package:usque/widgets/window_titlebar.dart';
 
 import 'app_test.dart' show FakeEngineClient;
 import 'quality_test_support.dart' show qualityFixture;
+import 'scenarios_test.dart'
+    show SceneEngine, confirmRichScenes, richSceneEngine, seedGoldenAccounts;
 import 'support/linux_golden_support.dart';
+import 'ui_workflow_test.dart' show pumpWorkflow, workflowHost;
 
 const _capabilities = EngineCapabilities(
   vpn: true,
@@ -209,6 +212,8 @@ enum _Scene {
   protonNodes,
   protonProfile,
   profiles,
+  proxy,
+  proxyPhone,
   qualityGood,
   qualityDegraded,
   qualityDegradedPhone,
@@ -522,6 +527,22 @@ const _fixtures = <_Fixture>[
     scale: 1,
   ),
   (
+    scene: _Scene.proxy,
+    name: 'proxy_en_light',
+    size: Size(1280, 1500),
+    locale: LocalePreference.english,
+    dark: false,
+    scale: 1,
+  ),
+  (
+    scene: _Scene.proxyPhone,
+    name: 'proxy_zh_phone_dark',
+    size: Size(390, 1900),
+    locale: LocalePreference.simplifiedChinese,
+    dark: true,
+    scale: 1,
+  ),
+  (
     scene: _Scene.qualityGood,
     name: 'network_quality_good_en_light',
     size: Size(1280, 1500),
@@ -654,6 +675,9 @@ void _configure(
     case _Scene.serviceCancelled:
     case _Scene.trayUnavailable:
       app.section = AppSection.settings;
+    case _Scene.proxy:
+    case _Scene.proxyPhone:
+      app.section = AppSection.proxy;
     case _Scene.profiles:
       app.section = AppSection.profiles;
       final active = app.activeProfile;
@@ -1176,6 +1200,168 @@ void main() {
             // An active session polls the engine until it is no longer
             // observed; stop it before the test checks for pending timers.
             app.diagnostics.setObservationVisible(false);
+          },
+          variant: const TargetPlatformVariant({TargetPlatform.linux}),
+          tags: const ['golden', 'linux-golden'],
+        );
+      }
+    },
+    skip: supportedHost ? false : 'Linux amd64 rasterization baseline only.',
+  );
+  group(
+    'Linux Profiles scenes',
+    () {
+      setUpAll(loadLinuxGoldenFonts);
+      for (final fixture in [
+        (
+          name: 'profiles_scenes_desktop_en_light',
+          size: const Size(1280, 900),
+          locale: LocalePreference.english,
+          scale: 1.0,
+          editor: false,
+          accounts: false,
+        ),
+        (
+          name: 'profiles_scenes_narrow_zh_light',
+          size: const Size(390, 844),
+          locale: LocalePreference.simplifiedChinese,
+          scale: 1.0,
+          editor: false,
+          accounts: false,
+        ),
+        (
+          name: 'profiles_scenes_rtl_large',
+          size: const Size(1280, 1000),
+          locale: LocalePreference.persian,
+          scale: 2.0,
+          editor: false,
+          accounts: false,
+        ),
+        (
+          name: 'profiles_accounts_desktop_en_light',
+          size: const Size(1280, 900),
+          locale: LocalePreference.english,
+          scale: 1.0,
+          editor: false,
+          accounts: true,
+        ),
+        (
+          name: 'profiles_accounts_narrow_zh_large',
+          size: const Size(390, 844),
+          locale: LocalePreference.simplifiedChinese,
+          scale: 2.0,
+          editor: false,
+          accounts: true,
+        ),
+        (
+          name: 'profiles_accounts_rtl_large',
+          size: const Size(1280, 1000),
+          locale: LocalePreference.persian,
+          scale: 2.0,
+          editor: false,
+          accounts: true,
+        ),
+        (
+          name: 'profiles_scene_editor_zh_light',
+          size: const Size(390, 844),
+          locale: LocalePreference.simplifiedChinese,
+          scale: 1.0,
+          editor: true,
+          accounts: false,
+        ),
+        (
+          name: 'profiles_scene_accounts_phone_large',
+          size: const Size(390, 844),
+          locale: LocalePreference.simplifiedChinese,
+          scale: 2.0,
+          editor: true,
+          accounts: true,
+        ),
+        (
+          name: 'profiles_scene_accounts_rtl_large',
+          size: const Size(1280, 1000),
+          locale: LocalePreference.persian,
+          scale: 2.0,
+          editor: true,
+          accounts: true,
+        ),
+      ]) {
+        testWidgets(
+          fixture.name,
+          (tester) async {
+            final engine = SceneEngine()..selected = 'scene-a';
+            final app = await pumpWorkflow(
+              tester,
+              engine,
+              section: AppSection.profiles,
+              size: fixture.size,
+            );
+            app.localePreference = fixture.locale;
+            app.engineCapabilities = await engine.getCapabilities();
+            if (fixture.accounts) seedGoldenAccounts(engine, app);
+            await app.scenarios.refresh();
+            await tester.pumpWidget(workflowHost(app, scale: fixture.scale));
+            await tester.pumpAndSettle();
+            if (fixture.editor) {
+              await tester.tap(find.byKey(const ValueKey('scenario-create')));
+              await tester.pumpAndSettle();
+            }
+            if (fixture.accounts) {
+              final account = find.byKey(
+                ValueKey(
+                  fixture.editor
+                      ? 'scenario-account-management'
+                      : 'profiles-manage-accounts',
+                ),
+              );
+              await tester.ensureVisible(account);
+              await tester.tap(account);
+              await tester.pumpAndSettle();
+            }
+            expect(tester.takeException(), isNull);
+            expect(find.byType(ErrorWidget), findsNothing);
+            await expectLater(
+              find.byType(MaterialApp),
+              matchesGoldenFile('goldens/linux/${fixture.name}.png'),
+            );
+          },
+          variant: const TargetPlatformVariant({TargetPlatform.linux}),
+          tags: const ['golden', 'linux-golden'],
+        );
+      }
+      // A drifted selection with a running session and differing rows.
+      for (final fixture in [
+        (
+          name: 'profiles_scenes_modified_desktop_en_light',
+          size: const Size(1280, 900),
+          locale: LocalePreference.english,
+        ),
+        (
+          name: 'profiles_scenes_modified_narrow_zh_light',
+          size: const Size(390, 844),
+          locale: LocalePreference.simplifiedChinese,
+        ),
+      ]) {
+        testWidgets(
+          fixture.name,
+          (tester) async {
+            final engine = richSceneEngine();
+            final app = await pumpWorkflow(
+              tester,
+              engine,
+              section: AppSection.profiles,
+              size: fixture.size,
+            );
+            app.localePreference = fixture.locale;
+            await confirmRichScenes(engine, app);
+            await tester.pumpWidget(workflowHost(app));
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+            expect(find.byType(ErrorWidget), findsNothing);
+            await expectLater(
+              find.byType(MaterialApp),
+              matchesGoldenFile('goldens/linux/${fixture.name}.png'),
+            );
           },
           variant: const TargetPlatformVariant({TargetPlatform.linux}),
           tags: const ['golden', 'linux-golden'],

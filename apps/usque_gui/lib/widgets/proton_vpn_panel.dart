@@ -13,6 +13,7 @@ import '../state/app_controller.dart';
 import 'chain_editor_layout.dart';
 import 'common.dart';
 import 'country_flag.dart';
+import 'tv_text_input.dart';
 import 'usque_dialog.dart';
 
 /// Native controls around a native-owned, cancellable authentication job.
@@ -388,6 +389,7 @@ class ProtonVpnPanelState extends State<ProtonVpnPanel> {
             child: Text(p('forget_local')),
           ),
           FilledButton(
+            style: dangerButtonStyle(context),
             onPressed: () => Navigator.pop(context, 'logout'),
             child: Text(p('sign_out_remove')),
           ),
@@ -446,51 +448,8 @@ class ProtonVpnPanelState extends State<ProtonVpnPanel> {
     }
   }
 
-  Future<List<Map<Object?, Object?>>> _loadServers(String id) async {
-    final nodes = <Map<Object?, Object?>>[];
-    var offset = 0, total = 0;
-    String? revision;
-    do {
-      final response = await _app.protonVpn({
-        'action': 'servers',
-        'profile_id': id,
-        'offset': offset,
-      });
-      try {
-        if (!mounted) return [];
-        final metadata = response.metadata;
-        final page = (metadata['servers'] as List?)
-            ?.whereType<Map<Object?, Object?>>()
-            .toList();
-        final nextTotal = metadata['server_total'];
-        final nextRevision = metadata['server_revision'];
-        if (metadata['error'] != null ||
-            page == null ||
-            page.length > 128 ||
-            nextTotal is! int ||
-            nextTotal < 0 ||
-            nextTotal > 20000 ||
-            nextRevision is! String ||
-            metadata['server_offset'] != offset ||
-            offset > nextTotal ||
-            offset != 0 && (total != nextTotal || revision != nextRevision) ||
-            page.isEmpty && offset < nextTotal) {
-          throw const FormatException('Invalid server page');
-        }
-        total = nextTotal;
-        revision = nextRevision;
-        nodes.addAll(page);
-        offset += page.length;
-        if (offset > total ||
-            nodes.map((node) => node['id']).toSet().length != nodes.length) {
-          throw const FormatException('Invalid server catalogue');
-        }
-      } finally {
-        response.clearHandoff();
-      }
-    } while (offset < total);
-    return nodes;
-  }
+  Future<List<Map<Object?, Object?>>> _loadServers(String id) =>
+      loadCachedProtonServers(_app, id, isCurrent: () => mounted);
 
   Future<void> _chooseServer(Map<Object?, Object?> profile) async {
     final id = profile['id'];
@@ -888,7 +847,7 @@ class ProtonVpnPanelState extends State<ProtonVpnPanel> {
             Row(
               children: [
                 Expanded(
-                  child: TextField(
+                  child: tvTextField(
                     controller: _totp,
                     obscureText: true,
                     maxLength: 6,
@@ -1023,6 +982,80 @@ class ProtonVpnPanelState extends State<ProtonVpnPanel> {
   }
 }
 
+Future<List<Map<Object?, Object?>>> loadCachedProtonServers(
+  AppController controller,
+  String id, {
+  bool Function()? isCurrent,
+}) async {
+  final nodes = <Map<Object?, Object?>>[];
+  var offset = 0, total = 0;
+  String? revision;
+  do {
+    final response = await controller.protonVpn({
+      'action': 'servers',
+      'profile_id': id,
+      'offset': offset,
+    });
+    try {
+      if (isCurrent != null && !isCurrent()) return [];
+      final metadata = response.metadata;
+      final page = (metadata['servers'] as List?)
+          ?.whereType<Map<Object?, Object?>>()
+          .toList();
+      final nextTotal = metadata['server_total'];
+      final nextRevision = metadata['server_revision'];
+      if (metadata['error'] != null ||
+          page == null ||
+          page.length > 128 ||
+          nextTotal is! int ||
+          nextTotal < 0 ||
+          nextTotal > 20000 ||
+          nextRevision is! String ||
+          metadata['server_offset'] != offset ||
+          offset > nextTotal ||
+          offset != 0 && (total != nextTotal || revision != nextRevision) ||
+          page.isEmpty && offset < nextTotal) {
+        throw const FormatException('Invalid server page');
+      }
+      total = nextTotal;
+      revision = nextRevision;
+      nodes.addAll(page);
+      offset += page.length;
+      if (offset > total ||
+          nodes.map((node) => node['id']).toSet().length != nodes.length) {
+        throw const FormatException('Invalid server catalogue');
+      }
+    } finally {
+      response.clearHandoff();
+    }
+  } while (offset < total);
+  return nodes;
+}
+
+/// Select an already cached logical server without changing account preferences,
+/// starting sign-in, or applying a live network configuration.
+Future<String?> chooseSavedProtonServer(
+  BuildContext context,
+  AppController controller,
+  String profileId,
+  String? selected,
+) async {
+  final nodes = await loadCachedProtonServers(
+    controller,
+    profileId,
+    isCurrent: () => context.mounted,
+  );
+  if (!context.mounted) return null;
+  return showDialog<String>(
+    context: context,
+    builder: (_) => _ProtonServerPicker(
+      nodes: nodes,
+      selected: selected,
+      text: controller.strings.proton,
+    ),
+  );
+}
+
 class _ProtonServerPicker extends StatefulWidget {
   const _ProtonServerPicker({
     required this.nodes,
@@ -1069,7 +1102,7 @@ class _ProtonServerPickerState extends State<_ProtonServerPicker> {
         height: (available * .55).clamp(100.0, 480.0),
         child: Column(
           children: [
-            TextField(
+            tvTextField(
               controller: _search,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
@@ -1193,7 +1226,7 @@ class _ProtonLoginDialogState extends State<_ProtonLoginDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
+          tvTextField(
             controller: _username,
             autofocus: true,
             autofillHints: const [],
@@ -1202,7 +1235,7 @@ class _ProtonLoginDialogState extends State<_ProtonLoginDialog> {
             decoration: InputDecoration(labelText: strings.proton('username')),
           ),
           const SizedBox(height: 12),
-          TextField(
+          tvTextField(
             controller: _password,
             obscureText: true,
             autofillHints: const [],

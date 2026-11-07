@@ -127,7 +127,9 @@ impl ConfigStore {
     {
         let _lock = self.lock_exclusive()?;
         let mut config = self.load_or_default()?;
+        let before = config.clone();
         let result = change(&mut config)?;
+        crate::scenarios::retire_restore_after_change(&before, &mut config);
         self.save(&config)?;
         Ok((config, result))
     }
@@ -355,6 +357,9 @@ impl AppConfig {
             schema_version: CURRENT_SCHEMA_VERSION,
             active_profile_id: legacy.active_profile_id,
             network,
+            scenarios: Vec::new(),
+            scenario_selection: None,
+            last_scenario_switch: None,
             profiles: legacy
                 .profiles
                 .into_iter()
@@ -551,6 +556,11 @@ fn migrate_app_config(config: &mut AppConfig) {
     if config.schema_version < 26 {
         config.network.endpoint.preset_region = None;
         config.schema_version = 26;
+    }
+    if config.schema_version < 27 {
+        // Scene fields default to an empty library and no selection when
+        // loading the configurations that predate this feature.
+        config.schema_version = 27;
     }
 }
 

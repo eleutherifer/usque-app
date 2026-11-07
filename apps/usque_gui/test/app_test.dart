@@ -43,6 +43,13 @@ class FakeEngineClient
         EngineClient,
         InitialIdentityClient,
         OnboardingPermissionsClient {
+  @override
+  Future<Map<String, Object?>> scenarioCommand(
+    Map<String, Object?> command,
+  ) async {
+    throw const EngineException('SCENARIOS_UNSUPPORTED', 'Scenes unavailable.');
+  }
+
   InitialIdentityState? initialSetupState;
   OnboardingPermissionState permissionState = const OnboardingPermissionState(
     notification: OnboardingNotificationPermission.notRequired,
@@ -523,6 +530,9 @@ class FakeEngineClient
   Future<void> setCloseToTray(bool enabled) async {}
 
   @override
+  Future<void> setHideFromRecents(bool enabled) async {}
+
+  @override
   Future<void> requestAddQuickSettingsTile() async {}
 
   PerAppProxySettings storedPerAppProxy = const PerAppProxySettings();
@@ -946,14 +956,14 @@ void main() {
     final downloader = RecordingUpdateDownloader(engine);
     final controller = AppController(engine, updateDownloader: downloader);
     await controller.initialize();
-    const path = 'test-update-cache/usque-v0.3.4-android-arm64-v8a.apk';
+    const path = 'test-update-cache/usque-v0.3.5-android-arm64-v8a.apk';
     controller.updateResult = const UpdateCheckResult(
       available: true,
-      version: 'v0.3.4',
+      version: 'v0.3.5',
       package: UpdatePackage(
-        name: 'usque-v0.3.4-android-arm64-v8a.apk',
+        name: 'usque-v0.3.5-android-arm64-v8a.apk',
         downloadUrl:
-            'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.4/usque-v0.3.4-android-arm64-v8a.apk',
+            'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.5/usque-v0.3.5-android-arm64-v8a.apk',
         size: 1024,
         sha256:
             'a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5',
@@ -1587,7 +1597,10 @@ void main() {
 
   test('compact navigation labels keep reviewed short translations', () {
     expect(AppStrings(LocalePreference.arabic).get('nav_home'), 'رئيسية');
-    expect(AppStrings(LocalePreference.arabic).get('nav_profiles'), 'حسابات');
+    expect(
+      AppStrings(LocalePreference.arabic).get('nav_profiles'),
+      'ملفات التعريف',
+    );
     expect(AppStrings(LocalePreference.arabic).get('nav_proxy'), 'وكيل');
     expect(AppStrings(LocalePreference.arabic).get('nav_settings'), 'إعدادات');
     expect(AppStrings(LocalePreference.german).get('nav_settings'), 'Optionen');
@@ -1597,7 +1610,7 @@ void main() {
       'Setelan',
     );
     expect(AppStrings(LocalePreference.italian).get('nav_settings'), 'Opzioni');
-    expect(AppStrings(LocalePreference.japanese).get('nav_profiles'), 'アカウント');
+    expect(AppStrings(LocalePreference.japanese).get('nav_profiles'), 'プロファイル');
     expect(AppStrings(LocalePreference.dutch).get('nav_settings'), 'Opties');
     expect(AppStrings(LocalePreference.polish).get('nav_settings'), 'Opcje');
     expect(
@@ -1820,8 +1833,8 @@ void main() {
     expect(tw.get('close_to_tray'), contains('系統匣'));
     expect(hk.get('geo_direct_help'), contains('網絡'));
     expect(tw.get('geo_direct_help'), contains('網路'));
-    expect(hk.get('diag_family'), 'IP 版本');
-    expect(tw.get('diag_family'), 'IP 版本');
+    expect(hk.get('diag_family'), 'IP 類型');
+    expect(tw.get('diag_family'), 'IP 類型');
   });
 
   testWidgets('Persian and Arabic locales select RTL directionality', (
@@ -2707,7 +2720,7 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(NavigationRail),
-        matching: find.text('Accounts'),
+        matching: find.text('Profiles'),
       ),
     );
     await tester.pumpAndSettle();
@@ -2755,7 +2768,7 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(NavigationRail),
-        matching: find.text('Accounts'),
+        matching: find.text('Profiles'),
       ),
     );
     await tester.pumpAndSettle();
@@ -3105,6 +3118,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Cloudflare terms'), findsOneWidget);
 
+    await tester.ensureVisible(find.byType(CheckboxListTile));
+    await tester.pumpAndSettle();
     await tester.tap(find.byType(CheckboxListTile));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.widgetWithText(FilledButton, 'Continue'));
@@ -3635,7 +3650,7 @@ void main() {
         bar.destinations.cast<NavigationDestination>().map(
           (destination) => destination.label,
         ),
-        <String>['Home', 'Accounts', 'Proxy', 'Settings'],
+        <String>['Home', 'Profiles', 'Proxy', 'Settings'],
       );
 
       final homeLabel = find.descendant(
@@ -3686,7 +3701,7 @@ void main() {
       await tester.tap(
         find.descendant(
           of: find.byType(NavigationRail),
-          matching: find.text('Accounts'),
+          matching: find.text('Profiles'),
         ),
       );
       await tester.pumpAndSettle();
@@ -3722,7 +3737,7 @@ void main() {
       }
 
       for (var index = 0; index < 50; index += 1) {
-        await tester.tap(find.byTooltip('Rename account').first);
+        await _accountMenuAction(tester, 'Rename account');
         await tester.pumpAndSettle();
         await tester.enterText(find.byType(TextField), 'Edited $index');
         await injectStatus(index + 100);
@@ -3731,7 +3746,7 @@ void main() {
       }
 
       for (var index = 0; index < 50; index += 1) {
-        await tester.tap(find.byTooltip('Rename account').first);
+        await _accountMenuAction(tester, 'Rename account');
         await tester.pumpAndSettle();
         await tester.enterText(find.byType(TextField), 'Enter $index');
         await injectStatus(index + 150);
@@ -3767,7 +3782,7 @@ void main() {
       final context = tester.element(find.byType(Scaffold).first);
       expect(Theme.of(context).brightness, Brightness.dark);
 
-      await tester.tap(find.text('账号').first);
+      await tester.tap(find.text('配置').first);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(find.text('添加账号'), findsOneWidget);
@@ -3804,7 +3819,7 @@ void main() {
       rail.destinations.map(
         (destination) => (destination.label as Tooltip).message,
       ),
-      <String>['Home', 'Accounts', 'Proxy', 'Settings'],
+      <String>['Home', 'Profiles', 'Proxy', 'Settings'],
     );
     final homeLabel = find.descendant(
       of: railFinder,
@@ -3979,11 +3994,26 @@ void main() {
   testWidgets('Windows settings hide the per-app proxy picker', (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     try {
+      const channel = MethodChannel('io.github.georgexie2333.usque/engine');
+      final messenger = tester.binding.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'getWindowVisibility') return true;
+        throw MissingPluginException();
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
       SharedPreferences.setMockInitialValues(<String, Object>{
         'onboarding_complete': true,
       });
       await tester.pumpWidget(UsqueBootstrap(engine: FakeEngineClient()));
       await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<ShellScreen>(find.byType(ShellScreen))
+            .controller
+            .uiVisible,
+        isTrue,
+        reason: 'a visible desktop remains interactive after startup',
+      );
       await tester.tap(
         find.descendant(
           of: find.byType(NavigationRail),
@@ -4015,13 +4045,13 @@ void main() {
         addTearDown(controller.dispose);
         controller.updateResult = const UpdateCheckResult(
           available: true,
-          version: 'v0.3.4',
+          version: 'v0.3.5',
           releaseUrl:
-              'https://github.com/GeorgeXie2333/usque-app/releases/tag/v0.3.4',
+              'https://github.com/GeorgeXie2333/usque-app/releases/tag/v0.3.5',
           package: UpdatePackage(
-            name: 'usque-v0.3.4-windows-x64-v2.msi',
+            name: 'usque-v0.3.5-windows-x64-v2.msi',
             downloadUrl:
-                'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.4/usque-v0.3.4-windows-x64-v2.msi',
+                'https://github.com/GeorgeXie2333/usque-app/releases/download/v0.3.5/usque-v0.3.5-windows-x64-v2.msi',
             size: 20 * 1024 * 1024,
             sha256:
                 'a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5',
@@ -4039,7 +4069,7 @@ void main() {
         );
 
         await tester.pumpWidget(app());
-        expect(find.text('v0.3.4  •  x64-v2  •  20.0 MiB'), findsOneWidget);
+        expect(find.text('v0.3.5  •  x64-v2  •  20.0 MiB'), findsOneWidget);
         expect(find.byType(LinearProgressIndicator), findsOneWidget);
         expect(find.text('5.0 MiB / 20.0 MiB'), findsOneWidget);
         expect(find.text('Cancel'), findsOneWidget);
@@ -4459,9 +4489,13 @@ void main() {
       expect(countrySwitch.value, isTrue);
       expect(countrySwitch.onChanged, isNotNull);
 
-      await tester.tap(
-        find.descendant(of: countryTile, matching: find.byType(Switch)),
+      final countryToggle = find.descendant(
+        of: countryTile,
+        matching: find.byType(Switch),
       );
+      await tester.ensureVisible(countryToggle);
+      await tester.pumpAndSettle();
+      await tester.tap(countryToggle);
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(FilledButton, 'Apply changes'));
       await tester.pumpAndSettle();
@@ -4908,6 +4942,13 @@ void main() {
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     try {
+      const channel = MethodChannel('io.github.georgexie2333.usque/engine');
+      final messenger = tester.binding.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'getWindowVisibility') return true;
+        throw MissingPluginException();
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(1280, 900);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -5032,7 +5073,7 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(NavigationRail),
-        matching: find.text('Accounts'),
+        matching: find.text('Profiles'),
       ),
     );
     await tester.pumpAndSettle();
@@ -5063,7 +5104,7 @@ void main() {
       findsNothing,
     );
 
-    await tester.tap(find.byTooltip('Rename account').first);
+    await _accountMenuAction(tester, 'Rename account');
     await tester.pumpAndSettle();
     expect(find.text('Rename account'), findsOneWidget);
     expect(find.text('Account name'), findsOneWidget);
@@ -5118,13 +5159,14 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(NavigationRail),
-        matching: find.text('Accounts'),
+        matching: find.text('Profiles'),
       ),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('WARP+'), findsOneWidget);
-    expect(find.text('Zero Trust'), findsOneWidget);
+    // A Zero Trust account names its organization beside the kind.
+    expect(find.text('Zero Trust · example-team'), findsOneWidget);
     expect(find.text('WARP Free'), findsNothing);
     expect(find.text('example-team · Experimental'), findsNothing);
   });
@@ -5152,7 +5194,7 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(NavigationRail),
-        matching: find.text('Accounts'),
+        matching: find.text('Profiles'),
       ),
     );
     await tester.pumpAndSettle();
@@ -5187,7 +5229,7 @@ void main() {
 
       await tester.pumpWidget(UsqueBootstrap(engine: engine));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Accounts').last);
+      await tester.tap(find.text('Profiles').last);
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
@@ -5202,4 +5244,22 @@ void main() {
       );
     },
   );
+}
+
+/// Opens the first account row's action menu and picks [label].
+Future<void> _accountMenuAction(WidgetTester tester, String label) async {
+  await tester.tap(
+    find
+        .byWidgetPredicate(
+          (widget) =>
+              widget is PopupMenuButton &&
+              widget.key is ValueKey<String> &&
+              (widget.key! as ValueKey<String>).value.startsWith(
+                'profile-menu-',
+              ),
+        )
+        .first,
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
 }

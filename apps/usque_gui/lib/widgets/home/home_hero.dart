@@ -14,7 +14,9 @@ import '../controller_selector.dart';
 import '../country_flag.dart';
 import '../live_duration.dart';
 import '../profile_identity_dialog.dart';
+import '../setup_handoff.dart';
 import 'home_details.dart';
+import 'home_scenario.dart';
 
 typedef _HeroView = ({
   ConnectionPhase phase,
@@ -33,7 +35,7 @@ _HeroView _heroView(AppController controller) => (
   phase: controller.snapshot.phase,
   busy: controller.busy,
   errorCode: controller.snapshot.errorCode,
-  profileName: controller.activeProfile.name,
+  profileName: controller.strings.accountName(controller.activeProfile),
   identityReady:
       controller.identityState(controller.activeProfileId) ==
       ProfileIdentityState.ready,
@@ -121,19 +123,26 @@ class HomeConnectionHero extends StatelessWidget {
             view.phase == ConnectionPhase.reconnecting) &&
         view.phase != ConnectionPhase.disconnecting &&
         !recoveryBlocked;
-    Widget ring(double size) => ConnectionRing(
-      phase: view.phase,
-      presentation: chainStatus.drivesHome ? presentation : null,
-      busy: view.busy,
-      actionLabel: action,
-      semanticLabel: '${strings.get('connection_status')}: $status',
-      size: size,
-      compactControl: compact,
-      onPressed: !canAct
-          ? null
-          : primaryRetry
-          ? controller.retry
-          : () => _connectOrRepairIdentity(context),
+    // After first-run setup the ring settles into place inside the arriving
+    // page, picking up the ring that setup just closed.
+    Widget ring(double size) => SetupEntranceTransition(
+      lift: 0,
+      scale: 0.92,
+      fade: false,
+      child: ConnectionRing(
+        phase: view.phase,
+        presentation: chainStatus.drivesHome ? presentation : null,
+        busy: view.busy,
+        actionLabel: action,
+        semanticLabel: '${strings.get('connection_status')}: $status',
+        size: size,
+        compactControl: compact,
+        onPressed: !canAct
+            ? null
+            : primaryRetry
+            ? controller.retry
+            : () => _connectOrRepairIdentity(context),
+      ),
     );
     final headline = _StatusHeadline(
       status: status,
@@ -189,7 +198,11 @@ class HomeConnectionHero extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        _AccountEyebrow(name: view.profileName, strings: strings),
+        _AccountEyebrow(
+          name: view.profileName,
+          strings: strings,
+          onOpen: controller.openAccounts,
+        ),
         const SizedBox(height: UsqueSpace.xs),
         headline,
         const SizedBox(height: UsqueSpace.s),
@@ -329,7 +342,13 @@ class _StatusHeadline extends StatelessWidget {
 
 /// The active account above the status, named for assistive technology.
 class _AccountEyebrow extends StatelessWidget {
-  const _AccountEyebrow({required this.name, required this.strings});
+  const _AccountEyebrow({
+    required this.name,
+    required this.strings,
+    required this.onOpen,
+  });
+
+  final VoidCallback onOpen;
 
   final String name;
   final AppStrings strings;
@@ -342,24 +361,28 @@ class _AccountEyebrow extends StatelessWidget {
       message: '${strings.get('active_profile')}: $name',
       child: Semantics(
         label: '${strings.get('active_profile')}: $name',
+        button: true,
         excludeSemantics: true,
-        child: Row(
-          key: const ValueKey('home-active-account'),
-          children: [
-            Icon(LucideIcons.circleUserRound, size: 16, color: muted),
-            const SizedBox(width: UsqueSpace.xs - 2),
-            Flexible(
-              child: Text(
-                name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: muted,
-                  fontWeight: FontWeight.w600,
+        child: InkWell(
+          onTap: onOpen,
+          child: Row(
+            key: const ValueKey('home-active-account'),
+            children: [
+              Icon(LucideIcons.circleUserRound, size: 16, color: muted),
+              const SizedBox(width: UsqueSpace.xs - 2),
+              Flexible(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: muted,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -473,6 +496,7 @@ class _DesktopSessionReadout extends StatelessWidget {
             ],
           ),
           const SizedBox(height: UsqueSpace.l - 4),
+          ScenarioHomeLink(controller: controller),
           HomeProtectionLine(
             killKey: view.killKey,
             alwaysOn: view.alwaysOn,

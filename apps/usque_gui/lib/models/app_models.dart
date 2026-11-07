@@ -624,17 +624,20 @@ class PlatformPreferences {
     this.startOnBoot = false,
     this.closeToTray = true,
     this.trayAvailable = true,
+    this.hideFromRecents = false,
   });
 
   final bool startOnBoot;
   final bool closeToTray;
   final bool trayAvailable;
+  final bool hideFromRecents;
 
   factory PlatformPreferences.fromMap(Map<Object?, Object?> map) {
     return PlatformPreferences(
       startOnBoot: map['start_on_boot'] as bool? ?? false,
       closeToTray: map['close_to_tray'] as bool? ?? true,
       trayAvailable: map['tray_available'] as bool? ?? true,
+      hideFromRecents: map['hide_from_recents'] as bool? ?? false,
     );
   }
 }
@@ -2157,6 +2160,7 @@ class EngineCapabilities {
     this.chainProtonVpn = false,
     this.protonAccountWarpFallback = false,
     this.protonServerSwitching = false,
+    this.connectionScenarios = false,
     this.chainHttpProxy = false,
     this.chainSocks5Proxy = false,
     this.chainProxyEncryptedDns = false,
@@ -2169,6 +2173,7 @@ class EngineCapabilities {
     this.zeroTrustEndpointEditing = false,
     this.chainOpenvpnMultiEndpoint = false,
     this.vpnGatePoolFavorites = false,
+    this.vpnGateEpochRequests = false,
     this.networkSettingsApplication = false,
     this.applicationQuicBlocking = false,
     this.accountMetadataMutations = false,
@@ -2198,6 +2203,7 @@ class EngineCapabilities {
     chainProtonVpn: map['chain_proton_vpn'] == true,
     protonAccountWarpFallback: map['proton_account_warp_fallback'] == true,
     protonServerSwitching: map['proton_server_switching'] == true,
+    connectionScenarios: map['connection_scenarios'] == true,
     chainHttpProxy: map['chain_http_proxy'] == true,
     chainSocks5Proxy: map['chain_socks5_proxy'] == true,
     chainProxyEncryptedDns: map['chain_proxy_encrypted_dns'] == true,
@@ -2210,6 +2216,7 @@ class EngineCapabilities {
     zeroTrustEndpointEditing: map['zero_trust_endpoint_editing'] == true,
     chainOpenvpnMultiEndpoint: map['chain_openvpn_multi_endpoint'] == true,
     vpnGatePoolFavorites: map['vpn_gate_pool_favorites'] == true,
+    vpnGateEpochRequests: map['vpn_gate_epoch_requests'] == true,
     networkSettingsApplication: map['network_settings_application'] == true,
     applicationQuicBlocking: map['application_quic_blocking'] == true,
     accountMetadataMutations: map['account_metadata_mutations'] == true,
@@ -2248,6 +2255,7 @@ class EngineCapabilities {
   final bool automaticEndpoints;
   final bool endpointPresets;
   final bool continuousConnection;
+  final bool connectionScenarios;
   final bool zeroTrustEndpointEditing;
   final bool networkQuality;
   final bool vpnGateTcp;
@@ -2263,6 +2271,7 @@ class EngineCapabilities {
       chainProxyEncryptedDns,
       chainOpenvpnMultiEndpoint;
   final bool vpnGatePoolFavorites;
+  final bool vpnGateEpochRequests;
   final bool networkSettingsApplication;
   final bool applicationQuicBlocking;
   final bool accountMetadataMutations;
@@ -2292,6 +2301,7 @@ class EngineCapabilities {
           chainProtonVpn == other.chainProtonVpn &&
           protonAccountWarpFallback == other.protonAccountWarpFallback &&
           protonServerSwitching == other.protonServerSwitching &&
+          connectionScenarios == other.connectionScenarios &&
           chainHttpProxy == other.chainHttpProxy &&
           chainSocks5Proxy == other.chainSocks5Proxy &&
           chainProxyEncryptedDns == other.chainProxyEncryptedDns &&
@@ -2304,6 +2314,7 @@ class EngineCapabilities {
           zeroTrustEndpointEditing == other.zeroTrustEndpointEditing &&
           chainOpenvpnMultiEndpoint == other.chainOpenvpnMultiEndpoint &&
           vpnGatePoolFavorites == other.vpnGatePoolFavorites &&
+          vpnGateEpochRequests == other.vpnGateEpochRequests &&
           networkSettingsApplication == other.networkSettingsApplication &&
           applicationQuicBlocking == other.applicationQuicBlocking &&
           accountMetadataMutations == other.accountMetadataMutations &&
@@ -2324,6 +2335,7 @@ class EngineCapabilities {
 
   @override
   int get hashCode => Object.hash(
+    connectionScenarios,
     networkSettingsApplication,
     applicationQuicBlocking,
     accountMetadataMutations,
@@ -2349,7 +2361,7 @@ class EngineCapabilities {
       zeroTrustEndpointEditing,
     ),
     chainOpenvpnMultiEndpoint,
-    vpnGatePoolFavorites,
+    Object.hash(vpnGatePoolFavorites, vpnGateEpochRequests),
     l4Tcp,
     l4TunTcp,
     l4DnsConversion,

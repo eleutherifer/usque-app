@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/app_strings.dart';
 import '../../core/chain_home_status.dart';
 import '../../core/chain_scope_presentation.dart';
+import '../../core/chain_strings.dart';
 import '../../core/usque_theme.dart';
 import '../../models/app_models.dart';
 import '../../state/app_controller.dart';
@@ -14,6 +15,7 @@ import '../common.dart';
 import '../controller_selector.dart';
 import '../usque_logo.dart';
 import 'home_details.dart';
+import 'home_scenario.dart';
 
 /// Phone page heading: the brand and the active account, which opens
 /// Accounts.
@@ -47,8 +49,10 @@ class HomePhoneHeader extends StatelessWidget {
             child: ControllerSelector<(String, String)>(
               controller: controller,
               active: (app) => app.section == AppSection.home,
-              selector: (app) =>
-                  (app.activeProfile.name, app.strings.catalogId),
+              selector: (app) => (
+                app.strings.accountName(app.activeProfile),
+                app.strings.catalogId,
+              ),
               builder: (context, view) =>
                   _AccountChip(controller: controller, name: view.$1),
             ),
@@ -81,7 +85,7 @@ class _AccountChip extends StatelessWidget {
           shape: const StadiumBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: () => controller.selectSection(AppSection.profiles),
+            onTap: controller.openAccounts,
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 40),
               child: Padding(
@@ -198,13 +202,14 @@ class HomeChainSummary extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'WARP → ${chain.source.label}',
+                              'WARP → ${controller.strings.chainSourceLabel(chain.source)}',
                               style: theme.textTheme.titleSmall,
                             ),
                             if (chain.selection != null) ...[
                               const SizedBox(height: 2),
                               ChainSelectionText(
                                 chain,
+                                strings: controller.strings,
                                 key: const ValueKey('home-chain-selection'),
                                 showSource: false,
                                 style: theme.textTheme.bodyMedium,
@@ -234,6 +239,7 @@ class HomeChainSummary extends StatelessWidget {
 }
 
 typedef _StatusView = ({
+  bool scenes,
   String killKey,
   bool alwaysOn,
   bool lockdown,
@@ -261,6 +267,7 @@ class HomeStatusCard extends StatelessWidget {
     controller: controller,
     active: (app) => app.section == AppSection.home,
     selector: (app) => (
+      scenes: app.scenarios.supported,
       killKey: killSwitchStatusKey(
         profile: app.activeProfile,
         snapshot: app.snapshot,
@@ -361,10 +368,11 @@ class HomeStatusCard extends StatelessWidget {
     ];
     return Panel(
       key: const ValueKey('home-status'),
-      padding: const EdgeInsetsDirectional.fromSTEB(20, 18, 20, 4),
+      padding: EdgeInsetsDirectional.fromSTEB(20, view.scenes ? 8 : 18, 20, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          ScenarioHomeLink(controller: controller, compact: true),
           for (var i = 0; i < rows.length; i++) ...[
             if (i > 0) const SizedBox(height: UsqueSpace.m),
             rows[i],

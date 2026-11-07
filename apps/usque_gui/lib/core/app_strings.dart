@@ -13,6 +13,7 @@ import 'l10n/network_quality.dart';
 import 'l10n/network_settings.dart';
 import 'l10n/onboarding.dart';
 import 'l10n/proton.dart';
+import 'l10n/scenarios.dart';
 import 'l10n/tls_fingerprint.dart';
 import 'l10n/ui_workflow.dart';
 import 'l10n/update_check.dart';
@@ -28,6 +29,13 @@ class AppStrings {
       );
 
   final String catalogId;
+
+  /// Localizes only the original default account's unchanged display name.
+  /// Stored names and user-created accounts are kept verbatim.
+  String accountName(UsqueProfile account) =>
+      account.id == UsqueProfile.defaultProfileId && account.name == 'Default'
+      ? get('account_default_name')
+      : account.name;
 
   String get vpnGateUnsupported =>
       get('l4_unsupported').replaceAll('L4', 'VPN Gate');
@@ -58,6 +66,8 @@ class AppStrings {
   }
 
   String _raw(String key) {
+    final scenes = kScenarioCatalogs[catalogId] ?? kScenarioEn;
+    if (scenes.containsKey(key)) return scenes[key]!;
     final presets =
         kEndpointPresetCatalogs[catalogId] ?? kEndpointPresetCatalogs['en']!;
     if (presets.containsKey(key)) return presets[key]!;
@@ -114,11 +124,14 @@ class AppStrings {
     'endpoint_preset_fi',
     'endpoint_preset_de',
     'endpoint_preset_us',
+    // French spells it the same.
+    'onboarding_notifications_title',
   };
 
   @visibleForTesting
   static bool get debugCatalogsAreComplete {
-    if (!_featureTablesComplete(
+    if (!_featureTablesComplete(kScenarioCatalogs, kScenarioEn) ||
+        !_featureTablesComplete(
           kEndpointPresetCatalogs,
           kEndpointPresetCatalogs['en']!,
         ) ||
@@ -262,7 +275,8 @@ class AppStrings {
 
   @visibleForTesting
   static bool get debugPlaceholdersArePreserved {
-    if (!_placeholdersPreserved(kEnCatalog, kCatalogs.values) ||
+    if (!_placeholdersPreserved(kScenarioEn, kScenarioCatalogs.values) ||
+        !_placeholdersPreserved(kEnCatalog, kCatalogs.values) ||
         !_placeholdersPreserved(
           kDiagnosticsCatalogs['en']!,
           kDiagnosticsCatalogs.values,
