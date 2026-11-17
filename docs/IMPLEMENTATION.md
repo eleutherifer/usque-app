@@ -1,9 +1,8 @@
 # Usque implementation progress
 
-This is the source-tree checklist for Windows, Linux and Android / Android TV, not a
-release changelog or a test-run report. A development branch can contain work
-not present in the latest package. macOS source is kept for later work and is
-not built, packaged, or tested for the current release.
+This checklist covers the source for Windows, macOS, Linux and Android / Android TV.
+The v0.3.5 candidate includes a macOS app. For published packages, consult the release
+notes for the installed version.
 
 - A checked implementation item means code or test infrastructure is in the
   tree. It does not certify that every test passed at the reader's commit or
@@ -17,9 +16,20 @@ The [documentation index](README.md) separates current contracts from historical
 records. [Reliability testing](RELIABILITY_TESTING.md) defines environments and
 evidence requirements; [Release process](RELEASE.md) defines publication.
 
-## v0.3.4 candidate changes since v0.3.3
+## v0.3.5 candidate changes since v0.3.4
 
-These changes are prepared for v0.3.4 and are not present in the published
+- macOS: Apple Silicon and Intel DMGs provide the desktop app and local proxy
+  mode; production system-wide TUN remains disabled. See
+  [macOS feature coverage](MACOS_WINDOWS_PARITY.md).
+- [Network settings](NETWORK_SETTINGS.md#parallel-masque-connections): one to
+  eight connections can distribute concurrent flows. Schema 28 defaults older
+  configurations to one connection and cannot be read by v0.3.4.
+- Profiles streamline scene switching; Windows recovery handles an already
+  unavailable adapter idempotently.
+
+## v0.3.4 changes since v0.3.3
+
+These changes were introduced in v0.3.4 and are not present in the published
 v0.3.3 packages. Candidate checks and publication are recorded separately;
 see [v0.3.4 preparation](RELEASE.md#preparing-v034).
 
@@ -207,6 +217,32 @@ the official Proton human-verification page. Desktop UI and engine remain unpriv
   uninstall.
 - [ ] Isolated clean-install, upgrade, and uninstall validation.
 
+### macOS desktop
+
+- [x] Current-user Unix Socket permissions, peer-UID validation, and protobuf engine IPC.
+- [x] Connect the Flutter macOS host to the Unix Socket client and sidecar lifecycle.
+- [x] Local HTTP and SOCKS5 proxies and menu bar connection controls.
+- [x] Root LaunchDaemon and administrator-authorized installation, repair and removal.
+- [x] Agent-owned utun, routes, DNS, PF protection and recovery journal in the
+  [opt-in TUN test build](MACOS_TUN_AGENT.md).
+- [x] Keychain storage for all identity record types.
+- [ ] LocalAuthentication re-authentication for reveal/copy/export operations.
+- [x] System proxy lease with a root-owned receipt and compare-and-restore cleanup.
+- [x] Separate [development DMGs](MACOS_DEVELOPMENT_PACKAGING.md) for Apple
+  Silicon and Intel targeting macOS 13 and later.
+- [ ] Complete the [network acceptance matrix](MACOS_TUN_AGENT.md#validation-and-release-gate)
+  before enabling production TUN.
+- [x] Protected tag jobs for both native DMGs, with [project self-signing](CODE_SIGNING.md#configure-and-verify-macos-release-signing), GitHub provenance and separate publication approval.
+
+### Linux desktop
+
+- [x] Unprivileged Engine with a private `XDG_RUNTIME_DIR` socket and peer-credential checks.
+- [x] Root Agent for TUN, routes, nftables guard, resolved/NetworkManager DNS and a Linux-only recovery journal.
+- [x] Secret Service storage for credentials and the chain-profile key, without plaintext fallback.
+- [x] GNOME/KDE system proxy, StatusNotifierItem tray and current-user login entry.
+- [x] Ed25519 signed amd64/arm64 AppImage, deb and rpm packages with format-matched updates and removal.
+- [ ] Isolated install, upgrade, removal, TUN, leak and recovery validation on `usque-linux-snapshot-vm`.
+
 ### Android and Android TV
 
 - [x] API 26 minimum, TV Leanback entry, and non-touchscreen compatibility.
@@ -225,26 +261,6 @@ the official Proton human-verification page. Desktop UI and engine remain unpriv
 - [x] Fail-closed Android reconnect: retain the TUN fd when Kill Switch is armed and the address/DNS/MTU/route identity is unchanged; establish a replacement TUN before closing the old one when that identity changes.
 - [x] Expose Android start-on-boot, Quick Settings tile request, and a deep link to system Always-on VPN settings.
 - [ ] Sleep, network-switch, and TV lifecycle tests.
-
-### macOS (deferred; not a current release gate)
-
-- [x] Current-user Unix Socket permissions, peer-UID validation, and protobuf engine IPC.
-- [x] Connect the Flutter macOS host to the Unix Socket client and sidecar lifecycle.
-- [ ] Minimal launch daemon/helper and authorization flow.
-- [ ] utun, route, resolver, PF Kill Switch, and recovery journal.
-- [x] Keychain storage for all identity record types.
-- [ ] LocalAuthentication re-authentication for reveal/copy/export operations.
-- [ ] System proxy snapshot, apply, and crash/uninstall recovery.
-- [ ] macOS 12+ Universal and macOS 10.15–11.7 Intel-compatible PKG packaging.
-
-### Linux desktop
-
-- [x] Unprivileged Engine with a private `XDG_RUNTIME_DIR` socket and peer-credential checks.
-- [x] Root Agent for TUN, routes, nftables guard, resolved/NetworkManager DNS and a Linux-only recovery journal.
-- [x] Secret Service storage for credentials and the chain-profile key, without plaintext fallback.
-- [x] GNOME/KDE system proxy, StatusNotifierItem tray and current-user login entry.
-- [x] Ed25519 signed amd64/arm64 AppImage, deb and rpm packages with format-matched updates and removal.
-- [ ] Isolated install, upgrade, removal, TUN, leak and recovery validation on `usque-linux-snapshot-vm`.
 
 ## Milestone 4 — Flutter UX
 

@@ -10,6 +10,8 @@
   ·
   <a href="README.zh-CN.md">简体中文</a>
   ·
+  <a href="README.zh-Hant.md">繁體中文</a>
+  ·
   <a href="README.ja.md">日本語</a>
   ·
   <a href="README.ko.md">한국어</a>
@@ -20,7 +22,7 @@
 </p>
 
 <p align="center">
-  An unofficial client compatible with Cloudflare® WARP® services for Windows, Linux and Android / Android TV,<br>
+  An unofficial client compatible with Cloudflare® WARP® services for Windows, macOS, Linux and Android / Android TV,<br>
   with a native Flutter interface and a Rust MASQUE engine.
 </p>
 
@@ -30,7 +32,7 @@
 
 <p align="center">
   <a href="https://github.com/GeorgeXie2333/usque-app/releases"><img alt="Total downloads" src="https://img.shields.io/github/downloads/GeorgeXie2333/usque-app/total?color=C2500C"></a>
-  <img alt="Platforms: Windows, Linux, Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20Android-555555">
+  <img alt="Platforms: Windows, macOS, Linux, Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-555555">
   <a href="LICENSE.md"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-C2500C.svg"></a>
 </p>
 
@@ -135,11 +137,12 @@ flowchart LR
 
 ## Download
 
-Version **v0.3.4** adds local connection scenes and improves setup, routing and the desktop and Android experience. For an installed version, follow its release notes and the documentation at its tag.
+Version **v0.3.5** adds macOS desktop support and configurable parallel connections, and makes scenes easier to switch. For an installed version, follow its release notes and the documentation at its tag.
 
 | Platform | Minimum system | Package |
 | --- | --- | --- |
 | Windows | Windows 10 2004, build 19041 | x64-v2 or ARM64 installer EXE |
+| macOS | macOS 13 or later | DMGs for Apple Silicon (arm64) and Intel (x86_64) |
 | Linux (since v0.3.3) | Ubuntu 22.04+, Debian 12+, supported Fedora; systemd | amd64 or arm64 AppImage, deb or rpm |
 | Android / Android TV | Android 8.0, API 26 | arm64-v8a, x86_64 or armeabi-v7a APK, or the universal APK |
 
@@ -152,7 +155,7 @@ Windows x64 requires a CPU supporting **x86-64-v2**; ARM64 Windows uses the nati
 >
 > **Never bypass a warning.** Pre-1.0 Windows and Android packages use fixed, project-controlled self-signed certificates: Windows may show an unknown-publisher warning, and Android packages are installed outside Google Play. Do not disable antivirus or the firewall, or import certificates from unofficial packages, to bypass a warning.
 
-- **Upgrades migrate configuration one way.** v0.3.2 and v0.3.3 use configuration schema 26; upgrading from v0.3.1 migrates schema 24 to 26, which v0.3.1 and older clients cannot read. v0.3.4 migrates schema 26 to 27, which v0.3.3 and older clients cannot read. Reinstalling an older package does not reverse the migration, so review [configuration compatibility](docs/INSTALLATION.md#configuration-compatibility-when-upgrading) and any required pre-upgrade backup first.
+- **Upgrades migrate configuration one way.** v0.3.2 and v0.3.3 use configuration schema 26; upgrading from v0.3.1 migrates schema 24 to 26, which v0.3.1 and older clients cannot read. v0.3.4 migrates schema 26 to 27, which v0.3.3 and older clients cannot read. Reinstalling an older package does not reverse the migration, so review [configuration compatibility](docs/INSTALLATION.md#configuration-compatibility-when-upgrading) and any required pre-upgrade backup first. v0.3.5 migrates to schema 28, which v0.3.4 and older clients cannot read.
 - **Linux:** the first AppImage VPN setup installs a background service with administrator authorization, and credentials require an unlocked Secret Service keyring. The [Linux desktop guide](docs/LINUX_DESKTOP.md) covers GNOME/KDE, X11/Wayland, recovery and the tested coverage.
 - **Updates** require confirmation before downloading and use the platform installer; there is no unattended installation.
 - [Installation and removal](docs/INSTALLATION.md) covers upgrades, uninstall, recovery and Android developer verification; [Code signing](docs/CODE_SIGNING.md) lists the official identities.
@@ -233,7 +236,53 @@ VPN, SOCKS5 and HTTP are enabled by default; system proxy is off. They share one
 
 ### Experimental and unsupported
 
-[Zero Trust enrollment](docs/ZERO_TRUST_EXPERIMENTAL.md) is experimental. It uses an organization identity for the MASQUE Internet tunnel and does not provide full Cloudflare One™ Client compatibility. macOS source is retained but not built or released. iOS, store distribution and a public CLI are outside this release's scope.
+[Zero Trust enrollment](docs/ZERO_TRUST_EXPERIMENTAL.md) is experimental. It uses
+an organization identity for the MASQUE Internet tunnel and does not provide full
+Cloudflare One™ Client compatibility. iOS, store distribution and a public CLI
+are outside this release's scope.
+
+### macOS in v0.3.5
+
+The macOS version supports local HTTP and SOCKS5 proxies on macOS 13 and later. System-wide TUN remains disabled in release DMGs. See the [macOS feature matrix](docs/MACOS_WINDOWS_PARITY.md) and [installation guide](docs/INSTALLATION.md#choose-a-package).
+
+Historical **unofficial v0.3.3 dev pre-release** for macOS 13+:
+[Apple Silicon (arm64)](https://github.com/JustinL330/usque-app/releases/download/macos-dev-v0.3.3-compact-12636756/usque-v0.3.3-macos-arm64.dmg)
+or [Intel (x86_64)](https://github.com/JustinL330/usque-app/releases/download/macos-dev-v0.3.3-compact-12636756/usque-v0.3.3-macos-x86_64.dmg).
+These ad-hoc signed packages are not notarized or production releases. Read the
+[release notes, checksums and manifests](https://github.com/JustinL330/usque-app/releases/tag/macos-dev-v0.3.3-compact-12636756)
+before testing; system VPN activation remains disabled.
+The compact images reduce downloads by 46.6% / 43.2%; see the
+[size explanation and validation](docs/MACOS_PACKAGE_SIZE.md). These older
+downloads include CEF verification and all application languages.
+
+The historical downloads above predate current macOS scenes and recovery. macOS
+supports Proton account sign-in, but not guest registration or the embedded
+verification browser; import a Proton configuration when browser verification
+is required. Use official releases for current packages.
+
+The [macOS test checklist](docs/MACOS_QA_CHECKLIST.md) separates isolated tests
+from actual device acceptance. The following items remain open:
+
+- **System VPN/TUN:** ordinary DMGs keep it disabled. The Agent still requires
+  device acceptance for routing, DNS and Kill Switch protection. Proxy-only
+  mode protects traffic that applications send to the proxy.
+- **System proxy and chain exits:** isolated configuration, recovery and transport
+  tests do not establish a successful live connection. Real authorization and
+  each external exit still need device tests. Current macOS source reuses WARP
+  or opens a temporary WARP connection for VPN Gate, retaining saved chain
+  settings; direct physical-network catalogue fallback remains disabled.
+- **Zero Trust:** callback validation and cancel/retry tests use synthetic data;
+  an actual organization login and callback remain unverified.
+- **Proton accounts:** macOS has no guest registration or embedded verification
+  browser. Account sign-in, authenticator codes and saved-account management
+  remain available; live sign-in and traffic still require device testing.
+- **Desktop and hardware:** layout checks use headless Windows/macOS widget
+  renders. Actual native-window interaction, Intel execution and macOS 13 hardware
+  remain untested. The default Mac content area now matches Windows at 1040×760,
+  fits the available screen, and preserves saved window geometry.
+
+No application, browser, permission window or host network setting is opened or
+changed by this background validation. Development packages are not notarized.
 
 ## Default network settings
 
@@ -245,6 +294,7 @@ VPN, SOCKS5 and HTTP are enabled by default; system proxy is off. They share one
 | Port / SNI | `443` / `speed.cloudflare.com` |
 | Transport | Auto: HTTP/3, then HTTP/2 |
 | HTTP/3 congestion control | `cubic`; BBRv2, experimental BBRv3, and `reno` are selectable |
+| MASQUE multiplexed connections | `1`; manually configurable from `1` to `8` for HTTP/2 and HTTP/3 / L4 |
 | QUIC UDP receive buffer | [2 MiB target](docs/UDP_RECEIVE_BUFFER.md) on Windows/Android for H3 and L4; actual capacity is OS-dependent |
 | TUN MTU | `1280` |
 | Fallback DNS | `1.1.1.1`, `2606:4700:4700::1111` |
@@ -259,6 +309,8 @@ VPN, SOCKS5 and HTTP are enabled by default; system proxy is off. They share one
 Proxy address and port edits are drafts until applied. Proxy DNS uses the current exit by default: configure [WARP DNS](docs/WARP_DNS.md) in Advanced settings or the final DNS in the chain configuration. The Proxy page has no DNS settings; a proxy DNS choice saved by an older version keeps working.
 
 Advanced settings reset loads defaults into the draft; it does not apply them immediately.
+
+In **Advanced network settings → MASQUE multiplexed connections**, enter **1–8** (default **1**), then **Apply changes**. A changed count reconnects the session. Separate flows use different MASQUE connections; each flow stays on one connection. The setting applies to HTTP/2/HTTP/3 CONNECT-IP and L4 (HTTP/3 TCP CONNECT). See [connection behavior](docs/NETWORK_SETTINGS.md#parallel-masque-connections).
 
 In Advanced network settings, Automatic selection races eligible account endpoints; Custom keeps manual addresses. Port and SNI remain editable. See [automatic endpoints](docs/NETWORK_SETTINGS.md#automatic-endpoints--自动选择端点).
 
@@ -288,7 +340,7 @@ Use the pinned toolchains and change-scoped checks in the contribution guide. Co
 
 Protocol behavior follows [Diniboy1123/usque](https://github.com/Diniboy1123/usque). This repository keeps a snapshot of that client in `oracle/go` for interoperability tests. The Flutter UI and Rust engine are new code. Upstream copyright stays in the license.
 
-First-party source is [MIT](LICENSE.md). Third-party components keep their own licenses. The optional [chain proxy](docs/CHAIN_PROXY.md) embeds OpenVPN 3 Core under MPL-2.0 and Mbed TLS under Apache-2.0. Corresponding source, reviewed patches and license texts are included in `third_party`; the application exposes the notices from its VPN Gate page. WireGuard uses BoringTun 0.7.1 (BSD-3-Clause), and local SVG icons use flutter_svg 2.3.0 (MIT); their notices are in the app's license registry.
+First-party source is [MIT](LICENSE.md). Third-party components keep their own licenses. The optional [chain proxy](docs/CHAIN_PROXY.md) embeds OpenVPN 3 Core under MPL-2.0 and Mbed TLS under Apache-2.0. Corresponding source, reviewed patches and license texts are included in `third_party`; the application exposes the notices from its VPN Gate page. WireGuard uses BoringTun 0.7.1 (BSD-3-Clause), and local SVG icons use flutter_svg 2.3.4 (MIT); their notices are in the app's license registry.
 
 The independent Proton SRP implementation references Proton go-srp (MIT); its [copyright and full license](apps/usque_gui/assets/licenses/proton-srp.txt) are retained in source, test vectors and the app license registry.
 

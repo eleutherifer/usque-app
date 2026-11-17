@@ -185,11 +185,13 @@ Every `unsafe` block needs a `// SAFETY:` comment that states the invariants. A 
 Userspace TCP budget or pinned stack changes also run the dependency tests;
 workspace tests do not execute dependency unit tests. On Windows, initialize
 the native environment through the Windows Rust helper before these commands.
-Both manifests resolve the same local smoltcp patch.
+Both manifests resolve the same local smoltcp patch. The integrated netstack
+suite includes the former core tests and the upstream TCP/UDP socket tests;
+throughput benchmarks and TUN examples are not executed on workstations.
 
 ```shell
 cargo test --manifest-path third_party/smoltcp-0.14.0/Cargo.toml --locked --lib
-cargo test --manifest-path third_party/ts_netstack_smoltcp_core/Cargo.toml --locked --all-targets
+cargo test --manifest-path third_party/ts_netstack_smoltcp-0.7.1/Cargo.toml --locked --lib --tests --features std,tokio
 ```
 
 Embedded OpenVPN changes additionally require the source/notice lock check and
@@ -503,15 +505,15 @@ both architectures. Pass only the Base64 quiet-launcher script through WiX
 
 For Flutter or Windows-runner changes, run the Windows Rust gates above and
 the complete sequence below on Windows with the pinned Flutter SDK. For the
-v0.3.4 candidate, first restore the reviewed engine to
-`target/v034-release/engine-x64` using `tool/flutter_windows_release_engine.py
+v0.3.5 candidate, first restore the reviewed engine to
+`target/v035-release/engine-x64` using `tool/flutter_windows_release_engine.py
 restore` with the current commit. Other source builds use the following
 source-build section. Do not substitute a build-only command for format,
 analysis, and tests:
 
 ```powershell
 Set-Location apps/usque_gui
-$engineRoot = (Resolve-Path ../../target/v034-release/engine-x64).Path
+$engineRoot = (Resolve-Path ../../target/v035-release/engine-x64).Path
 $engineSource = (Resolve-Path "$engineRoot/flutter/engine/src").Path
 $engineArguments = @("--local-engine-src-path=$engineSource", "--local-engine=host_release", "--local-engine-host=host_release")
 flutter @engineArguments pub get --enforce-lockfile
@@ -595,7 +597,7 @@ Compile-only PR builds can reuse the complete attested engine dependency from
 [the engine workflow](.github/workflows/flutter-engine.yml). Its exact reuse key
 covers the recipe, patches, build/packaging tools and regression/producer code.
 Missing or expired dependencies fall back to fresh source builds; integrity or
-provenance failures fail explicitly. The v0.3.4 release may reuse its separately
+provenance failures fail explicitly. The v0.3.5 release may reuse its separately
 reviewed, pinned source-built producer only through the release compatibility
 check; untrusted or mismatched inputs fail without a build fallback. Package
 completeness, trust, retention and bootstrap behavior are

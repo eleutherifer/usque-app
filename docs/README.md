@@ -2,7 +2,8 @@
 
 Choose a guide by task. Technical documents are mainly in English; the product
 overview is available in [English](../README.md),
-[简体中文](../README.zh-CN.md), [日本語](../README.ja.md),
+[简体中文](../README.zh-CN.md), [繁體中文](../README.zh-Hant.md),
+[日本語](../README.ja.md),
 [한국어](../README.ko.md), [Русский](../README.ru.md), and
 [فارسی](../README.fa.md).
 
@@ -44,6 +45,15 @@ Continuous connection behavior and control compatibility: [English / 简体中�
 | [Contributing](../CONTRIBUTING.md) | Toolchain setup and change-scoped checks / 工具链准备与检查矩阵 |
 | [Development-machine safety](../CONTRIBUTING.md#development-machines) | Workstation limits, isolation, and evidence requirements / 开发机安全边界与验证要求 |
 | [Implementation progress](IMPLEMENTATION.md) | Source-tree milestones, not proof of a test run / 源码实现进度，不等同于测试通过 |
+| [macOS TUN Agent](MACOS_TUN_AGENT.md) | Integrated root Agent/utun, recovery, service maintenance and release gate / 免订阅 Agent、TUN、恢复与分发验收门槛 |
+| [macOS TUN Agent validation](MACOS_TUN_AGENT_VALIDATION.json) | Source hashes, isolated test results and explicit not-run real-network matrix / 源码校验、隔离测试与未运行的实机矩阵 |
+| [macOS network prototype](MACOS_NETWORK_PROTOTYPE.md) | Sole VPN owner, isolated contracts, dual-architecture developer builds and pending signed routing acceptance / 单会话 VPN 原型、隔离测试、双架构开发构建与待签名实机验收 |
+| [macOS parity matrix](MACOS_WINDOWS_PARITY.md) | Windows comparison, desktop and proxy implementation, and explicit unsigned/hardware limits / Windows 功能对照、桌面与代理进展及验收限制 |
+| [macOS development packages](MACOS_DEVELOPMENT_PACKAGING.md) | Separate arm64/Intel DMGs, maintenance helper, stale browser rejection and disabled production installation / 双架构开发 DMG 与内嵌组件 |
+| [macOS background validation](MACOS_BACKGROUND_VALIDATION.json) | No-window follow-up evidence, fresh dual-architecture development images and deferred interactive acceptance / 无窗口验证记录与待完成的交互验收 |
+| [macOS Traditional Chinese validation](MACOS_TRADITIONAL_CHINESE_VALIDATION.json) | Hong Kong/Taiwan desktop language, live system-language regression and dual-architecture development images / 香港、台灣繁體介面與無視窗驗證記錄 |
+| [macOS test checklist and known issues](MACOS_QA_CHECKLIST.md) | VPN/proxy/chain tests, simulated Windows UI comparison, window sizing and account acceptance limits / VPN、代理、鏈式出口、介面與帳號測試及保留問題 |
+| [macOS checklist validation](MACOS_QA_VALIDATION.json) | Source-bound isolated results and checksums for the refreshed development packages / 本輪隔離結果與開發包校驗記錄 |
 | [Routing validation record](ROUTING_VALIDATION.md) | Workstation commands, results and unavailable isolated checks / 分流功能开发机验证与未运行的隔离检查 |
 | [GUI development](../apps/usque_gui/README.md) | Editing workflows and native UI conventions / 界面交互与布局约定 |
 | [Android TV input validation](ANDROID_TV_INPUT_VALIDATION.md) | D-pad editing, Back handling, automated checks and unavailable device validation / 方向键编辑、返回处理、自动化检查与未运行的设备验收 |
@@ -113,6 +123,8 @@ Common terms in these references:
 
 | Record | Scope / 范围 |
 | --- | --- |
+| [quiche 0.30.1 upgrade](QUICHE_UPGRADE_VALIDATION.md) | Rebased transport patches, dependency constraints, local checks and unrun platform/lab validation / 传输补丁迁移、依赖约束、本地检查与未运行的平台和隔离验证 |
+| [Dependency upgrade validation](DEPENDENCY_UPGRADE_VALIDATION.md) | Netstack, OpenVPN, trust roots and Flutter dependencies; JNI lifecycle adaptation and local checks / 网络栈、OpenVPN、根证书与 Flutter 依赖升级，JNI 生命周期适配及本地验证 |
 | [Linux implementation validation](LINUX_IMPLEMENTATION_VALIDATION.md) | Local Linux source/build checks, cross-platform regressions and explicitly unavailable native acceptance / Linux 本地源码与构建检查、跨平台回归及未运行的原生验收 |
 | [Upstream transport fixes](UPSTREAM_TRANSPORT_VALIDATION.md) | ICMP saturation and TCP packet-budget regressions, safe checks and isolated-test limits / ICMP 拥塞、TCP 包预算回归、安全检查与隔离测试边界 |
 | [Chrome ClientHello compatibility](CHROME_FINGERPRINT_VALIDATION.md) | Explicit H2/H3 WARP handshake and CONNECT-IP experiment, profile limits and validation / H2、H3 指纹握手与 CONNECT-IP 实测、指纹范围与验证 |
@@ -160,9 +172,9 @@ Usque app behavior.
 
 Third-party source and license notices remain with their components. Local
 changes are recorded separately for
-[quiche](../third_party/quiche-0.29.3/USQUE-PATCH.md),
+[quiche](../third_party/quiche-0.30.1/USQUE-PATCH.md),
 [boring-sys](../third_party/boring-sys-4.22.0/USQUE-PATCH.md),
-[smoltcp integration](../third_party/ts_netstack_smoltcp_core/PATCHES.md), and
+[smoltcp integration](../third_party/ts_netstack_smoltcp-0.7.1/PATCHES.md), and
 [Wintun provenance](../third_party/wintun-0.14.1/SOURCE.md).
 Do not rewrite frozen upstream documents as product instructions.
 

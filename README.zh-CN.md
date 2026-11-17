@@ -10,6 +10,8 @@
   ·
   简体中文
   ·
+  <a href="README.zh-Hant.md">繁體中文</a>
+  ·
   <a href="README.ja.md">日本語</a>
   ·
   <a href="README.ko.md">한국어</a>
@@ -20,7 +22,7 @@
 </p>
 
 <p align="center">
-  兼容 Cloudflare® WARP® 服务的非官方客户端，支持 Windows、Linux 和 Android / Android TV，<br>
+  兼容 Cloudflare® WARP® 服务的非官方客户端，支持 Windows、macOS、Linux 和 Android / Android TV，<br>
   采用原生 Flutter 界面与 Rust MASQUE 引擎。
 </p>
 
@@ -30,7 +32,7 @@
 
 <p align="center">
   <a href="https://github.com/GeorgeXie2333/usque-app/releases"><img alt="总下载量" src="https://img.shields.io/github/downloads/GeorgeXie2333/usque-app/total?color=C2500C"></a>
-  <img alt="平台：Windows、Linux、Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20Android-555555">
+  <img alt="平台：Windows、macOS、Linux、Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-555555">
   <a href="LICENSE.md"><img alt="MIT 许可证" src="https://img.shields.io/badge/license-MIT-C2500C.svg"></a>
 </p>
 
@@ -135,11 +137,12 @@ flowchart LR
 
 ## 下载
 
-**v0.3.4** 新增本机连接场景，并改进设置、分流及桌面和 Android 使用体验。安装的版本请以对应发布说明和标签下文档为准。
+**v0.3.5** 新增 macOS 桌面版和可配置的并行连接，并简化连接场景切换。安装的版本请以对应发布说明和标签下文档为准。
 
 | 平台 | 最低系统 | 安装包 |
 | --- | --- | --- |
 | Windows | Windows 10 2004，Build 19041 | x64-v2 或 ARM64 安装程序 EXE |
+| macOS | macOS 13 或更高版本 | Apple Silicon（arm64）和 Intel（x86_64）DMG |
 | Linux（自 v0.3.3 起） | Ubuntu 22.04+、Debian 12+、受支持的 Fedora；systemd | amd64 或 arm64 的 AppImage、deb 或 rpm |
 | Android / Android TV | Android 8.0，API 26 | arm64-v8a、x86_64 或 armeabi-v7a APK，或通用 APK |
 
@@ -152,7 +155,7 @@ Windows x64 需要支持 **x86-64-v2** 的 CPU；ARM64 Windows 使用原生 ARM6
 >
 > **不要绕过安全警告。** 1.0 之前的 Windows/Android 安装包使用项目自行管理的固定自签名证书：Windows 可能显示“未知发布者”警告，Android 安装包不通过 Google Play 分发。不要通过关闭杀毒软件、防火墙或导入非官方安装包提供的证书来绕过警告。
 
-- **升级会单向迁移配置。** v0.3.2 和 v0.3.3 使用配置 schema 26；从 v0.3.1 升级会将 schema 24 迁移至 26，v0.3.1 及更早客户端无法读取。v0.3.4 会将 schema 26 迁移至 27，v0.3.3 及更早客户端无法读取。重新安装旧版不会逆转迁移，请先查看[配置兼容性](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)并安排所需备份。
+- **升级会单向迁移配置。** v0.3.2 和 v0.3.3 使用配置 schema 26；从 v0.3.1 升级会将 schema 24 迁移至 26，v0.3.1 及更早客户端无法读取。v0.3.4 会将 schema 26 迁移至 27，v0.3.3 及更早客户端无法读取。重新安装旧版不会逆转迁移，请先查看[配置兼容性](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)并安排所需备份。 v0.3.5 迁移至 schema 28，v0.3.4 及更早客户端无法读取。
 - **Linux：** AppImage 首次使用 VPN 时需要管理员授权安装后台服务；凭据依赖已解锁的 Secret Service 钥匙串。[Linux 桌面指南](docs/LINUX_DESKTOP.md) 说明 GNOME/KDE、X11/Wayland、恢复流程与已测试范围。
 - **更新**下载需要用户确认，安装通过平台安装程序完成，不会未经确认自动安装。
 - 升级、卸载、恢复及 Android 开发者验证说明见[安装指南](docs/INSTALLATION.md)，官方签名身份见[代码签名策略](docs/CODE_SIGNING.md)。
@@ -233,7 +236,33 @@ VPN、SOCKS5 和 HTTP 默认开启，系统代理默认关闭。它们共用一�
 
 ### 实验性功能与支持范围
 
-[Zero Trust 注册](docs/ZERO_TRUST_EXPERIMENTAL.md)仍属实验性功能：可以用组织身份建立 MASQUE 公网隧道，但不提供完整的 Cloudflare One™ Client 功能。仓库保留 macOS 源码，但不构建或发布；当前也不提供 iOS 版本、应用商店分发或公开命令行工具。
+[Zero Trust 注册](docs/ZERO_TRUST_EXPERIMENTAL.md)仍属实验性功能：可以用组织身份建立 MASQUE 公网隧道，
+但不提供完整的 Cloudflare One™ Client 功能。
+当前也不提供 iOS 版本、应用商店分发或公开命令行工具。
+
+### v0.3.5 的 macOS 支持
+
+v0.3.5 的 macOS 版支持在 macOS 13 及以上版本使用本地 HTTP 和 SOCKS5 代理，正式 DMG 不启用系统级 VPN。详见 [macOS 功能对照表](docs/MACOS_WINDOWS_PARITY.md)和[安装指南](docs/INSTALLATION.md#choose-a-package)。
+
+macOS 13+ **历史 v0.3.3 非官方 dev 预发布包**：
+[Apple Silicon（arm64）](https://github.com/JustinL330/usque-app/releases/download/macos-dev-v0.3.3-compact-12636756/usque-v0.3.3-macos-arm64.dmg)／
+[Intel（x86_64）](https://github.com/JustinL330/usque-app/releases/download/macos-dev-v0.3.3-compact-12636756/usque-v0.3.3-macos-x86_64.dmg)。
+安装包仅作临时签名，尚未公证，不是正式版本，系统 VPN 保持关闭。测试前请阅读
+[发布说明、校验值和清单](https://github.com/JustinL330/usque-app/releases/tag/macos-dev-v0.3.3-compact-12636756)。
+上述旧版精简包下载量减少约 47%／43%，包含繁体中文、原有界面语言、CEF 验证元件和 sandbox。
+体积原因与验证结果见[macOS 安装包体积说明](docs/MACOS_PACKAGE_SIZE.md)。
+
+上方历史安装包早于当前连接场景及恢复功能，请使用正式 Release 获取当前安装包。
+
+[macOS 测试清单](docs/MACOS_QA_CHECKLIST.md)分别记录隔离测试与真机验收。以下项目仍未完成：
+
+- **系统 VPN／虚拟网卡：** 常规 DMG 默认关闭。Agent 的路由、DNS 和断网保护仍待真机验收。代理模式只处理应用发往代理的流量。
+- **系统代理与链式出口：** 隔离的配置、恢复和传输测试不能证明实网连接成功；真实授权及各类外部出口仍待验收。当前 macOS 源码复用 WARP 或自动建立临时 WARP 连接来刷新 VPN Gate，保留已保存的链式设置；不会回退到物理网络直接下载清单。
+- **Zero Trust：** 回调校验及取消后重试使用模拟数据；真实组织登录与回调仍未验证。
+- **Proton 账号：** macOS 已移除游客登录和内置验证浏览器；保留普通账号登录、身份验证器代码及已保存账号管理。若登录要求浏览器人机验证，此 macOS 版本无法完成；真实登录与流量仍待实机验证。
+- **桌面与硬件：** 布局检查使用无窗口的 Windows／macOS 组件渲染；原生窗口交互、Intel 运行及 macOS 13 真机仍待测试。Mac 默认内容区域已与 Windows 统一为 1040×760，并适配可用屏幕、保留已保存的窗口位置和尺寸。
+
+本轮后台验证没有开启应用、浏览器或权限窗口，也不修改本机网络设置。开发包尚未公证。
 
 ## 默认网络设置
 
@@ -245,6 +274,7 @@ VPN、SOCKS5 和 HTTP 默认开启，系统代理默认关闭。它们共用一�
 | 端口 / SNI | `443` / `speed.cloudflare.com` |
 | 传输 | 自动：先 HTTP/3，再 HTTP/2 |
 | HTTP/3 拥塞控制 | `cubic`；可选择 BBRv2、实验性 BBRv3 和 `reno` |
+| MASQUE 多路复用连接数 | `1`；HTTP/2、HTTP/3 / L4 均可手动填写 `1–8` |
 | QUIC UDP 接收缓冲 | Windows/Android 的 H3、L4 均以 [2 MiB 为目标](docs/UDP_RECEIVE_BUFFER.md)申请；实际容量由系统决定 |
 | TUN MTU | `1280` |
 | 备用 DNS | `1.1.1.1`、`2606:4700:4700::1111` |
@@ -259,6 +289,8 @@ VPN、SOCKS5 和 HTTP 默认开启，系统代理默认关闭。它们共用一�
 修改代理地址和端口后，需要点击 **应用修改** 才会提交。代理默认通过当前出口解析：在高级设置中配置 [WARP DNS](docs/WARP_DNS.md)，或在链式配置中设置最终出口 DNS。代理页不再提供 DNS 设置；旧版本保存的代理 DNS 选择继续生效。
 
 高级设置中的重置只会填入默认值，仍需提交才会生效。
+
+打开 **高级网络设置 → MASQUE 多路复用连接数**，填写 **1–8**（默认 **1**），再点击 **应用修改**。连接数变化会重新连接；不同流分配到不同 MASQUE 连接，同一条流固定使用一条连接。该设置适用于 HTTP/2、HTTP/3 CONNECT-IP 和 L4（HTTP/3 TCP CONNECT）。详见[连接行为](docs/NETWORK_SETTINGS.md#parallel-masque-connections)。
 
 高级网络设置的“自动选择”会并发连接账号可用的端点；“自定义”保留手动地址。端口和 SNI 在两种模式均可修改。详见[自动选择端点](docs/NETWORK_SETTINGS.md#automatic-endpoints--自动选择端点)。
 
@@ -288,7 +320,7 @@ Zero Trust 端点初始使用注册地址。在高级网络设置中选择 **编
 
 协议与行为参考 [Diniboy1123/usque](https://github.com/Diniboy1123/usque)。本仓库在 `oracle/go` 中保存一份快照，供互操作测试使用。Flutter 界面与 Rust 引擎为本项目新实现。上游版权声明见许可证。
 
-第一方源码采用 [MIT License](LICENSE.md)，第三方组件保留各自许可证。可选的[链式代理](docs/CHAIN_PROXY.md)内嵌 OpenVPN 3 Core（MPL-2.0）和 Mbed TLS（Apache-2.0）。对应源码、补丁和许可文本保存在 `third_party`；应用中的 VPN Gate 页面可查看原生依赖许可声明。WireGuard 使用 BoringTun 0.7.1（BSD-3-Clause），本地 SVG 图标使用 flutter_svg 2.3.0（MIT）；相应声明已纳入应用许可证列表。
+第一方源码采用 [MIT License](LICENSE.md)，第三方组件保留各自许可证。可选的[链式代理](docs/CHAIN_PROXY.md)内嵌 OpenVPN 3 Core（MPL-2.0）和 Mbed TLS（Apache-2.0）。对应源码、补丁和许可文本保存在 `third_party`；应用中的 VPN Gate 页面可查看原生依赖许可声明。WireGuard 使用 BoringTun 0.7.1（BSD-3-Clause），本地 SVG 图标使用 flutter_svg 2.3.4（MIT）；相应声明已纳入应用许可证列表。
 
 独立 Proton SRP 实现参考 Proton go-srp（MIT）；其[版权声明与完整许可](apps/usque_gui/assets/licenses/proton-srp.txt)保留在源码、测试向量及应用许可证列表中。
 

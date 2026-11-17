@@ -47,15 +47,15 @@ Before the next release tag, verify the live `main` ruleset, maintainer-only rel
 restrictions, required environment reviewers and deployment branch/tag rules.
 An `environment:` entry in YAML selects an environment; it does not prove that
 GitHub approval protection is enabled. Keep those protections when changing
-the accepted release tag. The executable contract targets `v0.3.4` with Android base build number `30`;
-see the [preparation](RELEASE.md#preparing-v034) and
-[v0.3.4 readiness review](RELEASE_V0.3.4_READINESS.md). A document update does not change the
+the accepted release tag. The executable contract targets `v0.3.5` with Android base build number `31`;
+see the [preparation](RELEASE.md#preparing-v035). A document update does not change the
 accepted tag or server-side protections.
 
 For stable releases, the tag workflow requires current `main` and its exact-SHA
-successful `ci.yml` push run. Beta requires the current `release/<tag>` tip and
-its exact-SHA successful push CI instead, without changing main or treating
-PR/main gates as passed. Neither path accepts dev or workflow-dispatch CI. Publication requires the signed staged
+successful CI and CodeQL push runs. Each main push workflow may reuse a verified
+dev push result for the same workflow when both branch tips match the candidate.
+Beta requires the current `release/<tag>` tip and its own successful push CI
+and CodeQL. Publication requires the signed staged
 candidate and `release-publish` approval. The five protected reliability jobs
 and their summary remain optional and are skipped in the public repository;
 their `not_run` or failure status cannot be presented as a pass and is not a
@@ -66,4 +66,4 @@ publication prerequisite.
 - A fork pull request gets a read-only token, cannot read secrets, and cannot upload an installable package.
 - Dependency Review runs on public pull requests.
 - Only packages published by the approved tag workflow are official; the
-  checked-in workflow accepts only the reviewed `v0.3.4` tag.
+  checked-in workflow accepts only the reviewed `v0.3.5` tag.

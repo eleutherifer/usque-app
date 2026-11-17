@@ -19,6 +19,7 @@ const UsqueProfile _goldenProfile = UsqueProfile(
   endpointPort: 1,
   sni: 'c',
   mtu: 1280,
+  masqueConnections: 3,
   dnsIpv4: 'd',
   dnsIpv6: 'e',
   killSwitch: true,
@@ -74,6 +75,7 @@ const List<int> _goldenProfileBytes = <int>[
   0x01,
   0x00, // routing {} (field 25 present even when explicitly clearing rules)
   0xd0, 0x01, 0x03, // tls_fingerprint CHROME155 (appended field 26)
+  0xd8, 0x01, 0x03, // optional masque_connections 3 (appended field 27)
   0x8a, 0x01, 0x02, // direct_dns { (field 17, 2 bytes)
   0x08, 0x01, //   mode PHYSICAL_SYSTEM
   // }
@@ -1101,6 +1103,11 @@ void main() {
         expect(requestTimeoutForPayload(10), const Duration(seconds: 5));
         expect(requestTimeoutForPayload(41), const Duration(seconds: 5));
         expect(requestTimeoutForPayload(42), const Duration(seconds: 5));
+        expect(requestTimeoutForPayload(13), const Duration(seconds: 5));
+        expect(macRequestTimeoutForPayload(13), const Duration(seconds: 120));
+        expect(macRequestTimeoutForPayload(10), const Duration(seconds: 5));
+        expect(macRequestTimeoutForPayload(12), const Duration(seconds: 715));
+        expect(macRequestTimeoutForPayload(27), const Duration(seconds: 1415));
       },
     );
 
@@ -1208,6 +1215,33 @@ void main() {
         client.dispose();
       },
     );
+
+    test('only automatic connect sets the background keychain flag', () async {
+      final seen = <Uint8List>[];
+      final client = DesktopEngineClient.forTest(
+        transport: DesktopEngineTransport.forTest(
+          exchange: (request) async {
+            seen.add(request);
+            return _statusResponse('1');
+          },
+          requestIdFactory: () => '1',
+        ),
+      );
+      addTearDown(client.dispose);
+      for (final background in [true, false]) {
+        await client.connect(_goldenProfile, background: background);
+        final payload = ControlPayloadWriter()..string(1, _goldenProfile.id);
+        if (background) payload.boolean(3, true);
+        expect(
+          seen.last,
+          const ControlCodec().buildRequestFrame(
+            requestId: '1',
+            payloadField: 12,
+            payload: payload.takeBytes(),
+          ),
+        );
+      }
+    });
 
     test('retry encodes control request payload field 14', () async {
       Uint8List? seen;

@@ -23,14 +23,61 @@ env:
   FLUTTER_VERSION: 3.44.7
 
 jobs:
+  promotion:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/promotion-check.yml
+    with:
+      workflow: ci.yml
+
+  macos-package:
+    name: macOS DMG with disposable signer (${{ matrix.arch }})
+    needs: promotion
+    if: &run-ci ${{ !cancelled() && needs.promotion.outputs.reused != 'true' && (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x86_64
+            runner: macos-15-intel
+    env:
+      ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12.10'
+      - name: Check native signing and keychain cleanup before the full build
+        timeout-minutes: 3
+        run: bash tool/sign_macos_release.sh "$ARCH" fixture fixture-probe
+      - run: bash tool/build_macos_release_app.sh "$ARCH"
+      - name: Exercise signing and verify the native DMG without release credentials
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          version=$(sed -nE 's/^version: ([^+]+)\+[0-9]+$/\1/p' apps/usque_gui/pubspec.yaml)
+          bash tool/sign_macos_release.sh "$ARCH" "v$version" fixture
+
   linux:
     name: Linux desktop and six package contracts
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     uses: ./.github/workflows/linux.yml
 
   workflow-lint:
     name: GitHub Actions syntax and security lint
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -60,7 +107,8 @@ jobs:
 
   rust:
     name: Rust format, lint, and tests
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     steps:
@@ -94,17 +142,19 @@ jobs:
 
       - name: Test pinned quiche recovery and BBRv3 independently
         run: |
-          cargo test --manifest-path third_party/quiche-0.29.3/Cargo.toml --locked --lib
-          cargo test --manifest-path third_party/quiche-0.29.3/Cargo.toml --locked --lib --features qlog recovery::gcongestion::bbr3::
+          cargo test --manifest-path third_party/quiche-0.30.1/Cargo.toml --locked --lib
+          cargo test --manifest-path third_party/quiche-0.30.1/Cargo.toml --locked --lib --features qlog recovery::gcongestion::bbr3::
+          cargo test --manifest-path third_party/quiche-0.30.1/Cargo.toml --locked --lib --features congestion_window_unchecked_available bbr3_and_unchecked_keep_independent_recovery
 
       - name: Test pinned userspace TCP patches independently
         run: |
           cargo test --manifest-path third_party/smoltcp-0.14.0/Cargo.toml --locked --lib
-          cargo test --manifest-path third_party/ts_netstack_smoltcp_core/Cargo.toml --locked --all-targets
+          cargo test --manifest-path third_party/ts_netstack_smoltcp-0.7.1/Cargo.toml --locked --lib --tests --features std,tokio
 
   tooling-quality:
     name: Multi-language tooling quality
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -204,7 +254,8 @@ jobs:
 
   android-host:
     name: Android host unit tests and lint
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     steps:
@@ -214,7 +265,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Java
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
           distribution: temurin
           java-version: "17"
@@ -268,7 +319,8 @@ jobs:
 
   flutter:
     name: Flutter analysis, widgets and Linux golden images
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -334,7 +386,8 @@ jobs:
 
   flutter-goldens:
     name: Flutter golden images (Windows)
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: windows-2025
     timeout-minutes: 60
     steps:
@@ -374,7 +427,8 @@ jobs:
 
   go-oracle:
     name: Archived Go oracle
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -404,7 +458,8 @@ jobs:
 
   security-audit:
     name: Locked dependency vulnerability audit
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -417,6 +472,9 @@ jobs:
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
+
+      - name: Revalidate the chrono maintenance-only exception
+        run: python tool/check_chrono_maintenance.py
 
       - name: Install and verify OSV-Scanner 2.3.8
         env:
@@ -469,6 +527,7 @@ jobs:
 
       - name: Enforce severity and exception policy
         run: |
+          python tool/check_chrono_maintenance.py
           python tool/check_osv_results.py \
             --shipping "$RUNNER_TEMP/osv-shipping.json" \
             --oracle "$RUNNER_TEMP/osv-oracle.json" \
@@ -476,7 +535,8 @@ jobs:
 
   release-contract:
     name: Release artifact manifest contract
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -500,16 +560,17 @@ jobs:
       - name: Test fail-closed artifact contract
         run: python -m unittest discover -s tool -p "test_*.py" -v
 
-      - name: Verify v0.3.4 release version contract
+      - name: Verify v0.3.5 release version contract
         run: |
           python tool/release_contract.py verify-version \
             --root . \
-            --tag v0.3.4 \
-            --android-version-code 30
+            --tag v0.3.5 \
+            --android-version-code 31
 
   windows-installer-authoring:
     name: MSI authoring (${{ matrix.arch }})
-    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    needs: promotion
+    if: *run-ci
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
@@ -531,7 +592,7 @@ jobs:
           persist-credentials: false
 
       - name: Install pinned .NET SDK
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: 8.0.412
 
@@ -555,6 +616,7 @@ jobs:
     name: CI / gate
     if: ${{ always() && (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
     needs:
+      - promotion
       - workflow-lint
       - rust
       - tooling-quality
@@ -564,13 +626,16 @@ jobs:
       - go-oracle
       - security-audit
       - release-contract
+      - macos-package
       - windows-installer-authoring
       - linux
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Require every CI job
+      - name: Require every CI job or verified dev CI
         env:
+          PROMOTION: ${{ needs.promotion.result }}
+          REUSED: ${{ needs.promotion.outputs.reused }}
           WORKFLOW_LINT: ${{ needs.workflow-lint.result }}
           RUST: ${{ needs.rust.result }}
           TOOLING: ${{ needs.tooling-quality.result }}
@@ -580,10 +645,16 @@ jobs:
           GO_ORACLE: ${{ needs.go-oracle.result }}
           SECURITY_AUDIT: ${{ needs.security-audit.result }}
           RELEASE_CONTRACT: ${{ needs.release-contract.result }}
+          MACOS_PACKAGE: ${{ needs.macos-package.result }}
           WINDOWS_AUTHORING: ${{ needs.windows-installer-authoring.result }}
           LINUX: ${{ needs.linux.result }}
         run: |
           set -euo pipefail
+          expected=success
+          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/heads/main ]]; then
+            test "$PROMOTION" = success
+            if [[ "$REUSED" == true ]]; then expected=skipped; fi
+          fi
           for result in \
             "$WORKFLOW_LINT" \
             "$RUST" \
@@ -594,7 +665,8 @@ jobs:
             "$GO_ORACLE" \
             "$SECURITY_AUDIT" \
             "$RELEASE_CONTRACT" \
+            "$MACOS_PACKAGE" \
             "$LINUX" \
             "$WINDOWS_AUTHORING"; do
-            test "$result" = "success"
+            test "$result" = "$expected"
           done

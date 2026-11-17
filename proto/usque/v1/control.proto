@@ -124,6 +124,7 @@ enum ProfileIdentityState {
   PROFILE_IDENTITY_STATE_READY = 1;
   PROFILE_IDENTITY_STATE_MISSING = 2;
   PROFILE_IDENTITY_STATE_INVALID = 3;
+  PROFILE_IDENTITY_STATE_LOCKED = 4;
 }
 
 enum ConnectionPhase {
@@ -233,6 +234,7 @@ message Profile {
   WarpDnsSettings warp_dns = 24;
   RoutingSettings routing = 25;
   TlsFingerprint tls_fingerprint = 26;
+  optional uint32 masque_connections = 27;
 }
 
 message RoutingSettings {
@@ -546,6 +548,8 @@ message Capabilities {
   bool proton_server_switching = 53;
   bool connection_scenarios = 54;
   bool vpn_gate_epoch_requests = 55;
+  uint32 max_masque_connections = 56;
+  bool l4_masque_connections = 57;
 }
 
 message FrontendStatus {
@@ -713,6 +717,7 @@ message ListProfilesRequest {
 message ConnectRequest {
   string profile_id = 1;
   bool continuous = 2;
+  bool background = 3;
 }
 message DisconnectRequest {}
 message RetryRequest {
@@ -1168,6 +1173,7 @@ message InitialIdentityRequest {
 }
 message GetInitialIdentityStateRequest {
   string profile_id = 1;
+  bool allow_keychain_interaction = 2;
 }
 enum InitialIdentityPhase {
   INITIAL_IDENTITY_PHASE_UNSPECIFIED = 0;

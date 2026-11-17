@@ -10,6 +10,8 @@
   ·
   <a href="README.zh-CN.md">简体中文</a>
   ·
+  <a href="README.zh-Hant.md">繁體中文</a>
+  ·
   日本語
   ·
   <a href="README.ko.md">한국어</a>
@@ -20,7 +22,7 @@
 </p>
 
 <p align="center">
-  Windows、Linux、Android / Android TV 向けの Cloudflare® WARP® サービスと互換性のある非公式クライアントです。<br>
+  Windows、macOS、Linux、Android / Android TV向けの Cloudflare® WARP® サービスと互換性のある非公式クライアントです。<br>
   ネイティブの Flutter インターフェースと Rust 製の MASQUE エンジンで動作します。
 </p>
 
@@ -30,7 +32,7 @@
 
 <p align="center">
   <a href="https://github.com/GeorgeXie2333/usque-app/releases"><img alt="累計ダウンロード数" src="https://img.shields.io/github/downloads/GeorgeXie2333/usque-app/total?color=C2500C"></a>
-  <img alt="対応プラットフォーム：Windows、Linux、Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20Android-555555">
+  <img alt="対応プラットフォーム：Windows、macOS、Linux、Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-555555">
   <a href="LICENSE.md"><img alt="MIT ライセンス" src="https://img.shields.io/badge/license-MIT-C2500C.svg"></a>
 </p>
 
@@ -135,11 +137,12 @@ flowchart LR
 
 ## ダウンロード
 
-**v0.3.4** ではローカル接続シーンを追加し、設定、ルーティング、デスクトップと Android の操作を改善しました。インストールした版のリリースノートと対応するタグの文書を確認してください。
+**v0.3.5** では macOS デスクトップ版と並列接続の設定を追加し、接続シーンの切り替えを簡単にしました。インストールした版のリリースノートと対応するタグの文書を確認してください。
 
 | プラットフォーム | 最低 OS 要件 | パッケージ |
 | --- | --- | --- |
 | Windows | Windows 10 2004、ビルド 19041 | x64-v2 または ARM64 の EXE インストーラー |
+| macOS | macOS 13 以降 | Apple Silicon（arm64）用と Intel（x86_64）用 DMG |
 | Linux（v0.3.3 以降） | Ubuntu 22.04+、Debian 12+、サポート中の Fedora；systemd | amd64 または arm64 の AppImage、deb、rpm |
 | Android / Android TV | Android 8.0、API 26 | arm64-v8a、x86_64、armeabi-v7a の APK、またはユニバーサル APK |
 
@@ -152,7 +155,7 @@ Windows x64 には **x86-64-v2** 対応 CPU が必要で、ARM64 Windows には�
 >
 > **警告を回避しないでください。** 1.0 より前の Windows/Android パッケージは、プロジェクトで管理する固定の自己署名証明書を使用します。Windows では発行元が不明という警告が表示されることがあり、Android パッケージは Google Play 外からインストールします。警告を回避するためにウイルス対策やファイアウォールを無効にしたり、非公式パッケージに付属する証明書をインポートしたりしないでください。
 
-- **アップグレードによる設定の移行は一方向です。** v0.3.2 と v0.3.3 は設定スキーマ 26 を使用します。v0.3.1 からのアップグレードではスキーマが 24 から 26 に移行し、v0.3.1 以前では読み込めません。v0.3.4 ではスキーマが 26 から 27 に移行し、v0.3.3 以前では読み込めません。旧版の再インストールでは移行を元に戻せないため、事前に[設定の互換性](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)を確認し、必要なバックアップを用意してください。
+- **アップグレードによる設定の移行は一方向です。** v0.3.2 と v0.3.3 は設定スキーマ 26 を使用します。v0.3.1 からのアップグレードではスキーマが 24 から 26 に移行し、v0.3.1 以前では読み込めません。v0.3.4 ではスキーマが 26 から 27 に移行し、v0.3.3 以前では読み込めません。旧版の再インストールでは移行を元に戻せないため、事前に[設定の互換性](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)を確認し、必要なバックアップを用意してください。 v0.3.5 はスキーマ 28 に移行し、v0.3.4 以前では読み込めません。
 - **Linux：** AppImage の初回 VPN 設定では管理者承認でバックグラウンドサービスを導入します。認証情報にはロック解除済みの Secret Service キーリングが必要です。GNOME/KDE、X11/Wayland、復旧手順とテスト範囲は [Linux デスクトップガイド](docs/LINUX_DESKTOP.md) を参照してください。
 - **更新** のダウンロードには確認が必要で、インストールには各プラットフォームのインストーラーを使用します。無人での自動インストールは行いません。
 - アップグレード、アンインストール、復旧、Android の開発者確認については[インストールと削除](docs/INSTALLATION.md)、正式な署名に使う証明書については[コード署名](docs/CODE_SIGNING.md)を参照してください。
@@ -233,7 +236,12 @@ VPN、SOCKS5、HTTP は既定で有効、システムプロキシは無効です
 
 ### 実験的な機能と未対応の範囲
 
-[Zero Trust 登録](docs/ZERO_TRUST_EXPERIMENTAL.md)は実験的な機能です。組織の ID を使って MASQUE インターネットトンネルを構成しますが、Cloudflare One™ Client の全機能との互換性は提供しません。macOS のソースは保持していますが、ビルドやリリースは行いません。iOS、アプリストアでの配布、公開 CLI は今回のリリース範囲に含まれません。
+[Zero Trust 登録](docs/ZERO_TRUST_EXPERIMENTAL.md)は実験的な機能です。組織の ID を使って MASQUE インターネットトンネルを構成しますが、Cloudflare One™ Client の全機能との互換性は提供しません。
+iOS、アプリストアでの配布、公開 CLI は今回のリリース範囲に含まれません。
+
+### v0.3.5 の macOS 対応
+
+v0.3.5 の macOS 版はローカル HTTP / SOCKS5 プロキシを利用できます。正式 DMG ではシステム VPN は無効です。[macOS 機能対応表](docs/MACOS_WINDOWS_PARITY.md)と[インストールガイド](docs/INSTALLATION.md#choose-a-package)を参照してください。macOS では Proton のゲスト登録と内蔵認証ブラウザーは利用できません。
 
 ## 既定のネットワーク設定
 
@@ -245,6 +253,7 @@ VPN、SOCKS5、HTTP は既定で有効、システムプロキシは無効です
 | ポート / SNI | `443` / `speed.cloudflare.com` |
 | トランスポート | 自動: HTTP/3、次に HTTP/2 |
 | HTTP/3 輻輳制御 | `cubic`。BBRv2、実験的な BBRv3、`reno` も選択可能 |
+| MASQUE 多重化接続数 | `1`。HTTP/2 と HTTP/3 / L4 で `1–8` を手動入力可能 |
 | QUIC UDP 受信バッファ | Windows/Android の H3 と L4 で [2 MiB を目標](docs/UDP_RECEIVE_BUFFER.md)として要求。実際の容量は OS に依存 |
 | TUN MTU | `1280` |
 | フォールバック DNS | `1.1.1.1`、`2606:4700:4700::1111` |
@@ -259,6 +268,8 @@ VPN、SOCKS5、HTTP は既定で有効、システムプロキシは無効です
 プロキシのアドレスとポートの編集は、変更を適用するまで下書きです。プロキシ DNS は既定で現在の出口を使用します。高度な設定で [WARP DNS](docs/WARP_DNS.md)、またはチェーン設定で最終出口の DNS を設定します。プロキシ画面に DNS の設定項目はありません。旧バージョンで保存したプロキシ DNS の設定は引き続き有効です。
 
 高度な設定のリセットは既定値を下書きに読み込むだけで、即座には適用しません。
+
+**高度なネットワーク設定 → MASQUE 多重化接続数** に **1～8**（既定値 **1**）を入力し、**変更を適用** します。接続数を変更すると再接続します。異なるフローを複数の MASQUE 接続に分散し、各フローは同じ接続を使い続けます。HTTP/2、HTTP/3 CONNECT-IP と L4（HTTP/3 TCP CONNECT）に適用されます。[接続の動作](docs/NETWORK_SETTINGS.md#parallel-masque-connections)を参照してください。
 
 高度なネットワーク設定の自動選択は、アカウントで利用可能なエンドポイントへの接続を並行して試みます。カスタムでは手動のアドレスを維持します。ポートと SNI はどちらでも編集できます。[自動エンドポイント選択](docs/NETWORK_SETTINGS.md#automatic-endpoints--自动选择端点)を参照してください。
 
@@ -288,7 +299,7 @@ Zero Trust は初期状態で登録時のアドレスを使用します。高度
 
 プロトコルの動作は [Diniboy1123/usque](https://github.com/Diniboy1123/usque) を参考にしています。このリポジトリは相互運用性テスト用に、そのクライアントのスナップショットを `oracle/go` に保存しています。Flutter UI と Rust エンジンは新たに実装したものです。上流の著作権表示はライセンスに残しています。
 
-本プロジェクトのソースは [MIT](LICENSE.md) ライセンスです。サードパーティのコンポーネントはそれぞれのライセンスを維持します。任意の[チェーンプロキシ](docs/CHAIN_PROXY.md)は、MPL-2.0 の OpenVPN 3 Core と Apache-2.0 の Mbed TLS を組み込みます。対応するソース、レビュー済みのパッチ、ライセンス本文は `third_party` に含まれ、アプリの VPN Gate ページからライセンス表示を確認できます。WireGuard は BoringTun 0.7.1（BSD-3-Clause）、ローカル SVG アイコンは flutter_svg 2.3.0（MIT）を使用します。これらのライセンス表示もアプリのライセンス一覧に含まれています。
+本プロジェクトのソースは [MIT](LICENSE.md) ライセンスです。サードパーティのコンポーネントはそれぞれのライセンスを維持します。任意の[チェーンプロキシ](docs/CHAIN_PROXY.md)は、MPL-2.0 の OpenVPN 3 Core と Apache-2.0 の Mbed TLS を組み込みます。対応するソース、レビュー済みのパッチ、ライセンス本文は `third_party` に含まれ、アプリの VPN Gate ページからライセンス表示を確認できます。WireGuard は BoringTun 0.7.1（BSD-3-Clause）、ローカル SVG アイコンは flutter_svg 2.3.4（MIT）を使用します。これらのライセンス表示もアプリのライセンス一覧に含まれています。
 
 独立実装の Proton SRP は Proton go-srp（MIT）を参照しています。[著作権表示とライセンス全文](apps/usque_gui/assets/licenses/proton-srp.txt)はソース、テストベクトル、アプリのライセンス一覧に保持されています。
 

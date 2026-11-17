@@ -10,6 +10,16 @@ available in that editor.
 VPN Gate lets you choose a volunteer server as the final Internet exit on
 Windows, Android and Android TV. Usque reaches that server through the WARP tunnel.
 
+The macOS development build supports VPN Gate in proxy mode. Use **Refresh list**
+directly: Usque reuses connected WARP or opens a temporary WARP connection with
+the active account. The temporary connection has no proxy listeners and keeps
+your saved chain settings. List and profile requests, including their DNS, stay
+inside WARP; failure never falls back to the physical network. Retained VPN
+protection or unfinished proxy cleanup must be disconnected/recovered before a
+new temporary connection can start. Cached lists, preparation and favorites
+remain available offline. System TUN remains unavailable in the ad-hoc build;
+see the [macOS follow-up and validation limits](MACOS_VPN_GATE_TUN_FOLLOWUP.md).
+
 ## Set up an exit
 
 1. Open **Proxy → Chain proxy**, select **VPN Gate**, and turn on the shared **Enable chain proxy**
@@ -237,7 +247,7 @@ Mbed TLS authenticates the OpenVPN CA chain and configured OpenVPN certificate
 constraints, rather than assuming an HTTPS DNS SAN for a numeric VPN remote.
 Compatibility patches explicitly select CBC PKCS#7 padding and enforce TLS
 version limits. The complete patch rationale is in
-[the upstream patch record](../third_party/openvpn3-3.11.7/USQUE-PATCH.md).
+[the upstream patch record](../third_party/openvpn3-3.11.8/USQUE-PATCH.md).
 
 ## Lifecycle, cleanup and privacy
 

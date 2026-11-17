@@ -10,6 +10,8 @@
   ·
   <a href="README.zh-CN.md">简体中文</a>
   ·
+  <a href="README.zh-Hant.md">繁體中文</a>
+  ·
   <a href="README.ja.md">日本語</a>
   ·
   한국어
@@ -20,7 +22,7 @@
 </p>
 
 <p align="center">
-  Windows, Linux 및 Android / Android TV용 Cloudflare® WARP® 서비스와 호환되는 비공식 클라이언트입니다.<br>
+  Windows, macOS, Linux 및 Android / Android TV에서 Cloudflare® WARP® 서비스와 호환되는 비공식 클라이언트입니다.<br>
   네이티브 Flutter 인터페이스와 Rust로 구현한 MASQUE 엔진으로 동작합니다.
 </p>
 
@@ -30,7 +32,7 @@
 
 <p align="center">
   <a href="https://github.com/GeorgeXie2333/usque-app/releases"><img alt="총 다운로드 수" src="https://img.shields.io/github/downloads/GeorgeXie2333/usque-app/total?color=C2500C"></a>
-  <img alt="지원 플랫폼: Windows, Linux, Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20Android-555555">
+  <img alt="지원 플랫폼: Windows, macOS, Linux, Android" src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-555555">
   <a href="LICENSE.md"><img alt="MIT 라이선스" src="https://img.shields.io/badge/license-MIT-C2500C.svg"></a>
 </p>
 
@@ -135,11 +137,12 @@ flowchart LR
 
 ## 다운로드
 
-**v0.3.4**는 로컬 연결 시나리오를 추가하고 설정, 라우팅, 데스크톱과 Android 환경을 개선합니다. 설치한 버전의 릴리스 노트와 해당 태그 문서를 확인하세요.
+**v0.3.5**는 macOS 데스크톱 앱과 병렬 연결 설정을 추가하고 연결 시나리오 전환을 간소화합니다. 설치한 버전의 릴리스 노트와 해당 태그 문서를 확인하세요.
 
 | 플랫폼 | 최소 OS | 패키지 |
 | --- | --- | --- |
 | Windows | Windows 10 2004, 빌드 19041 | x64-v2 또는 ARM64 EXE 설치 프로그램 |
+| macOS | macOS 13 이상 | Apple Silicon(arm64) 및 Intel(x86_64) DMG |
 | Linux(v0.3.3부터) | Ubuntu 22.04+, Debian 12+, 지원 중인 Fedora; systemd | amd64 또는 arm64용 AppImage, deb, rpm |
 | Android / Android TV | Android 8.0, API 26 | arm64-v8a, x86_64 또는 armeabi-v7a APK, 또는 범용 APK |
 
@@ -152,7 +155,7 @@ Windows x64에는 **x86-64-v2**를 지원하는 CPU가 필요하며, ARM64 Windo
 >
 > **경고를 우회하지 마세요.** 1.0 이전 Windows/Android 패키지는 프로젝트에서 관리하는 고정된 자체 서명 인증서를 사용합니다. Windows에는 알 수 없는 게시자 경고가 나타날 수 있으며, Android 패키지는 Google Play 밖에서 설치합니다. 경고를 우회하려고 백신이나 방화벽을 끄거나 비공식 패키지에 포함된 인증서를 가져오지 마세요.
 
-- **업그레이드 시 구성은 한 방향으로만 마이그레이션됩니다.** v0.3.2와 v0.3.3은 구성 스키마 26을 사용합니다. v0.3.1에서 업그레이드하면 스키마가 24에서 26으로 바뀌며 v0.3.1 이하에서는 읽을 수 없습니다. v0.3.4는 스키마를 26에서 27로 바꾸며 v0.3.3 이하에서는 읽을 수 없습니다. 이전 버전 재설치는 마이그레이션을 되돌리지 않으므로, 먼저 [구성 호환성](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)을 확인하고 필요한 백업을 준비하세요.
+- **업그레이드 시 구성은 한 방향으로만 마이그레이션됩니다.** v0.3.2와 v0.3.3은 구성 스키마 26을 사용합니다. v0.3.1에서 업그레이드하면 스키마가 24에서 26으로 바뀌며 v0.3.1 이하에서는 읽을 수 없습니다. v0.3.4는 스키마를 26에서 27로 바꾸며 v0.3.3 이하에서는 읽을 수 없습니다. 이전 버전 재설치는 마이그레이션을 되돌리지 않으므로, 먼저 [구성 호환성](docs/INSTALLATION.md#configuration-compatibility-when-upgrading)을 확인하고 필요한 백업을 준비하세요. v0.3.5는 스키마 28로 마이그레이션하며 v0.3.4 이하는 이를 읽을 수 없습니다.
 - **Linux:** AppImage에서 처음 VPN을 설정할 때 관리자 승인으로 백그라운드 서비스를 설치합니다. 인증 정보에는 잠금 해제된 Secret Service 키링이 필요합니다. GNOME/KDE, X11/Wayland, 복구 및 테스트 범위는 [Linux 데스크톱 가이드](docs/LINUX_DESKTOP.md)를 참고하세요.
 - **업데이트**는 다운로드 전에 확인이 필요하며, 플랫폼 설치 프로그램으로 설치합니다. 사용자 확인 없이 자동으로 설치하지 않습니다.
 - 업그레이드, 제거, 복구, Android 개발자 인증에 관한 설명은 [설치 및 제거](docs/INSTALLATION.md)를, 공식 서명에 사용하는 인증서 정보는 [코드 서명](docs/CODE_SIGNING.md)을 참고하세요.
@@ -233,7 +236,12 @@ VPN, SOCKS5, HTTP는 기본적으로 켜져 있고, 시스템 프록시는 꺼�
 
 ### 실험적 기능과 지원하지 않는 범위
 
-[Zero Trust 등록](docs/ZERO_TRUST_EXPERIMENTAL.md)은 실험적 기능입니다. 조직의 ID로 MASQUE 인터넷 터널을 구성하지만, Cloudflare One™ Client의 모든 기능과 호환되지는 않습니다. macOS 소스는 보존하고 있으나 빌드하거나 배포하지 않습니다. iOS, 앱 스토어 배포, 공개 CLI는 이번 릴리스 범위에 포함되지 않습니다.
+[Zero Trust 등록](docs/ZERO_TRUST_EXPERIMENTAL.md)은 실험적 기능입니다. 조직의 ID로 MASQUE 인터넷 터널을 구성하지만, Cloudflare One™ Client의 모든 기능과 호환되지는 않습니다.
+iOS, 앱 스토어 배포, 공개 CLI는 이번 릴리스 범위에 포함되지 않습니다.
+
+### v0.3.5의 macOS 지원
+
+v0.3.5 macOS 앱은 로컬 HTTP 및 SOCKS5 프록시를 지원하며 정식 DMG에서 시스템 VPN은 비활성화되어 있습니다. [macOS 기능 비교표](docs/MACOS_WINDOWS_PARITY.md)와 [설치 안내](docs/INSTALLATION.md#choose-a-package)를 참조하세요. macOS에서는 Proton 게스트 등록과 내장 인증 브라우저를 사용할 수 없습니다.
 
 ## 기본 네트워크 설정
 
@@ -245,6 +253,7 @@ VPN, SOCKS5, HTTP는 기본적으로 켜져 있고, 시스템 프록시는 꺼�
 | 포트 / SNI | `443` / `speed.cloudflare.com` |
 | 전송 | 자동: HTTP/3, 그다음 HTTP/2 |
 | HTTP/3 혼잡 제어 | `cubic`. BBRv2, 실험적 BBRv3, `reno`도 선택 가능 |
+| MASQUE 다중화 연결 수 | `1`; HTTP/2와 HTTP/3 / L4에서 `1–8`을 직접 입력 가능 |
 | QUIC UDP 수신 버퍼 | Windows/Android의 H3와 L4에서 [2 MiB를 목표](docs/UDP_RECEIVE_BUFFER.md)로 요청. 실제 용량은 OS에 따라 다름 |
 | TUN MTU | `1280` |
 | 폴백 DNS | `1.1.1.1`, `2606:4700:4700::1111` |
@@ -259,6 +268,8 @@ VPN, SOCKS5, HTTP는 기본적으로 켜져 있고, 시스템 프록시는 꺼�
 프록시 주소와 포트 수정은 변경을 적용하기 전까지 초안입니다. 프록시 DNS는 기본적으로 현재 출구를 사용합니다. 고급 설정에서 [WARP DNS](docs/WARP_DNS.md)를, 체인 설정에서 최종 출구 DNS를 구성하세요. 프록시 화면에는 DNS 설정 항목이 없습니다. 이전 버전에서 저장한 프록시 DNS 설정은 계속 적용됩니다.
 
 고급 설정의 초기화는 기본값을 초안에 불러올 뿐 즉시 적용하지 않습니다.
+
+**고급 네트워크 설정 → MASQUE 다중화 연결 수**에 **1~8**(기본값 **1**)을 입력한 뒤 변경 사항을 적용하세요. 연결 수를 바꾸면 다시 연결합니다. 서로 다른 흐름을 여러 MASQUE 연결에 분산하며 각 흐름은 같은 연결을 유지합니다. HTTP/2, HTTP/3 CONNECT-IP와 L4(HTTP/3 TCP CONNECT)에 적용됩니다. [연결 동작](docs/NETWORK_SETTINGS.md#parallel-masque-connections)을 참고하세요.
 
 고급 네트워크 설정의 자동 선택은 계정에서 사용 가능한 엔드포인트에 병렬로 연결을 시도하며, 사용자 지정은 수동 주소를 유지합니다. 포트와 SNI는 두 모드 모두 수정할 수 있습니다. [자동 엔드포인트 선택](docs/NETWORK_SETTINGS.md#automatic-endpoints--自动选择端点)을 참고하세요.
 
@@ -288,7 +299,7 @@ Zero Trust는 처음에 등록된 주소를 사용합니다. 고급 네트워크
 
 프로토콜 동작은 [Diniboy1123/usque](https://github.com/Diniboy1123/usque)를 참고합니다. 이 저장소는 상호 운용성 테스트를 위해 해당 클라이언트의 스냅샷을 `oracle/go`에 보관합니다. Flutter UI와 Rust 엔진은 새로 구현한 코드입니다. 업스트림 저작권 표시는 라이선스에 유지합니다.
 
-프로젝트 소스는 [MIT](LICENSE.md) 라이선스입니다. 서드파티 구성 요소는 각자의 라이선스를 유지합니다. 선택적인 [체인 프록시](docs/CHAIN_PROXY.md)는 MPL-2.0의 OpenVPN 3 Core와 Apache-2.0의 Mbed TLS를 포함합니다. 해당 소스, 검토한 패치, 라이선스 전문은 `third_party`에 있으며, 앱의 VPN Gate 페이지에서 라이선스 고지를 확인할 수 있습니다. WireGuard는 BoringTun 0.7.1(BSD-3-Clause)을, 로컬 SVG 아이콘은 flutter_svg 2.3.0(MIT)을 사용합니다. 해당 고지는 앱의 라이선스 목록에도 포함되어 있습니다.
+프로젝트 소스는 [MIT](LICENSE.md) 라이선스입니다. 서드파티 구성 요소는 각자의 라이선스를 유지합니다. 선택적인 [체인 프록시](docs/CHAIN_PROXY.md)는 MPL-2.0의 OpenVPN 3 Core와 Apache-2.0의 Mbed TLS를 포함합니다. 해당 소스, 검토한 패치, 라이선스 전문은 `third_party`에 있으며, 앱의 VPN Gate 페이지에서 라이선스 고지를 확인할 수 있습니다. WireGuard는 BoringTun 0.7.1(BSD-3-Clause)을, 로컬 SVG 아이콘은 flutter_svg 2.3.4(MIT)을 사용합니다. 해당 고지는 앱의 라이선스 목록에도 포함되어 있습니다.
 
 독립 Proton SRP 구현은 Proton go-srp(MIT)를 참조합니다. [저작권 고지와 전체 라이선스](apps/usque_gui/assets/licenses/proton-srp.txt)는 소스, 테스트 벡터와 앱 라이선스 목록에 보존됩니다.
 

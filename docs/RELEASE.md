@@ -5,17 +5,18 @@ record that the current checkout has been published. The authoritative
 executable contracts are [release.yml](../.github/workflows/release.yml) and
 [release_contract.py](../tool/release_contract.py).
 
-The checked-in application metadata and workflow target `v0.3.4` /
-`0.3.4+30`. Consult GitHub Releases for the currently published Latest.
+The checked-in application metadata and workflow target `v0.3.5` /
+`0.3.5+31`. Consult GitHub Releases for the currently published Latest.
+This candidate adds macOS DMGs for Apple Silicon and Intel.
 [v0.3.3](https://github.com/GeorgeXie2333/usque-app/releases/tag/v0.3.3) was
 published as the stable Latest on 2026-10-26 (UTC) from
 `1d44597ddb6dee7fca6700c0442e0d3856eea31b` with 34 public assets.
 [v0.3.2](https://github.com/GeorgeXie2333/usque-app/releases/tag/v0.3.2) was
 published on 2026-10-17 from `02685ee399debf93731751f59b33cdfaef49dcdf`.
-See [Preparing v0.3.4](#preparing-v034). The published `v0.3.3` tag must not
-be moved or reused. A stable tag must
-match the current main tip and a completed successful main push CI run for that
-exact SHA; release/dev checks cannot substitute. Only the maintainer creates the tag.
+See [Preparing v0.3.5](#preparing-v035). Published release tags must not
+be moved or reused. A stable tag must match the current main tip and its
+successful CI and CodeQL push runs. On promotion, those runs can verify
+completed dev checks for the same commit. Only the maintainer creates the tag.
 Signing and publish jobs run in GitHub Environments that need approval. If a
 required file, signing input, or CI result is missing, the workflow fails. A
 local bundle, MSI, or APK cannot replace a failed Actions build.
@@ -30,18 +31,53 @@ published tag; a subsequent release needs a separately reviewed version and
 workflow update and the existing approval gates. Static and compile-only
 checks are not evidence of a successful real-machine upgrade.
 
+## Preparing v0.3.5
+
+The candidate uses thirteen Cargo packages at `0.3.5`, Flutter `0.3.5+31`,
+and 21 catalogs. Android universal/ARMv7/ARM64/x86_64 version codes are
+31000/31001/31002/31004. The MSI ProductVersion is `0.3.599`, Agent PE is
+`0.3.599.0`, and Windows bundle and Linux package versions are `0.3.5`.
+Configuration schema 28 adds the shared connection count with a migration
+default of one; Agent protocol 3, Windows/Linux journals 6/1 and recovery
+export 2 remain unchanged. macOS release DMGs provide local proxy mode, use
+the pinned project self-signature and are not Apple-notarized.
+
+Require exact-candidate CI, Build and CodeQL and then main push CI and
+CodeQL. The main push can reuse verified dev checks for the same commit. The
+Windows release reuses only the pinned, attested producer when its actual
+engine inputs match; a mismatch, missing artifact or provenance failure stops
+the candidate without a fresh build fallback. Retain both engine restore
+receipts, PDBs and the three existing Flutter symbol archives. Wait for all
+seven signing jobs and approve them together; publish remains a separate
+approval after staging verification. The 39 staged files include two internal
+Linux ELF reports; the final 38 public assets contain sixteen packages,
+sixteen SPDX SBOMs, four Linux signature metadata files, the candidate
+manifest and SHA256SUMS. Protected laboratory checks remain optional and
+`not_run` when absent.
+
+The candidate temporarily retains `chrono` for UTC timestamps and RFC 3339
+parsing. [RUSTSEC-2026-0543](https://github.com/RustSec/advisory-db/blob/main/crates/chrono/RUSTSEC-2026-0543.md)
+is an unmaintained-status advisory; it identifies no vulnerable function and
+provides no patched version. Its narrowly scoped OSV exception expires on
+2026-11-30. Before expiry, migrate to a maintained alternative and verify
+the existing serialized timestamps, parsers and public interfaces. This does
+not except other advisories or change the high/critical/unknown gate. CI checks
+the current advisory text and metadata before applying the exception and fails
+closed if its identity, scope, aliases or severity change.
+
 ## Preparing v0.3.4
 
-The candidate uses twelve Cargo packages at `0.3.4`, Flutter `0.3.4+30`, and
+This historical candidate used twelve Cargo packages at `0.3.4`, Flutter `0.3.4+30`, and
 21 catalogs. Android universal/ARMv7/ARM64/x86_64 version codes are
 30000/30001/30002/30004. The MSI ProductVersion is `0.3.499`, Agent PE version
 is `0.3.499.0`, and Windows bundle and Linux package versions are `0.3.4`.
 See the [readiness record](RELEASE_V0.3.4_READINESS.md); preparation is not
 evidence of a published release or successful final-candidate validation.
 
-The candidate uses configuration schema 27 for [connection scenes](SCENARIOS.md),
+That candidate used configuration schema 27 for [connection scenes](SCENARIOS.md),
 Agent protocol 3, Windows/Linux recovery journals 6/1 and recovery export 2.
-Require exact-candidate CI, Build and CodeQL and main push CI and CodeQL. The
+Require exact-candidate CI, Build and CodeQL. Wait for the main push CI and
+CodeQL results after promotion as described [below](#before-signing-starts). The
 reviewed Windows engine inputs are reused only after the pinned producer,
 artifact and provenance checks described in [engine reuse](FLUTTER_WINDOWS_TIMER.md).
 Retain both engine restore receipts, PDBs and Flutter symbol archives. Keep the
@@ -220,10 +256,17 @@ Which signatures count as official, how fingerprints are published, and what hap
 - Complete the preparation for the next version first. The accepted tag must
   match `release.yml`; a stable tag must point to the exact main tip, and a Beta
   tag to the exact `release/<tag>` tip.
-- A stable commit must already have a successful `main` `ci.yml` push run,
-  including `CI / gate`, plus CodeQL; a release-branch or dev run cannot
-  substitute. A Beta commit instead needs its `release/<tag>` push CI, CodeQL
-  and Build, and PR/main gates are not applicable.
+- Before promoting dev to main, wait for CI, CodeQL and Build on the exact
+  candidate. When both tips match, each main push workflow independently checks
+  the latest dev push of its own workflow for that SHA in the same repository.
+  CI requires a successful `CI / gate`. CodeQL requires successful Actions,
+  C/C++, Python and Rust analysis jobs. The main run summary links the verified
+  dev run attempt. A different tip, incomplete evidence or lookup error runs
+  the corresponding workflow in full.
+- CodeQL results reused from dev remain associated with dev. Scheduled and
+  manually dispatched CodeQL runs still analyze main when run on main.
+  PRs and `release/<tag>` pushes keep their normal checks. A Beta candidate
+  requires its own release-branch push CI and CodeQL and a successful Build.
 - `release-signing` and `release-publish` both require approval.
 - Android Developer Console must show `io.github.georgexie2333.usque` and the certificate fingerprint in `ANDROID_SIGNER_SHA256` as **Registered**.
 - Signing material stays in environment secrets. Do not put it in repository variables, files, artifacts, logs, or caches.
@@ -231,17 +274,17 @@ Which signatures count as official, how fingerprints are published, and what hap
 Review the live `main` ruleset, tag restrictions and both environment approval
 settings before tagging. A checked-in document cannot establish their current
 GitHub configuration. `PR Check / gate`, `CI / gate` and `Build / gate` are the
-documented merge checks. The release gate separately requires a successful
-`ci.yml` **push** run for the exact tag SHA and appropriate source branch:
-current `main` for stable, `release/<tag>` for Beta. An earlier PR, other-branch
-run or local check is insufficient. `publish` depends only on `stage-candidate`
+documented merge checks. Before signing, the tag workflow checks the latest
+`ci.yml` and `codeql.yml` **push** runs for the exact tag SHA on the current
+source branch (`main` for stable, `release/<tag>` for Beta). Both must have
+completed successfully. `publish` depends only on `stage-candidate`
 and requires `release-publish` approval; protected reliability jobs are not
 dependencies of publication.
 
 ### Batch the signing review
 
-For future tags containing the batching helper, wait until **all five** signing
-jobs (Windows x64-v2/ARM64, Android, Linux amd64/arm64) are awaiting review, then
+For the next tag, wait until **all seven** signing
+jobs (Windows x64-v2/ARM64, macOS arm64/x86_64, Linux amd64/arm64 and Android) are awaiting review, then
 approve `release-signing` together. Do not approve the first arriving job and
 then repeatedly approve later platforms. The release-gate summary supplies a
 candidate-bound command; it does not approve anything:
@@ -252,7 +295,7 @@ python tool/release_signing_review.py --repo OWNER/REPO --run-id RUN_ID --attemp
 
 This defaults to read-only observation. It requires the exact tag-push Release
 workflow, candidate and run attempt, a successful release-gate, unchanged
-annotated tag/source branch, all five job review requests and permission to
+annotated tag/source branch, all seven job review requests and permission to
 review `release-signing`. Missing/queued jobs wait within the time bound; failure,
 an already-started subset or changed identity stops without approval. Exit 2
 means the full batch is not ready; never treat it as approval or success.
@@ -260,7 +303,7 @@ means the full batch is not ready; never treat it as approval or success.
 Only with explicit maintainer authorization, add `--approve --tag-object
 RECORDED_TAG_OBJECT_SHA` to the command. It fetches the full snapshot again,
 then sends **one** environment-review request containing only `release-signing`.
-It expects five distinct approved deployments for the same candidate. A changed
+It expects seven distinct approved deployments for the same candidate. A changed
 snapshot, uncertain response, timeout or partial approval must be inspected in
 GitHub; do not automatically retry or approve the remaining jobs one by one.
 Reruns must use the explicitly reviewed attempt number, not earlier evidence.
@@ -288,6 +331,8 @@ The `release-signing` environment holds these secrets:
 | --- | --- |
 | `WINDOWS_SIGNING_PFX_BASE64` | Base64 of the stable self-signed Authenticode PFX |
 | `WINDOWS_SIGNING_PFX_PASSWORD` | PFX password |
+| `MACOS_SIGNING_P12_BASE64` | Base64 of the encrypted project self-signed identity |
+| `MACOS_SIGNING_P12_PASSWORD` | PKCS#12 password |
 | `ANDROID_RELEASE_KEYSTORE_BASE64` | Base64 of the fixed Android release keystore |
 | `ANDROID_RELEASE_STORE_PASSWORD` | Keystore password |
 | `ANDROID_RELEASE_KEY_ALIAS` | Release key alias |
@@ -301,7 +346,7 @@ These non-secret variables come from the repository or the same environments:
 | `WINDOWS_SIGNER_SHA256` | SHA-256 of the raw Authenticode signer certificate, 64 hex characters |
 | `ANDROID_SIGNER_SHA256` | SHA-256 of the Android signing certificate, 64 hex characters |
 
-Keep encrypted offline backups of all three signing identities. Pre-1.0 packages use these fixed self-signed identities. A v1.0.0 signing change is a separate release.
+Keep encrypted offline backups of all four platform signing identities. Pre-1.0 packages use these fixed project identities. A v1.0.0 signing change is a separate release.
 
 The Windows job imports the private identity only into the runner user's personal certificate store. It does not add the certificate to Root or TrustedPublisher. It records the imported identity before checking the fingerprint or locating SignTool, so those failures still reach cleanup. Verification accepts the expected untrusted-root result and checks the DER SHA-256 fingerprint. An `always()` step removes both the certificate and its private key with `-DeleteKey`; its `finally` block deletes the temporary PFX even if certificate removal fails. Cleanup errors fail the job. The workflow never re-signs the official Wintun DLL. The Android job deletes its temporary keystore afterward.
 
@@ -324,12 +369,12 @@ bypasses the fingerprint check.
    extraction, 64-bit ELF LOAD segments must support 16 KiB alignment, and ZIP
    alignment must pass. Wrong ABIs, duplicate entries, shipped symbols and native
    debug information are rejected before candidate upload. No APK is installed.
-3. A staging job downloads those artifacts, rejects missing or extra EXE/MSI/APK/AppImage/deb/rpm files, writes an internal release manifest, generates SPDX SBOMs, and records SBOM attestations.
-4. The publish job rechecks every primary package against the immutable manifest, calculates final package checksums, and creates the GitHub release with twelve user-facing installers, two update-only MSIs, the manifest, checksums, per-package SBOMs and four Linux signature metadata files.
+3. The two native Mac jobs sign and verify the app and DMG with the pinned project certificate. Staging checks each DMG's GitHub provenance against the exact tag, workflow and commit, requires all sixteen packages and generates their SPDX SBOM attestations. See [macOS verification](CODE_SIGNING.md#configure-and-verify-macos-release-signing).
+4. The publish job rechecks the staged manifest, calculates final checksums and publishes fourteen user-facing installers, two update-only MSIs, the manifest, checksums, sixteen SPDX SBOMs and four Linux signature metadata files.
    Separately retain the three matching Flutter symbol artifacts for the
    supported lifetime of this release, following [Flutter release symbols](FLUTTER_SYMBOLS.md).
    Verify their source SHA, version, AOT/build-ID and symbol hashes against the
-   actual packages. Symbols stay outside the 34 public Release assets and must
+   actual packages. Symbols stay outside the 38 public Release assets and must
    not be deleted with temporary package-verification downloads.
 5. Only in a private repository, and when repository variable `RUN_PROTECTED_RELEASE_VALIDATION` is exactly `true`, five protected self-hosted runner classes separately exercise the staged candidate: separate Windows and Linux snapshot VMs, a dedicated Android device, an independent network observer, and a controlled performance lab. The public repository skips these jobs even if the variable is enabled; its Actions artifacts cannot provide a restricted evidence store.
 6. Protected validation is supplemental and does not gate publication. In the private execution context, the aggregator emits `reliability-report.json` and `device-matrix.md` only when every required report and evidence file passes its exact-candidate and isolation checks. These artifacts inherit the private repository's read permissions. Skipped or unavailable validation is `not_run`, not a pass. Missing infrastructure, `failed`, and `not_run` never become release approval.
@@ -395,20 +440,22 @@ next reviewed version (official only after approved publication):
 - `usque-vX.Y.Z-windows-arm64.exe`
 - `usque-vX.Y.Z-windows-x64-v2.msi`
 - `usque-vX.Y.Z-windows-arm64.msi`
-- `usque-vX.Y.Z-android-arm64-v8a.apk`
-- `usque-vX.Y.Z-android-x86_64.apk`
-- `usque-vX.Y.Z-android-armeabi-v7a.apk`
-- `usque-vX.Y.Z-android-universal.apk`
+- `usque-vX.Y.Z-macos-arm64.dmg`
+- `usque-vX.Y.Z-macos-x86_64.dmg`
 - `usque-vX.Y.Z-linux-amd64.AppImage`
 - `usque-vX.Y.Z-linux-amd64.deb`
 - `usque-vX.Y.Z-linux-amd64.rpm`
 - `usque-vX.Y.Z-linux-arm64.AppImage`
 - `usque-vX.Y.Z-linux-arm64.deb`
 - `usque-vX.Y.Z-linux-arm64.rpm`
+- `usque-vX.Y.Z-android-arm64-v8a.apk`
+- `usque-vX.Y.Z-android-x86_64.apk`
+- `usque-vX.Y.Z-android-armeabi-v7a.apk`
+- `usque-vX.Y.Z-android-universal.apk`
 
-The two EXEs, four APKs and six Linux files are user-facing packages; the two MSIs are
+The two EXEs, two Mac DMGs, six Linux files and four APKs are user-facing packages; the two MSIs are
 update payloads consumed by the signed Windows updater. In addition to these
-fourteen primary artifacts, the public release includes `release-manifest.json`,
+sixteen primary artifacts, the public release includes `release-manifest.json`,
 `SHA256SUMS`, each artifact's SPDX SBOM, and two Linux manifests with detached
 Ed25519 signatures. Common release-manifest schema 1 is preserved for existing
 Windows/Android updaters; Linux entries and the public key are appended. A public

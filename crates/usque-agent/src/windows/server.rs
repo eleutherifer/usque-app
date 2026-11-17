@@ -140,7 +140,9 @@ struct DirectEgressKey {
     purpose: EgressPurpose,
 }
 
-const MAX_AUTOMATIC_ENDPOINT_LEASES: usize = 16;
+// Bound exact endpoint permits for active pools, recovery probes, replacements
+// and endpoint races while supporting the configured maximum connection count.
+const MAX_AUTOMATIC_ENDPOINT_LEASES: usize = 4 * usque_core::MAX_MASQUE_CONNECTIONS as usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum EgressPurpose {
@@ -1366,7 +1368,8 @@ where
                     .map_err(|error| (request_id.clone(), error))?;
                 agent_response::Payload::Empty(agent_v1::Empty {})
             }
-            agent_request::Payload::ReleaseLinuxDirectEgress(_) => {
+            agent_request::Payload::ReleaseLinuxDirectEgress(_)
+            | agent_request::Payload::Macos(_) => {
                 return Err((request_id, ServiceError::DirectEgressTarget));
             }
             agent_request::Payload::AcquireDirectEgress(request) => {
